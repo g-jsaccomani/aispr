@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+bash scripts/poc/run_full_poc_journey.sh "$@"

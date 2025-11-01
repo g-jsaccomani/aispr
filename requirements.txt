@@ -1,0 +1,22 @@
+# Core CLI & Reporting Dependencies
+requests>=2.31.0
+tabulate>=0.9.0
+pyyaml>=6.0
+jinja2>=3.1.2
+
+# Web Server & Cloud Run Platform
+fastapi>=0.100.0
+uvicorn[standard]>=0.23.0
+
+# Google Cloud Authentication & Core SDKs
+google-auth>=2.20.0
+google-cloud-storage>=2.10.0
+google-cloud-secret-manager>=2.16.0
+google-cloud-aiplatform>=1.60.0
+google-cloud-securitycenter>=1.30.0
+google-cloud-asset>=3.20.0
+google-cloud-modelarmor>=0.1.0
+
+# Google GenAI & Agent SDKs
+google-genai>=0.1.0
+google-adk>=0.1.0
