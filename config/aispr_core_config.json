@@ -1,0 +1,8 @@
+{
+  "folder_id": "848348788945",
+  "project_id": "aispr-enterprise-core",
+  "sa_engine": "sa-aispr-engine@aispr-enterprise-core.iam.gserviceaccount.com",
+  "reports_bucket": "bkt-aispr-reports-1cab11",
+  "runner_ip": "10.50.10.2",
+  "region": "us-central1"
+}
