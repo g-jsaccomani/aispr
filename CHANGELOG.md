@@ -8,3 +8,6 @@ All notable changes and security posture review milestones recorded below.
 ### [2025-11-28] feat(engine): add posture scoring engine and executive reporting generator
 - Completed milestone deliverables and technical verification.
 
+### [2025-12-12] docs(architecture): define enterprise AI security architecture blueprint and threat models
+- Completed milestone deliverables and technical verification.
+
