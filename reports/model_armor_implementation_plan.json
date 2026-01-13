@@ -1,0 +1,110 @@
+{
+  "metadata": {
+    "generated_at": "2026-08-21T17:29:55.141624Z",
+    "framework": "Google SAIF \u2022 NIST AI RMF \u2022 ISO 42001",
+    "project_id": "test-enterprise-ai",
+    "location": "us-central1",
+    "template_id": "secops-guardrail-prod",
+    "profile_name": "balanced"
+  },
+  "parameters": {
+    "enable_floor_setting": true,
+    "enable_dlp": true,
+    "pi_confidence_level": "LOW_AND_ABOVE",
+    "rai_confidence_level": "MEDIUM_AND_ABOVE",
+    "enable_malicious_uris": true,
+    "log_operations": true,
+    "custom_error_code": 400,
+    "custom_error_message": "Prompt rejected by enterprise Model Armor security policy."
+  },
+  "transformation_matrix": [
+    {
+      "aispr_domain": "Application Security & Prompt Hardening (APP)",
+      "finding_source": "Red Team Simulation & Prompt SAST",
+      "gap_summary": "Unvalidated LLM prompt input and RAG retrieval vectors susceptible to Jailbreaks & System Prompt Leakage",
+      "model_armor_component": "piAndJailbreakFilterSettings",
+      "recommended_configuration": {
+        "filterEnforcement": "ENABLED",
+        "confidenceLevel": "LOW_AND_ABOVE"
+      },
+      "protection_impact": "Blocks prompt injection, developer-mode override, and extraction payloads before reaching foundational models.",
+      "owasp_mapping": "OWASP LLM-01: Prompt Injection / LLM-07: System Prompt Leakage",
+      "saif_pillar": "SAIF Pillar 1: Strong Security Foundations",
+      "criticality": "HIGH"
+    },
+    {
+      "aispr_domain": "Data Security & Lineage (DAT)",
+      "finding_source": "AI-BOM Inventory & Sensitive Data Scan",
+      "gap_summary": "Cleartext PII (CPF, SSN, Credit Cards, Auth Tokens) exposed to model prompt/completion logs",
+      "model_armor_component": "dlpSettings (Sensitive Data Protection)",
+      "recommended_configuration": {
+        "inspect_template": "projects/test-enterprise-ai/locations/global/inspectTemplates/aispr-dlp-inspect-v1",
+        "deidentify_template": "projects/test-enterprise-ai/locations/global/deidentifyTemplates/aispr-dlp-deidentify-v1",
+        "info_types": [
+          "BRAZIL_CPF_NUMBER",
+          "US_SOCIAL_SECURITY_NUMBER",
+          "CREDIT_CARD_NUMBER",
+          "PHONE_NUMBER",
+          "EMAIL_ADDRESS",
+          "AUTH_TOKEN",
+          "GCP_CREDENTIALS",
+          "JSON_WEB_TOKEN",
+          "GENERIC_API_KEY"
+        ]
+      },
+      "protection_impact": "Inline token masking and synthetic replacement preventing PII ingestion and training leakage.",
+      "owasp_mapping": "OWASP LLM-06: Sensitive Information Disclosure",
+      "saif_pillar": "SAIF Pillar 2: Expand Detection and Response",
+      "criticality": "HIGH"
+    },
+    {
+      "aispr_domain": "Governance & Enterprise Baseline (GOV/INF)",
+      "finding_source": "Shadow AI Hunter (GKE / Compute Engine)",
+      "gap_summary": "Detected 4 unmanaged AI serving containers without central security gateway",
+      "model_armor_component": "Global FloorSetting Enforcement",
+      "recommended_configuration": {
+        "enableFloorSettingEnforcement": true,
+        "scope": "projects/test-enterprise-ai/locations/global/floorSetting",
+        "mandatory_rai_filters": [
+          "HATE_SPEECH",
+          "HARASSMENT",
+          "SEXUALLY_EXPLICIT",
+          "DANGEROUS"
+        ]
+      },
+      "protection_impact": "Establishes non-burlable organizational floor guardrails that cannot be disabled by individual project teams.",
+      "owasp_mapping": "OWASP LLM-05: Improper Output Handling",
+      "saif_pillar": "SAIF Pillar 6: Contextualize AI Risks",
+      "criticality": "CRITICAL"
+    },
+    {
+      "aispr_domain": "RAG Perimeter & Egress Protection (APP/ASR)",
+      "finding_source": "Red Team Attack Suite ADV-08 & Threat Modeling",
+      "gap_summary": "Document corpus contamination containing C2 exfiltration URLs and phishing domains",
+      "model_armor_component": "maliciousUriFilterSettings",
+      "recommended_configuration": {
+        "filterEnforcement": "ENABLED"
+      },
+      "protection_impact": "Real-time Google Safe Browsing and Threat Intelligence verification of URLs embedded in prompts or generated answers.",
+      "owasp_mapping": "OWASP LLM-02: Insecure Output Handling / MITRE ATLAS AML.T0051.001",
+      "saif_pillar": "SAIF Pillar 1: Strong Security Foundations",
+      "criticality": "HIGH"
+    },
+    {
+      "aispr_domain": "Security Assurance, Telemetry & SIEM (ASR)",
+      "finding_source": "AISPR 104-Control Framework ASR-01/ASR-02",
+      "gap_summary": "Lack of centralized SIEM logging and automated detection for adversarial prompt injection surges",
+      "model_armor_component": "Cloud Logging Sink & Cloud Monitoring Alert Policy",
+      "recommended_configuration": {
+        "logSanitizeOperations": true,
+        "cloud_monitoring_metric": "modelarmor.googleapis.com/sanitization_requests_count",
+        "alert_threshold": "spikes > 10 blocked requests / 5 min",
+        "notification_channel": "SecOps SOC AI Alerts"
+      },
+      "protection_impact": "Direct telemetry forward to Google Security Operations (Chronicle SIEM) for threat correlation.",
+      "owasp_mapping": "OWASP LLM-10: Unbounded Consumption",
+      "saif_pillar": "SAIF Pillar 2: Expand Detection and Response",
+      "criticality": "MEDIUM"
+    }
+  ]
+}
