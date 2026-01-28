@@ -1,0 +1,21 @@
+{
+  "bom_format": "CycloneDX-AI",
+  "spec_version": "1.5-AI-SPR",
+  "metadata": {
+    "author": "@jsaccomani",
+    "tool": "Agentic AISPR Enterprise Suite",
+    "scan_target": "/Users/jsaccomani/Documents/Jetsky/My Projects/aispr",
+    "total_models_detected": 0,
+    "total_ml_libraries_detected": 1
+  },
+  "components": {
+    "ml_libraries": [
+      {
+        "package": "google-cloud-aiplatform",
+        "version": "1.74.0",
+        "license": "Apache-2.0"
+      }
+    ],
+    "discovered_models": []
+  }
+}
