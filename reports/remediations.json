@@ -1,0 +1,3 @@
+{
+  "terraform_hardening_blueprint": "\n# AISPR Automated Hardening: Restrict Unmanaged AI Workbenches & Enforce CMEK\nresource \"google_org_policy_policy\" \"restrict_vertex_workbench\" {\n  name   = \"projects/${var.project_id}/policies/vertexai.restrictWorkbenchCreation\"\n  parent = \"projects/${var.project_id}\"\n  spec {\n    rules {\n      enforce = \"TRUE\"\n    }\n  }\n}\n\nresource \"google_org_policy_policy\" \"require_cmek\" {\n  name   = \"projects/${var.project_id}/policies/gcp.restrictNonCmekServices\"\n  parent = \"projects/${var.project_id}\"\n  spec {\n    rules {\n      values {\n        allowed_values = [\"is:projects/${var.project_id}/locations/us-central1/keyRings/aispr-keyring\"]\n      }\n    }\n  }\n}\n"
+}
