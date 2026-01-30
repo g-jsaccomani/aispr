@@ -1,0 +1,50 @@
+{
+  "project_id": "my-gcp-ai-prod",
+  "total_findings": 4,
+  "summary": {
+    "critical": 1,
+    "high": 3,
+    "unmanaged_containers": 2,
+    "startup_script_cves": 1,
+    "pickle_hijack_risks": 1
+  },
+  "findings": [
+    {
+      "id": "SHADOW-AI-K8S-001",
+      "type": "UNMANAGED_CONTAINER",
+      "category": "Unmanaged Local LLM Engine",
+      "severity": "HIGH",
+      "resource": "k8s://marketing-analytics/ollama-inference-78f99",
+      "image": "ollama/ollama:latest",
+      "port": 11434,
+      "description": "Unsanctioned AI serving container 'ollama/ollama:latest' running in namespace 'marketing-analytics' on port 11434 without central Model Armor gateway."
+    },
+    {
+      "id": "SHADOW-AI-K8S-002",
+      "type": "UNMANAGED_CONTAINER",
+      "category": "High-Throughput Shadow Inference Engine",
+      "severity": "HIGH",
+      "resource": "k8s://data-science-sandbox/vllm-serving-44b12",
+      "image": "vllm/vllm-openai:v0.4.2",
+      "port": 8000,
+      "description": "Unsanctioned AI serving container 'vllm/vllm-openai:v0.4.2' running in namespace 'data-science-sandbox' on port 8000 without central Model Armor gateway."
+    },
+    {
+      "id": "VULN-CVE-2026-2244-003",
+      "type": "STARTUP_SCRIPT_TOKEN_LEAK",
+      "cve": "CVE-2026-2244",
+      "severity": "CRITICAL",
+      "resource": "vertex-workbench://us-central1-a/research-workbench-sandbox-01",
+      "script_source": "gs://research-scripts-bucket/init.sh",
+      "description": "Vertex AI Workbench instance 'research-workbench-sandbox-01' executes an unauthenticated startup script that writes privileged access tokens to world-readable disk logs."
+    },
+    {
+      "id": "VULN-PICKLE-HIJACK-004",
+      "type": "PICKLE_DESERIALIZATION_RISK",
+      "severity": "HIGH",
+      "resource": "gs://ml-training-staging-temp",
+      "sdk_version": "1.140.0",
+      "description": "Staging bucket 'gs://ml-training-staging-temp' uses legacy Vertex SDK 1.140.0 (<=1.148.0) and lacks Object Retention / Owner locks, exposing neural weights to Pickle-in-the-Middle tampering."
+    }
+  ]
+}
