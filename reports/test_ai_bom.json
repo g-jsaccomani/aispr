@@ -1,0 +1,116 @@
+{
+  "tenant_id": "Acme Global Enterprise",
+  "discovered_models": [
+    {
+      "name": "gemini-2.5-pro-endpoint",
+      "provider": "gcp",
+      "resource_type": "vertex_ai_endpoint",
+      "location": "us-central1",
+      "cmek_enabled": true,
+      "model_armor_enabled": true,
+      "private_endpoint": true
+    },
+    {
+      "name": "custom-customer-churn-v1",
+      "provider": "gcp",
+      "resource_type": "vertex_model_registry",
+      "location": "us-central1",
+      "cmek_enabled": false,
+      "model_armor_enabled": false,
+      "private_endpoint": false
+    },
+    {
+      "name": "anthropic.claude-3-5-sonnet",
+      "provider": "aws",
+      "resource_type": "bedrock_foundation_model",
+      "region": "us-east-1",
+      "guardrails_enabled": false,
+      "data_encryption_kms": true
+    },
+    {
+      "name": "amazon.titan-embed-text-v1",
+      "provider": "aws",
+      "resource_type": "bedrock_embedding_model",
+      "region": "us-east-1",
+      "guardrails_enabled": true,
+      "data_encryption_kms": true
+    },
+    {
+      "name": "gpt-4o-enterprise-deployment",
+      "provider": "azure",
+      "resource_type": "azure_openai_service",
+      "location": "eastus",
+      "content_safety_enabled": false,
+      "customer_managed_keys": true
+    }
+  ],
+  "discovered_endpoints": [
+    {
+      "name": "projects/your-gcp-project-id/locations/us-central1/endpoints/gemini-prod",
+      "provider": "gcp",
+      "url": "https://us-central1-aiplatform.googleapis.com",
+      "protected": true
+    },
+    {
+      "name": "arn:aws:bedrock:us-east-1:123456789012:agent/support-agent-prod",
+      "provider": "aws",
+      "resource_type": "bedrock_agent",
+      "protected": false
+    },
+    {
+      "name": "/subscriptions/sub-000-111-222/resourceGroups/ai-rg/providers/Microsoft.CognitiveServices/accounts/openai-corp",
+      "provider": "azure",
+      "url": "https://openai-corp.openai.azure.com",
+      "protected": false
+    }
+  ],
+  "shadow_ai_findings": [
+    {
+      "id": "GCP-SHADOW-01",
+      "type": "Unsanctioned Ollama Container",
+      "provider": "gcp",
+      "severity": "HIGH",
+      "resource": "k8s://marketing-analytics/ollama-pod",
+      "description": "Rogue Ollama instance serving local Llama models without central Model Armor inspection."
+    },
+    {
+      "id": "AWS-SHADOW-01",
+      "type": "Unsanctioned vLLM Inference Container",
+      "provider": "aws",
+      "severity": "HIGH",
+      "resource": "arn:aws:ecs:us-east-1:123456789012:task/vllm-serving-task",
+      "description": "High-throughput vLLM instance exposed on port 8000 without Amazon Bedrock Guardrails."
+    },
+    {
+      "id": "AZURE-SHADOW-01",
+      "type": "Unsanctioned LocalAI Container",
+      "provider": "azure",
+      "severity": "HIGH",
+      "resource": "azure-vm://eastus/data-science-vm-01",
+      "description": "LocalAI Docker container listening on port 8080 with direct database access."
+    }
+  ],
+  "vulnerabilities": [
+    {
+      "id": "GCP-VULN-01",
+      "cve": "CVE-2026-2244",
+      "severity": "CRITICAL",
+      "resource": "vertex-workbench://us-central1-a/research-instance",
+      "description": "Vertex AI Workbench startup script exposes access token to world-readable disk logs."
+    },
+    {
+      "id": "AWS-VULN-01",
+      "cve": "N/A",
+      "severity": "HIGH",
+      "resource": "arn:aws:s3:::bedrock-knowledge-base-staging-unencrypted",
+      "description": "S3 Knowledge Base bucket lacks SSE-KMS Customer Managed Key encryption."
+    },
+    {
+      "id": "AZURE-VULN-01",
+      "cve": "N/A",
+      "severity": "HIGH",
+      "resource": "openai-corp.openai.azure.com",
+      "description": "Azure OpenAI endpoint allows public network ingress without Private Endpoint (Private Link) isolation."
+    }
+  ]
+}
