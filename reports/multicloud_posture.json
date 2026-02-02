@@ -1,0 +1,35 @@
+{
+  "gcp": {
+    "provider": "GCP",
+    "status": "CLI_NOT_INSTALLED",
+    "findings": [
+      {
+        "id": "GCP-CLI",
+        "severity": "INFO",
+        "issue": "gcloud CLI not found in PATH."
+      }
+    ]
+  },
+  "aws": {
+    "provider": "AWS",
+    "status": "CLI_NOT_INSTALLED",
+    "findings": [
+      {
+        "id": "AWS-CLI",
+        "severity": "INFO",
+        "issue": "aws CLI not found in PATH."
+      }
+    ]
+  },
+  "azure": {
+    "provider": "AZURE",
+    "status": "CLI_NOT_INSTALLED",
+    "findings": [
+      {
+        "id": "AZURE-CLI",
+        "severity": "INFO",
+        "issue": "az CLI not found in PATH."
+      }
+    ]
+  }
+}
