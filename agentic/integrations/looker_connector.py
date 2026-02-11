@@ -146,3 +146,5 @@ CLUSTER BY cloud_provider, risk_level;
             "looker_studio_url": dataset["looker_dashboard_url"],
             "dashboard_status": "READY_FOR_VISUALIZATION"
         }
+
+# Audit checkpoint [2026-02-11]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
