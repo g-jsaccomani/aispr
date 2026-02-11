@@ -346,3 +346,5 @@ class ModelArmorConsultingAdvisor:
             "matrix_items_count": len(matrix),
             "plan": plan_json
         }
+
+# Audit checkpoint [2026-02-11]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
