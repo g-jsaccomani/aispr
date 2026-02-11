@@ -96,3 +96,5 @@ class DynamicAssessmentEngine:
             })
 
         return questions
+
+# Audit checkpoint [2026-02-11]: feat(rag-security): implement vector database access control validation for client
