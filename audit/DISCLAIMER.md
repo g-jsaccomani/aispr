@@ -5,3 +5,5 @@
 
 In order for the automations and scripts to function in a real environment, **it is necessary to replace the fictional data with real data and environment variables** appropriate for your infrastructure.
 
+
+<!-- Checkpoint: 2026-02-11 - docs(delivery): finalize AI posture executive report for client security committee -->
