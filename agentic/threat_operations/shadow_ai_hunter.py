@@ -113,3 +113,5 @@ class ShadowAIHunter:
                 "workbench_vulnerabilities": cve_findings
             }
         }
+
+# Audit checkpoint [2026-02-12]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
