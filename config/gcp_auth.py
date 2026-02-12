@@ -257,3 +257,5 @@ class GCPAuth:
 
     def get_genai(self, location: str = "us-central1", vertexai: bool = True) -> Any:
         return get_gemini_client(project_id=self.project_id, location=location, vertexai=vertexai)
+
+# Audit checkpoint [2026-02-12]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
