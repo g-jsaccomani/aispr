@@ -8,3 +8,5 @@ Licensed under the Apache License, Version 2.0.
 AISPR - AI Security Posture Review (AI-SPM) Platform
 Clean Enterprise Assessment Console, Dynamic Health Scoring & Audit Questionnaire
 """
+
+# Audit checkpoint [2026-02-12]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
