@@ -20,3 +20,6 @@ All notable changes and security posture review milestones recorded below.
 ### [2026-01-29] feat(journey): add interactive multi-cloud client journey onboarding orchestrator
 - Completed milestone deliverables and technical verification.
 
+### [2026-02-13] feat(connectors): implement federated read-only cloud connectors for GCP, AWS, and Azure
+- Completed milestone deliverables and technical verification.
+
