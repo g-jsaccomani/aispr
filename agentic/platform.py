@@ -111,3 +111,5 @@ class AISPRAgenticCore:
         Generates production-ready remediation configurations across GCP, AWS, Azure, and Terraform.
         """
         return RemediationEngine.generate_remediations(failed_controls)
+
+# Audit checkpoint [2026-02-16]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
