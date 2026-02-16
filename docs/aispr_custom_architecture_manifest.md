@@ -77,3 +77,5 @@ aispr/
 *Copyright © 2026 Google LLC. Developed by Joabson Saccomani (@jsaccomani).*
 *Role: Cloud Security Consultant | LinkedIn: https://www.linkedin.com/in/jsaccomani*
 *Licensed under the Apache License, Version 2.0.*
+
+<!-- Checkpoint: 2026-02-16 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->

@@ -47,3 +47,6 @@ All notable changes and security updates recorded below.
 ### [2026-02-15] feat(rag-security): implement vector database access control validation for client
 - Added automated checks to ensure vector database queries enforce tenant isolation and metadata filtering.
 
+### [2026-02-16] sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model
+- Integrated adversarial fuzzing engine to stress test model boundaries against direct and indirect injection.
+
