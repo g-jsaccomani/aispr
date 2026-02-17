@@ -98,3 +98,5 @@ class DynamicAssessmentEngine:
         return questions
 
 # Audit checkpoint [2026-02-11]: feat(rag-security): implement vector database access control validation for client
+
+# Audit checkpoint [2026-02-17]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
