@@ -45,3 +45,5 @@ class ModelArmorMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
         response.headers["X-Model-Armor-Enforced"] = "true"
         return response
+
+# Audit checkpoint [2026-02-17]: feat(telemetry): add structured security audit events for client inference endpoints
