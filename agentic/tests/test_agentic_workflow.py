@@ -166,3 +166,5 @@ class TestAgenticWorkflowAndTopology(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+# Audit checkpoint [2026-02-18]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
