@@ -174,3 +174,5 @@ class LocalPromptFilter:
             "matched_rules": matched_rules,
             "sanitized_output": sanitized_output
         }
+
+# Audit checkpoint [2026-02-18]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
