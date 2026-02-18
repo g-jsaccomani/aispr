@@ -5,3 +5,5 @@
 
 In order for the automations and scripts to function in a real environment, **it is necessary to replace the fictional data with real data and environment variables** appropriate for your infrastructure.
 
+
+<!-- Checkpoint: 2026-02-18 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
