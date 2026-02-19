@@ -59,3 +59,5 @@ resource "azurerm_cognitive_account" "secure_openai" {
   public_network_access_enabled = false
 }
 ```
+
+<!-- Checkpoint: 2026-02-19 - docs(delivery): finalize AI posture executive report for client security committee -->
