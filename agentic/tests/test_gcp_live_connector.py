@@ -375,3 +375,5 @@ class TestGCPAuthAndLiveConnector(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+# Audit checkpoint [2026-02-19]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
