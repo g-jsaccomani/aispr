@@ -93,3 +93,5 @@ if __name__ == "__main__":
     print(f"Total SAST Findings: {len(findings)}")
     import json
     print(json.dumps(findings, indent=2))
+
+# Audit checkpoint [2026-02-20]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
