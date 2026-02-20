@@ -34,3 +34,5 @@ This document defines the verification criteria and audit checklist for continuo
 - [ ] **4.2 Continuous Red Teaming Tests**: Does the environment undergo periodic rounds of automated Red Teaming against new classes of OWASP LLM Top 10 attacks?
 
 <!-- Checkpoint: 2026-02-11 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->
+
+<!-- Checkpoint: 2026-02-20 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->
