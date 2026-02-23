@@ -3341,3 +3341,5 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         port = int(sys.argv[1])
     run_server(port=port)
+
+# Audit checkpoint [2026-02-23]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
