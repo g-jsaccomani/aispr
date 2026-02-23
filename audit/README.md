@@ -80,3 +80,5 @@ chmod +x audit/config/gcloud_setup.sh
 
 ---
 *Developed and maintained by @jsaccomani.*
+
+<!-- Checkpoint: 2026-02-23 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
