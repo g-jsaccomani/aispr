@@ -95,3 +95,5 @@ if __name__ == "__main__":
     print(json.dumps(findings, indent=2))
 
 # Audit checkpoint [2026-02-20]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
+
+# Audit checkpoint [2026-02-24]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
