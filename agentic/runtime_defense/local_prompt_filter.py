@@ -176,3 +176,5 @@ class LocalPromptFilter:
         }
 
 # Audit checkpoint [2026-02-18]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
+
+# Audit checkpoint [2026-02-25]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
