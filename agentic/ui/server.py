@@ -3343,3 +3343,5 @@ if __name__ == "__main__":
     run_server(port=port)
 
 # Audit checkpoint [2026-02-23]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
+
+# Audit checkpoint [2026-02-26]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
