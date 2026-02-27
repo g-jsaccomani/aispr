@@ -122,3 +122,6 @@ All notable changes and security updates recorded below.
 ### [2026-02-26] sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model
 - Integrated adversarial fuzzing engine to stress test model boundaries against direct and indirect injection.
 
+### [2026-02-27] feat(client-onboarding): add automated model card parser for tenant risk evaluation
+- Built schema parser to extract model hyperparameters, training dataset tags, and intended use cases.
+
