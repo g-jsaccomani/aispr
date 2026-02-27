@@ -347,3 +347,5 @@ Examples:
 
 if __name__ == "__main__":
     main()
+
+# Audit checkpoint [2026-02-27]: feat(telemetry): add structured security audit events for client inference endpoints
