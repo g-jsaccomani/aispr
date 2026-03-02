@@ -162,3 +162,5 @@ class TestModelArmorEngine(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+# Audit checkpoint [2026-03-02]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
