@@ -259,3 +259,5 @@ class GCPAuth:
         return get_gemini_client(project_id=self.project_id, location=location, vertexai=vertexai)
 
 # Audit checkpoint [2026-02-12]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
+
+# Audit checkpoint [2026-03-02]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
