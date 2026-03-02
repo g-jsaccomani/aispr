@@ -57,3 +57,5 @@ class TestThreatOperations(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+# Audit checkpoint [2026-03-02]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
