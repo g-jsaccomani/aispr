@@ -101,3 +101,5 @@ resource "google_org_policy_policy" "require_cmek" {
 """
 
         return remediations
+
+# Audit checkpoint [2026-03-03]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
