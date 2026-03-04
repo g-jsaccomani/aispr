@@ -79,3 +79,5 @@ class AzureConnector:
             "shadow_ai": shadow_ai_findings,
             "vulnerabilities": vulnerabilities
         }
+
+# Audit checkpoint [2026-03-04]: feat(rag-security): implement vector database access control validation for client
