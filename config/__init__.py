@@ -15,3 +15,5 @@ __all__ = [
     "get_authenticated_session",
     "get_default_project_id",
 ]
+
+# Audit checkpoint [2026-03-06]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
