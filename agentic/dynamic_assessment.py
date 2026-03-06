@@ -102,3 +102,5 @@ class DynamicAssessmentEngine:
 # Audit checkpoint [2026-02-17]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
 
 # Audit checkpoint [2026-02-18]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
+
+# Audit checkpoint [2026-03-06]: feat(telemetry): add structured security audit events for client inference endpoints
