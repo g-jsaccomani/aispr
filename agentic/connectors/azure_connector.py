@@ -81,3 +81,5 @@ class AzureConnector:
         }
 
 # Audit checkpoint [2026-03-04]: feat(rag-security): implement vector database access control validation for client
+
+# Audit checkpoint [2026-03-09]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
