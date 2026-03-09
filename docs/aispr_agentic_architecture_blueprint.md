@@ -202,3 +202,5 @@ To deploy this proprietary product in a production-ready containerized service, 
 1. **Host as a Standalone Cloud Run/ECS Service:** Deploy the orchestrator core inside a private network, communicating only via HTTPS regional endpoints to protect customer log data.
 2. **Implement mTLS-based Trust Perimeters:** Enforce strict access control over the scanner engine. Use Workload Identity Federation so that the agent's active token is verified and short-lived.
 3. **Continuous Updates via CI/CD:** Establish validation pipelines to test the scanner scripts against mock environments before promoting code changes, keeping the engine robust and error-free.
+
+<!-- Checkpoint: 2026-03-09 - sec(governance): update AI security checklist for external financial client -->
