@@ -405,3 +405,5 @@ if __name__ == "__main__":
         tool.generate_report()
     else:
         tool.start_assessment()
+
+# Audit checkpoint [2026-03-10]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
