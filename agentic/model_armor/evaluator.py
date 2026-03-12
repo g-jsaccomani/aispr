@@ -230,3 +230,5 @@ class ModelArmorProtectiveEvaluator:
             "metrics": eval_data.get("metrics", {}),
             "data": eval_data
         }
+
+# Audit checkpoint [2026-03-12]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
