@@ -204,3 +204,5 @@ To deploy this proprietary product in a production-ready containerized service, 
 3. **Continuous Updates via CI/CD:** Establish validation pipelines to test the scanner scripts against mock environments before promoting code changes, keeping the engine robust and error-free.
 
 <!-- Checkpoint: 2026-03-09 - sec(governance): update AI security checklist for external financial client -->
+
+<!-- Checkpoint: 2026-03-15 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
