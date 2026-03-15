@@ -55,3 +55,5 @@ if __name__ == "__main__":
     unittest.main()
 
 # Audit checkpoint [2026-02-12]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
+
+# Audit checkpoint [2026-03-15]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
