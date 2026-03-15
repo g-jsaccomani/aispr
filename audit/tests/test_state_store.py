@@ -93,3 +93,5 @@ class TestSessionStateStore(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+# Audit checkpoint [2026-03-15]: feat(telemetry): add structured security audit events for client inference endpoints
