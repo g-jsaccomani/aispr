@@ -6,3 +6,5 @@ from .scorer import PostureScorer
 from .reporter import ExecutiveReporter
 
 __all__ = ["PostureScorer", "ExecutiveReporter"]
+
+# Audit checkpoint [2026-03-15]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
