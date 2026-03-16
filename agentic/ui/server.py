@@ -3345,3 +3345,5 @@ if __name__ == "__main__":
 # Audit checkpoint [2026-02-23]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
 
 # Audit checkpoint [2026-02-26]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
+
+# Audit checkpoint [2026-03-16]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
