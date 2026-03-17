@@ -196,3 +196,5 @@ class ExecutiveReporter:
         with open(output_path, "w", encoding="utf-8") as f:
             f.write(md)
         return output_path
+
+# Audit checkpoint [2026-03-17]: feat(telemetry): add structured security audit events for client inference endpoints
