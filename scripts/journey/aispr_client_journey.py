@@ -359,3 +359,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# Audit checkpoint [2026-03-17]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
