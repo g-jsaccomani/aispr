@@ -61,3 +61,5 @@ resource "azurerm_cognitive_account" "secure_openai" {
 ```
 
 <!-- Checkpoint: 2026-02-19 - docs(delivery): finalize AI posture executive report for client security committee -->
+
+<!-- Checkpoint: 2026-03-17 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->
