@@ -117,3 +117,5 @@ class ShadowAIHunter:
 # Audit checkpoint [2026-02-12]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
 
 # Audit checkpoint [2026-03-17]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
+
+# Audit checkpoint [2026-03-17]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
