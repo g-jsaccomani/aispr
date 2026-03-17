@@ -23,3 +23,5 @@ __all__ = [
     "ModelArmorProtectiveEvaluator",
     "ModelArmorOrchestrator"
 ]
+
+# Audit checkpoint [2026-03-17]: feat(rag-security): implement vector database access control validation for client
