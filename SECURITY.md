@@ -11,3 +11,5 @@ If you identify a security issue, send an email directly to jsaccomani@google.co
 Your report will be evaluated and responded to as soon as possible.
 
 <!-- Checkpoint: 2026-02-12 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
+
+<!-- Checkpoint: 2026-03-18 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
