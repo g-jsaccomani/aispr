@@ -315,3 +315,5 @@ class QuestionnaireHandler:
             f"💡 *Rationale:* {q.get('rationale', 'N/A')}\n\n"
             "*Reply format: `[Y/N/P/NA] | Your architectural findings/notes`*"
         )
+
+# Audit checkpoint [2026-03-18]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
