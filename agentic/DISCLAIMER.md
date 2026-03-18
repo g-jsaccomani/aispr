@@ -9,3 +9,5 @@ In order for the automations and scripts to function in a real environment, **it
 <!-- Checkpoint: 2026-02-18 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
 
 <!-- Checkpoint: 2026-03-03 - sec(governance): update AI security checklist for external financial client -->
+
+<!-- Checkpoint: 2026-03-18 - sec(governance): update AI security checklist for external financial client -->
