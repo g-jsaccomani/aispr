@@ -260,3 +260,6 @@ All notable changes and security updates recorded below.
 ### [2026-03-19] docs(delivery): finalize AI posture executive report for client security committee
 - Compiled final deliverable summarizing findings from the multi-week AI Security Posture Review.
 
+### [2026-03-20] feat(rag-security): implement vector database access control validation for client
+- Added automated checks to ensure vector database queries enforce tenant isolation and metadata filtering.
+
