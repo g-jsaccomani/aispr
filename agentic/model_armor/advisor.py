@@ -350,3 +350,5 @@ class ModelArmorConsultingAdvisor:
 # Audit checkpoint [2026-02-11]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
 
 # Audit checkpoint [2026-02-14]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
+
+# Audit checkpoint [2026-03-20]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
