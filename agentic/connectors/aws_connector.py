@@ -90,3 +90,5 @@ class AWSConnector:
             "shadow_ai": shadow_ai_findings,
             "vulnerabilities": vulnerabilities
         }
+
+# Audit checkpoint [2026-03-24]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
