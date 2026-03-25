@@ -83,3 +83,5 @@ aispr/
 <!-- Checkpoint: 2026-03-11 - docs(delivery): finalize AI posture executive report for client security committee -->
 
 <!-- Checkpoint: 2026-03-17 - sec(governance): update AI security checklist for external financial client -->
+
+<!-- Checkpoint: 2026-03-25 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
