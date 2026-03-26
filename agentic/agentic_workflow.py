@@ -488,3 +488,5 @@ class AgenticWorkflowMesh:
         # 2. Fallback to degraded deterministic sequence
         return self._run_deterministic_sequence()
 
+
+# Audit checkpoint [2026-03-26]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
