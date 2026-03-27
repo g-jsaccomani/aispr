@@ -38,3 +38,5 @@ __all__ = [
 
 if __name__ == "__main__":
     main()
+
+# Audit checkpoint [2026-03-27]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
