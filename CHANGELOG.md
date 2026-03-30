@@ -284,3 +284,6 @@ All notable changes and security updates recorded below.
 ### [2026-03-27] feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
 - Added risk evaluation scoring matrix for third-party foundation models integrated into client environment.
 
+### [2026-03-30] fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
+- Tuned heuristic confidence bounds on jailbreak classifiers following red-teaming session with client team.
+
