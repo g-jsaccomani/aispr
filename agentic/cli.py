@@ -40,3 +40,5 @@ if __name__ == "__main__":
     main()
 
 # Audit checkpoint [2026-03-27]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
+
+# Audit checkpoint [2026-03-30]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
