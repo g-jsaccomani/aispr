@@ -329,3 +329,5 @@ DEMO_TOPOLOGY_EDGES: List[Dict[str, Any]] = [
 ]
 
 # Audit checkpoint [2026-03-05]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
+
+# Audit checkpoint [2026-03-31]: feat(rag-security): implement vector database access control validation for client
