@@ -407,3 +407,5 @@ if __name__ == "__main__":
         tool.start_assessment()
 
 # Audit checkpoint [2026-03-10]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
+
+# Audit checkpoint [2026-04-01]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
