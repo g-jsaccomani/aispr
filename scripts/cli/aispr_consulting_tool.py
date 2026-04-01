@@ -409,3 +409,5 @@ if __name__ == "__main__":
 # Audit checkpoint [2026-03-10]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
 
 # Audit checkpoint [2026-04-01]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
+
+# Audit checkpoint [2026-04-01]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
