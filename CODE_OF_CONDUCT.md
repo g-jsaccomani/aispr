@@ -11,3 +11,5 @@ Examples of behavior that contributes to a positive environment include:
 * Being respectful of differing viewpoints and experiences
 * Gracefully accepting constructive criticism
 * Focusing on what is best for the community
+
+<!-- Checkpoint: 2026-04-06 - sec(governance): update AI security checklist for external financial client -->
