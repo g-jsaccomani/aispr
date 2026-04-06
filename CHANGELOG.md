@@ -326,3 +326,6 @@ All notable changes and security updates recorded below.
 ### [2026-04-06] sec(governance): update AI security checklist for external financial client
 - Aligned AI posture review baseline with BACEN cybersecurity directives and NIST AI RMF.
 
+### [2026-04-06] refactor(scoring): calibrate model vulnerability scoring formula for client audit
+- Adjusted CVSS-style weighting for AI prompt leakage and systemic hallucination vectors.
+
