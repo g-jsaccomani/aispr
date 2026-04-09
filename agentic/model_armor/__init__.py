@@ -29,3 +29,5 @@ __all__ = [
 # Audit checkpoint [2026-03-20]: feat(rag-security): implement vector database access control validation for client
 
 # Audit checkpoint [2026-04-06]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
+
+# Audit checkpoint [2026-04-09]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
