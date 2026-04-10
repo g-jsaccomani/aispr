@@ -95,3 +95,5 @@ if __name__ == "__main__":
     unittest.main()
 
 # Audit checkpoint [2026-03-15]: feat(telemetry): add structured security audit events for client inference endpoints
+
+# Audit checkpoint [2026-04-10]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
