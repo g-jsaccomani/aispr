@@ -32,3 +32,6 @@ All notable changes and security posture review milestones recorded below.
 ### [2026-03-27] feat(inventory): implement CycloneDX AI-BOM generator and asset graph mapper
 - Completed milestone deliverables and technical verification.
 
+### [2026-04-10] feat(shadow-ai): add Shadow AI Hunter for unauthorized LLM daemons and notebooks
+- Completed milestone deliverables and technical verification.
+

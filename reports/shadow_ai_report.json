@@ -1,0 +1,65 @@
+{
+  "project_id": "your-gcp-project-id",
+  "status": "COMPLETED",
+  "total_findings": 4,
+  "shadow_ai_detected": 2,
+  "vulnerabilities_detected": 2,
+  "summary": {
+    "critical": 2,
+    "high": 2,
+    "medium": 0,
+    "low": 0
+  },
+  "findings": {
+    "shadow_ai": [
+      {
+        "finding_id": "SHADOW-GCP-K8S-01",
+        "severity": "CRITICAL",
+        "category": "Unmanaged Local LLM Engine",
+        "engine": "Ollama (Llama-3-70B)",
+        "cluster": "gke-credit-risk-prod",
+        "namespace": "credit-risk-analytics",
+        "pod_name": "ollama-inference-daemon-7b89f",
+        "port": 11434,
+        "exposure": "INTERNAL_VPC_UNAUTHENTICATED",
+        "risk": "Rogue LLM instance accepting uninspected internal prompts without Cloud DLP or Model Armor.",
+        "mitigation": "Enforce admission controllers blocking unapproved container images and isolate port 11434 via NetworkPolicy."
+      },
+      {
+        "finding_id": "SHADOW-GCP-GCE-02",
+        "severity": "HIGH",
+        "category": "Unmanaged Local LLM Engine",
+        "engine": "vLLM Inference Server",
+        "cluster": "gce-sandbox",
+        "namespace": "default",
+        "pod_name": "ml-dev-sandbox-vm",
+        "port": 8000,
+        "exposure": "VPC_PEERING_ACCESSIBLE",
+        "risk": "Developer instance running vLLM with world-readable local logs logging raw financial prompts.",
+        "mitigation": "Quarantine compute instance and migrate workload to managed Vertex AI Private Endpoints."
+      }
+    ],
+    "workbench_vulnerabilities": [
+      {
+        "finding_id": "VULN-GCP-WB-01",
+        "cve": "CVE-2026-2244",
+        "severity": "CRITICAL",
+        "resource_name": "workbench-analyst-gpu-01",
+        "zone": "southamerica-east1-a",
+        "vulnerability_type": "OAuth Token Exposure in World-Readable Logs",
+        "risk": "Custom startup script writes Google Cloud access token to world-readable disk log (/var/log/startup.log).",
+        "mitigation": "Update metadata to remove sensitive tokens and redeploy with Shielded VM and CMEK."
+      },
+      {
+        "finding_id": "VULN-GCP-WB-02",
+        "cve": "MISCONFIG-PUBLIC-IP",
+        "severity": "HIGH",
+        "resource_name": "workbench-analyst-gpu-01",
+        "zone": "southamerica-east1-a",
+        "vulnerability_type": "Direct Internet Access (Public IP Enabled)",
+        "risk": "Vertex AI Workbench instance is accessible directly via public IPv4 address without Cloud IAP.",
+        "mitigation": "Disable public IP and enforce VPC-SC perimeter ingress rules."
+      }
+    ]
+  }
+}
