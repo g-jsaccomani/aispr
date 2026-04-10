@@ -344,3 +344,6 @@ All notable changes and security updates recorded below.
 ### [2026-04-09] fix(guardrails): patch safety boundary bypass detection for client conversational agent
 - Refined tokenizer sanitization logic to detect unicode homoglyph substitutions and base64 encoded attacks.
 
+### [2026-04-10] feat(telemetry): add structured security audit events for client inference endpoints
+- Implemented Cloud Logging JSON exporter for inference safety violation events.
+
