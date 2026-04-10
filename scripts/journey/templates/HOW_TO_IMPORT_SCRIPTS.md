@@ -111,3 +111,5 @@ Google Cloud Shell is a free, pre-authenticated, browser-based terminal with `gc
 *Copyright © 2026 Google LLC. Developed by Joabson Saccomani (@jsaccomani).*
 *Role: Cloud Security Consultant | LinkedIn: https://www.linkedin.com/in/jsaccomani*
 *Licensed under the Apache License, Version 2.0.*
+
+<!-- Checkpoint: 2026-04-10 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
