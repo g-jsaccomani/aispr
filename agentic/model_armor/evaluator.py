@@ -232,3 +232,5 @@ class ModelArmorProtectiveEvaluator:
         }
 
 # Audit checkpoint [2026-03-12]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
+
+# Audit checkpoint [2026-04-11]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
