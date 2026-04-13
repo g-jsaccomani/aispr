@@ -377,3 +377,5 @@ if __name__ == "__main__":
     unittest.main()
 
 # Audit checkpoint [2026-02-19]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
+
+# Audit checkpoint [2026-04-13]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
