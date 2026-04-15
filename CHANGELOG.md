@@ -377,3 +377,6 @@ All notable changes and security updates recorded below.
 ### [2026-04-14] feat(client-onboarding): add automated model card parser for tenant risk evaluation
 - Built schema parser to extract model hyperparameters, training dataset tags, and intended use cases.
 
+### [2026-04-15] fix(guardrails): patch safety boundary bypass detection for client conversational agent
+- Refined tokenizer sanitization logic to detect unicode homoglyph substitutions and base64 encoded attacks.
+

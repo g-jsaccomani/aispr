@@ -59,3 +59,5 @@ if __name__ == "__main__":
 # Audit checkpoint [2026-03-15]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
 
 # Audit checkpoint [2026-03-30]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
+
+# Audit checkpoint [2026-04-15]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
