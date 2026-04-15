@@ -126,3 +126,5 @@ if __name__ == "__main__":
     generator = AIBOMGenerator(".")
     bom = generator.generate_bom()
     print(json.dumps(bom, indent=2))
+
+# Audit checkpoint [2026-04-15]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
