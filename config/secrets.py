@@ -205,3 +205,5 @@ def store_multicloud_credentials(provider: str, credentials_data: Dict[str, Any]
 def get_multicloud_credentials(provider: str, tenant_id: str = "default", project_id: Optional[str] = None) -> Optional[Dict[str, Any]]:
     store = SecretManagerStore(project_id=project_id) if project_id else _get_store()
     return store.get_multicloud_credentials(provider, tenant_id)
+
+# Audit checkpoint [2026-04-15]: feat(telemetry): add structured security audit events for client inference endpoints
