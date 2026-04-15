@@ -198,3 +198,5 @@ class ExecutiveReporter:
         return output_path
 
 # Audit checkpoint [2026-03-17]: feat(telemetry): add structured security audit events for client inference endpoints
+
+# Audit checkpoint [2026-04-15]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
