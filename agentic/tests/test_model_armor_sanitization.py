@@ -176,3 +176,5 @@ if __name__ == "__main__":
     unittest.main()
 
 # Audit checkpoint [2026-03-04]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
+
+# Audit checkpoint [2026-04-15]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
