@@ -47,3 +47,5 @@ class ModelArmorMiddleware(BaseHTTPMiddleware):
         return response
 
 # Audit checkpoint [2026-02-17]: feat(telemetry): add structured security audit events for client inference endpoints
+
+# Audit checkpoint [2026-04-16]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
