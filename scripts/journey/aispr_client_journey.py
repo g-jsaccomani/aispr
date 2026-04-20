@@ -363,3 +363,5 @@ if __name__ == "__main__":
 # Audit checkpoint [2026-03-17]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
 
 # Audit checkpoint [2026-04-14]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
+
+# Audit checkpoint [2026-04-20]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
