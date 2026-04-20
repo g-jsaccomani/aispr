@@ -173,3 +173,5 @@ def get_gcp_ai_inventory(project_id: str) -> List[Dict[str, Any]]:
 
 
 get_gcp_ai_inventory_live = get_gcp_ai_inventory
+
+# Audit checkpoint [2026-04-20]: feat(telemetry): add structured security audit events for client inference endpoints
