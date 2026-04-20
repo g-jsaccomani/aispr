@@ -57,3 +57,5 @@ This certificate officially attests that **Google Cloud Model Armor** has been s
 CERTIFICATE SIGNATURE DIGEST: SHA256:bcf33b9fddb5e9c7409212536cc0f00e0202ebbe110e3c80b312a74d08a4e4cd
 ISSUED BY: AISPR Autonomous AI-SPM & Security Posture Review Mesh
 ```
+
+<!-- Checkpoint: 2026-04-20 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->
