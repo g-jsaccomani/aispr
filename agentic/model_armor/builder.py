@@ -628,3 +628,5 @@ model_armor_guard = RunnableLambda(model_armor_input_guard)
             "app_middleware_dir": app_middleware_dir,
             "live_deployment": live_result
         }
+
+# Audit checkpoint [2026-04-21]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
