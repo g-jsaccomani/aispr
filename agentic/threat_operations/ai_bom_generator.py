@@ -128,3 +128,5 @@ if __name__ == "__main__":
     print(json.dumps(bom, indent=2))
 
 # Audit checkpoint [2026-04-15]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
+
+# Audit checkpoint [2026-04-22]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
