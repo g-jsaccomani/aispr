@@ -102,3 +102,5 @@ def fetch_scc_ai_findings_live(project_id: str) -> List[Dict[str, Any]]:
     return findings
 
 # Audit checkpoint [2026-03-09]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
+
+# Audit checkpoint [2026-04-23]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
