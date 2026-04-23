@@ -455,3 +455,6 @@ All notable changes and security updates recorded below.
 ### [2026-04-22] feat(telemetry): add structured security audit events for client inference endpoints
 - Implemented Cloud Logging JSON exporter for inference safety violation events.
 
+### [2026-04-23] sec(threat-intel): update adversarial attack taxonomy for client production models
+- Synchronized local threat definitions with latest MITRE ATLAS framework techniques.
+

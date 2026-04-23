@@ -91,3 +91,5 @@ aispr/
 <!-- Checkpoint: 2026-04-15 - sec(governance): update AI security checklist for external financial client -->
 
 <!-- Checkpoint: 2026-04-22 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->
+
+<!-- Checkpoint: 2026-04-23 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
