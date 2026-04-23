@@ -119,3 +119,5 @@ class ShadowAIHunter:
 # Audit checkpoint [2026-03-17]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
 
 # Audit checkpoint [2026-03-17]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
+
+# Audit checkpoint [2026-04-23]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
