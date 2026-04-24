@@ -35,3 +35,6 @@ All notable changes and security posture review milestones recorded below.
 ### [2026-04-10] feat(shadow-ai): add Shadow AI Hunter for unauthorized LLM daemons and notebooks
 - Completed milestone deliverables and technical verification.
 
+### [2026-04-24] sec(sast): add static prompt injection scanner for LLM application codebases
+- Completed milestone deliverables and technical verification.
+
