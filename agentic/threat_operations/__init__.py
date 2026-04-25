@@ -6,3 +6,5 @@ from .shadow_ai_hunter import ShadowAIHunter
 from .ai_red_team_simulator import AIRedTeamSimulator
 
 __all__ = ["ShadowAIHunter", "AIRedTeamSimulator"]
+
+# Audit checkpoint [2026-04-25]: feat(rag-security): implement vector database access control validation for client
