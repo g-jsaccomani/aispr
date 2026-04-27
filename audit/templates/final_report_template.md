@@ -56,3 +56,5 @@ Google Cloud Professional Services conducted a structured **AI Security Posture 
 *Copyright © 2026 Google LLC / Joabson Saccomani. All rights reserved. Distributed under the Apache License 2.0.*
 
 <!-- Checkpoint: 2026-03-02 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
+
+<!-- Checkpoint: 2026-04-27 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->
