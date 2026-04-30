@@ -96,3 +96,5 @@ class AISPRCopilot:
             return self.questions_handler.get_next_step(msg, session_state)
             
         return "Command not recognized. Type **'Start Questionnaire'**, **'Generate Report'**, or enter your **GCP Project ID**."
+
+# Audit checkpoint [2026-04-30]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
