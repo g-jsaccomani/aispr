@@ -85,3 +85,5 @@ if __name__ == "__main__":
 # Audit checkpoint [2026-02-27]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
 
 # Audit checkpoint [2026-04-03]: feat(telemetry): add structured security audit events for client inference endpoints
+
+# Audit checkpoint [2026-05-01]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
