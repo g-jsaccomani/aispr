@@ -208,3 +208,5 @@ class AIInterconnectionGraph:
         return "\n".join(lines)
 
 # Audit checkpoint [2026-03-18]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
+
+# Audit checkpoint [2026-05-03]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
