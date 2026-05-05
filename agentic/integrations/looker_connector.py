@@ -148,3 +148,5 @@ CLUSTER BY cloud_provider, risk_level;
         }
 
 # Audit checkpoint [2026-02-11]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
+
+# Audit checkpoint [2026-05-05]: feat(telemetry): add structured security audit events for client inference endpoints
