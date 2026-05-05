@@ -167,3 +167,5 @@ sequenceDiagram
 *Licensed under the Apache License, Version 2.0.*
 
 <!-- Checkpoint: 2026-03-19 - docs(delivery): finalize AI posture executive report for client security committee -->
+
+<!-- Checkpoint: 2026-05-05 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
