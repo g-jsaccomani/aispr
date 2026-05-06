@@ -379,3 +379,5 @@ if __name__ == "__main__":
 # Audit checkpoint [2026-02-19]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
 
 # Audit checkpoint [2026-04-13]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
+
+# Audit checkpoint [2026-05-06]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
