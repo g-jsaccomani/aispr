@@ -38,3 +38,6 @@ All notable changes and security posture review milestones recorded below.
 ### [2026-04-24] sec(sast): add static prompt injection scanner for LLM application codebases
 - Completed milestone deliverables and technical verification.
 
+### [2026-05-08] feat(runtime-defense): integrate Google Cloud Model Armor semantic guardrail client
+- Completed milestone deliverables and technical verification.
+
