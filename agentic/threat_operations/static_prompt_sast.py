@@ -99,3 +99,5 @@ if __name__ == "__main__":
 # Audit checkpoint [2026-02-24]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
 
 # Audit checkpoint [2026-02-26]: feat(rag-security): implement vector database access control validation for client
+
+# Audit checkpoint [2026-05-12]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
