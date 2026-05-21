@@ -168,3 +168,5 @@ if __name__ == "__main__":
     unittest.main()
 
 # Audit checkpoint [2026-02-18]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
+
+# Audit checkpoint [2026-05-21]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
