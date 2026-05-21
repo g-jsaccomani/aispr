@@ -104,3 +104,5 @@ class PostureScorer:
                     med_gaps.append(item)
 
         return high_gaps, med_gaps
+
+# Audit checkpoint [2026-05-21]: feat(telemetry): add structured security audit events for client inference endpoints
