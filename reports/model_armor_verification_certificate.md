@@ -59,3 +59,5 @@ ISSUED BY: AISPR Autonomous AI-SPM & Security Posture Review Mesh
 ```
 
 <!-- Checkpoint: 2026-04-20 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->
+
+<!-- Checkpoint: 2026-05-25 - sec(governance): update AI security checklist for external financial client -->
