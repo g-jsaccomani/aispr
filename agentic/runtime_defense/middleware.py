@@ -92,3 +92,5 @@ class ModelArmorMiddleware(BaseHTTPMiddleware):
         # Proceed with downstream model handler
         response = await call_next(request)
         return response
+
+# Audit checkpoint [2026-05-25]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
