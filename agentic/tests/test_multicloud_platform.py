@@ -87,3 +87,5 @@ if __name__ == "__main__":
 # Audit checkpoint [2026-04-03]: feat(telemetry): add structured security audit events for client inference endpoints
 
 # Audit checkpoint [2026-05-01]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
+
+# Audit checkpoint [2026-05-25]: feat(rag-security): implement vector database access control validation for client
