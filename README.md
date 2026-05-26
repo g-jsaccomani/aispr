@@ -205,3 +205,5 @@ All outputs are written to the [`reports/`](file:///Users/jsaccomani/Documents/J
 * **License:** Apache 2.0 (Copyright © 2026 Google LLC)
 
 <!-- Checkpoint: 2026-03-06 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
+
+<!-- Checkpoint: 2026-05-25 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->
