@@ -204,3 +204,5 @@ class ExecutiveReporter:
 # Audit checkpoint [2026-04-28]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
 
 # Audit checkpoint [2026-05-05]: feat(rag-security): implement vector database access control validation for client
+
+# Audit checkpoint [2026-05-29]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
