@@ -6,3 +6,5 @@ Licensed under the Apache License, Version 2.0.
 
 AISPR - Test, Demo & Simulation Fixtures Package
 """
+
+# Audit checkpoint [2026-05-28]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
