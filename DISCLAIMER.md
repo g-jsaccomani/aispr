@@ -7,3 +7,5 @@ In order for the automations and scripts to function in a real environment, **it
 
 
 <!-- Checkpoint: 2026-02-26 - docs(delivery): finalize AI posture executive report for client security committee -->
+
+<!-- Checkpoint: 2026-06-02 - sec(governance): update AI security checklist for external financial client -->
