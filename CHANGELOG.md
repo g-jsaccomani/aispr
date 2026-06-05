@@ -44,3 +44,6 @@ All notable changes and security posture review milestones recorded below.
 ### [2026-05-22] feat(model-armor): add protective verification evaluator and deployment blueprint generator
 - Completed milestone deliverables and technical verification.
 
+### [2026-06-05] feat(cli): add standalone consulting CLI tools for offline security assessments
+- Completed milestone deliverables and technical verification.
+
