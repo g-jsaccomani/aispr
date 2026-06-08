@@ -492,3 +492,5 @@ class AgenticWorkflowMesh:
 # Audit checkpoint [2026-03-26]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
 
 # Audit checkpoint [2026-04-22]: feat(telemetry): add structured security audit events for client inference endpoints
+
+# Audit checkpoint [2026-06-08]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
