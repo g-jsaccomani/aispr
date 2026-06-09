@@ -31,3 +31,5 @@ __all__ = [
 # Audit checkpoint [2026-04-06]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
 
 # Audit checkpoint [2026-04-09]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
+
+# Audit checkpoint [2026-06-09]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
