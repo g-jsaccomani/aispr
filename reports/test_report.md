@@ -259,3 +259,5 @@ This section documents the granular evidence collected across all evaluated doma
 <!-- Checkpoint: 2026-04-13 - docs(delivery): finalize AI posture executive report for client security committee -->
 
 <!-- Checkpoint: 2026-06-08 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
+
+<!-- Checkpoint: 2026-06-16 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->
