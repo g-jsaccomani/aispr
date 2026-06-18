@@ -115,3 +115,5 @@ class AISPRAgenticCore:
 # Audit checkpoint [2026-02-16]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
 
 # Audit checkpoint [2026-04-10]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
+
+# Audit checkpoint [2026-06-18]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
