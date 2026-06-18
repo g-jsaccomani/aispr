@@ -47,3 +47,5 @@ if __name__ == "__main__":
 # Audit checkpoint [2026-02-12]: feat(telemetry): add structured security audit events for client inference endpoints
 
 # Audit checkpoint [2026-04-20]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
+
+# Audit checkpoint [2026-06-18]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
