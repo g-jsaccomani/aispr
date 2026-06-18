@@ -67,3 +67,5 @@ resource "azurerm_cognitive_account" "secure_openai" {
 <!-- Checkpoint: 2026-04-09 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->
 
 <!-- Checkpoint: 2026-05-15 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->
+
+<!-- Checkpoint: 2026-06-18 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
