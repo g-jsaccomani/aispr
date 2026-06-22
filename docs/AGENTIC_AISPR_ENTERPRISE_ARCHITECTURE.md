@@ -169,3 +169,5 @@ sequenceDiagram
 <!-- Checkpoint: 2026-03-19 - docs(delivery): finalize AI posture executive report for client security committee -->
 
 <!-- Checkpoint: 2026-05-05 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
+
+<!-- Checkpoint: 2026-06-22 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->
