@@ -180,3 +180,5 @@ class LocalPromptFilter:
 # Audit checkpoint [2026-02-25]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
 
 # Audit checkpoint [2026-05-26]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
+
+# Audit checkpoint [2026-06-22]: feat(telemetry): add structured security audit events for client inference endpoints
