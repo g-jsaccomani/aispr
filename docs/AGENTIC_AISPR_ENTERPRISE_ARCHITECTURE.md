@@ -171,3 +171,5 @@ sequenceDiagram
 <!-- Checkpoint: 2026-05-05 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
 
 <!-- Checkpoint: 2026-06-22 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->
+
+<!-- Checkpoint: 2026-06-29 - sec(governance): update AI security checklist for external financial client -->
