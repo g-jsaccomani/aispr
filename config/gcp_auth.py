@@ -263,3 +263,5 @@ class GCPAuth:
 # Audit checkpoint [2026-03-02]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
 
 # Audit checkpoint [2026-04-05]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
+
+# Audit checkpoint [2026-06-29]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
