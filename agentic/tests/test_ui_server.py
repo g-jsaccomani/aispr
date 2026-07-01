@@ -201,3 +201,5 @@ if __name__ == "__main__":
     unittest.main()
 
 # Audit checkpoint [2026-04-10]: feat(telemetry): add structured security audit events for client inference endpoints
+
+# Audit checkpoint [2026-07-01]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
