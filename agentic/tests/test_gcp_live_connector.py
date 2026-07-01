@@ -383,3 +383,5 @@ if __name__ == "__main__":
 # Audit checkpoint [2026-05-06]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
 
 # Audit checkpoint [2026-05-28]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
+
+# Audit checkpoint [2026-07-01]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
