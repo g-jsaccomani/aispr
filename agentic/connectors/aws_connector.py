@@ -94,3 +94,5 @@ class AWSConnector:
 # Audit checkpoint [2026-03-24]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
 
 # Audit checkpoint [2026-05-05]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
+
+# Audit checkpoint [2026-07-03]: feat(telemetry): add structured security audit events for client inference endpoints
