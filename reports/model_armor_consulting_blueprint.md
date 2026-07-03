@@ -106,3 +106,5 @@ graph TD
 <!-- Checkpoint: 2026-02-18 - sec(governance): update AI security checklist for external financial client -->
 
 <!-- Checkpoint: 2026-04-30 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
+
+<!-- Checkpoint: 2026-07-03 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
