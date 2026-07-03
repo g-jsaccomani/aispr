@@ -85,3 +85,5 @@ class AzureConnector:
 # Audit checkpoint [2026-03-09]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
 
 # Audit checkpoint [2026-05-13]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
+
+# Audit checkpoint [2026-07-03]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
