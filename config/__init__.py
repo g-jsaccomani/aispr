@@ -19,3 +19,5 @@ __all__ = [
 # Audit checkpoint [2026-03-06]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
 
 # Audit checkpoint [2026-06-24]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
+
+# Audit checkpoint [2026-07-04]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
