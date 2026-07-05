@@ -214,3 +214,5 @@ To deploy this proprietary product in a production-ready containerized service, 
 <!-- Checkpoint: 2026-04-16 - docs(delivery): finalize AI posture executive report for client security committee -->
 
 <!-- Checkpoint: 2026-06-22 - docs(delivery): finalize AI posture executive report for client security committee -->
+
+<!-- Checkpoint: 2026-07-05 - sec(governance): update AI security checklist for external financial client -->
