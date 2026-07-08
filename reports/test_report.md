@@ -263,3 +263,5 @@ This section documents the granular evidence collected across all evaluated doma
 <!-- Checkpoint: 2026-06-16 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->
 
 <!-- Checkpoint: 2026-07-07 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->
+
+<!-- Checkpoint: 2026-07-08 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
