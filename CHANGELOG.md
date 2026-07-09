@@ -785,3 +785,6 @@ All notable changes and security updates recorded below.
 ### [2026-07-08] refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
 - Optimized stateful conversation evaluator to maintain session context across up to 10 dialogue turns.
 
+### [2026-07-09] feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
+- Added risk evaluation scoring matrix for third-party foundation models integrated into client environment.
+
