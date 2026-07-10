@@ -238,3 +238,5 @@ class ModelArmorProtectiveEvaluator:
 # Audit checkpoint [2026-06-18]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
 
 # Audit checkpoint [2026-07-09]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
+
+# Audit checkpoint [2026-07-10]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
