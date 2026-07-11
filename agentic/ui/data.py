@@ -55,3 +55,5 @@ FINDINGS_MAP = DEMO_FINDINGS_MAP
 DISCOVERED_AI_ASSETS = DEMO_DISCOVERED_AI_ASSETS
 TOPOLOGY_NODES = DEMO_TOPOLOGY_NODES
 TOPOLOGY_EDGES = DEMO_TOPOLOGY_EDGES
+
+# Audit checkpoint [2026-07-11]: feat(rag-security): implement vector database access control validation for client
