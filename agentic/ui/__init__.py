@@ -14,3 +14,5 @@ Clean Enterprise Assessment Console, Dynamic Health Scoring & Audit Questionnair
 # Audit checkpoint [2026-02-19]: feat(rag-security): implement vector database access control validation for client
 
 # Audit checkpoint [2026-04-20]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
+
+# Audit checkpoint [2026-07-13]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
