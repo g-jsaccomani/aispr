@@ -89,3 +89,5 @@ class AzureConnector:
 # Audit checkpoint [2026-07-03]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
 
 # Audit checkpoint [2026-07-05]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
+
+# Audit checkpoint [2026-07-14]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
