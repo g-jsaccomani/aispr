@@ -106,3 +106,5 @@ class DynamicAssessmentEngine:
 # Audit checkpoint [2026-03-06]: feat(telemetry): add structured security audit events for client inference endpoints
 
 # Audit checkpoint [2026-04-24]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
+
+# Audit checkpoint [2026-07-15]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
