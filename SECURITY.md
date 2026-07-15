@@ -19,3 +19,5 @@ Your report will be evaluated and responded to as soon as possible.
 <!-- Checkpoint: 2026-05-03 - sec(governance): update AI security checklist for external financial client -->
 
 <!-- Checkpoint: 2026-07-01 - docs(delivery): finalize AI posture executive report for client security committee -->
+
+<!-- Checkpoint: 2026-07-15 - sec(governance): update AI security checklist for external financial client -->
