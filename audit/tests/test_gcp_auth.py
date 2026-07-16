@@ -81,3 +81,5 @@ if __name__ == "__main__":
     unittest.main()
 
 # Audit checkpoint [2026-04-08]: feat(rag-security): implement vector database access control validation for client
+
+# Audit checkpoint [2026-07-16]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
