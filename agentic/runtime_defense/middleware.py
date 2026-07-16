@@ -94,3 +94,5 @@ class ModelArmorMiddleware(BaseHTTPMiddleware):
         return response
 
 # Audit checkpoint [2026-05-25]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
+
+# Audit checkpoint [2026-07-16]: feat(rag-security): implement vector database access control validation for client
