@@ -137,3 +137,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# Audit checkpoint [2026-07-17]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
