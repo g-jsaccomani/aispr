@@ -17,3 +17,5 @@ Examples of behavior that contributes to a positive environment include:
 <!-- Checkpoint: 2026-04-21 - sec(governance): update AI security checklist for external financial client -->
 
 <!-- Checkpoint: 2026-06-12 - sec(governance): update AI security checklist for external financial client -->
+
+<!-- Checkpoint: 2026-07-17 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
