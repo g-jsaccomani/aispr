@@ -206,3 +206,5 @@ class ExecutiveReporter:
 # Audit checkpoint [2026-05-05]: feat(rag-security): implement vector database access control validation for client
 
 # Audit checkpoint [2026-05-29]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
+
+# Audit checkpoint [2026-07-17]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
