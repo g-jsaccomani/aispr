@@ -108,3 +108,5 @@ graph TD
 <!-- Checkpoint: 2026-04-30 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
 
 <!-- Checkpoint: 2026-07-03 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
+
+<!-- Checkpoint: 2026-07-17 - docs(delivery): finalize AI posture executive report for client security committee -->
