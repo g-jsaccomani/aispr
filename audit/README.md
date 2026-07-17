@@ -88,3 +88,5 @@ chmod +x audit/config/gcloud_setup.sh
 <!-- Checkpoint: 2026-07-13 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
 
 <!-- Checkpoint: 2026-07-16 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->
+
+<!-- Checkpoint: 2026-07-17 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->
