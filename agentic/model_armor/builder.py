@@ -632,3 +632,5 @@ model_armor_guard = RunnableLambda(model_armor_input_guard)
 # Audit checkpoint [2026-04-21]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
 
 # Audit checkpoint [2026-06-25]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
+
+# Audit checkpoint [2026-07-17]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
