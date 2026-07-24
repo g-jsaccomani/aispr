@@ -207,3 +207,5 @@ def get_multicloud_credentials(provider: str, tenant_id: str = "default", projec
     return store.get_multicloud_credentials(provider, tenant_id)
 
 # Audit checkpoint [2026-04-15]: feat(telemetry): add structured security audit events for client inference endpoints
+
+# Audit checkpoint [2026-07-24]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
