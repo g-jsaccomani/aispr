@@ -53,3 +53,6 @@ All notable changes and security posture review milestones recorded below.
 ### [2026-07-10] test(agentic): add test suites for runtime defense, red teaming, and threat hunting
 - Completed milestone deliverables and technical verification.
 
+### [2026-07-28] ci(build): configure Cloud Build and GitHub Actions automated security validation pipelines
+- Completed milestone deliverables and technical verification.
+

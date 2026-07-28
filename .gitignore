@@ -1,0 +1,42 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Generated Assessment & Threat Reports
+reports/
+out/
+/workspace/out/
+
+# Environments
+.venv/
+venv/
+ENV/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+
+# Credentials and Secrets
+*.env
+.env*
+*.key
+*.pem
+*.cert
+*.crt
+credentials/
+secrets/
+client_secret*.json
+key.json
+*.p12
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
