@@ -101,3 +101,5 @@ if __name__ == "__main__":
 # Audit checkpoint [2026-06-08]: feat(telemetry): add structured security audit events for client inference endpoints
 
 # Audit checkpoint [2026-07-17]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
+
+# Audit checkpoint [2026-07-29]: feat(telemetry): add structured security audit events for client inference endpoints
