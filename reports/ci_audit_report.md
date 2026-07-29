@@ -186,3 +186,5 @@ The following matrix correlates identified technical gaps with statutory enforce
 <!-- Checkpoint: 2026-05-04 - docs(delivery): finalize AI posture executive report for client security committee -->
 
 <!-- Checkpoint: 2026-07-24 - sec(governance): update AI security checklist for external financial client -->
+
+<!-- Checkpoint: 2026-07-29 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
