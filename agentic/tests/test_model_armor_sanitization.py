@@ -184,3 +184,5 @@ if __name__ == "__main__":
 # Audit checkpoint [2026-06-09]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
 
 # Audit checkpoint [2026-07-21]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
+
+# Audit checkpoint [2026-07-31]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
