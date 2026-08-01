@@ -935,3 +935,6 @@ All notable changes and security updates recorded below.
 ### [2026-07-31] fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
 - Tuned heuristic confidence bounds on jailbreak classifiers following red-teaming session with client team.
 
+### [2026-08-01] sec(governance): update AI security checklist for external financial client
+- Aligned AI posture review baseline with BACEN cybersecurity directives and NIST AI RMF.
+
