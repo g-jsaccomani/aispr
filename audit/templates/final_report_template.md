@@ -60,3 +60,5 @@ Google Cloud Professional Services conducted a structured **AI Security Posture 
 <!-- Checkpoint: 2026-04-27 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->
 
 <!-- Checkpoint: 2026-07-01 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->
+
+<!-- Checkpoint: 2026-08-06 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
