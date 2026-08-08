@@ -106,3 +106,5 @@ class PostureScorer:
         return high_gaps, med_gaps
 
 # Audit checkpoint [2026-05-21]: feat(telemetry): add structured security audit events for client inference endpoints
+
+# Audit checkpoint [2026-08-08]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
