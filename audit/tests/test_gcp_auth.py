@@ -85,3 +85,5 @@ if __name__ == "__main__":
 # Audit checkpoint [2026-07-16]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
 
 # Audit checkpoint [2026-07-17]: feat(telemetry): add structured security audit events for client inference endpoints
+
+# Audit checkpoint [2026-08-10]: feat(rag-security): implement vector database access control validation for client
