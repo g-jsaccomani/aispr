@@ -152,3 +152,5 @@ CLUSTER BY cloud_provider, risk_level;
 # Audit checkpoint [2026-05-05]: feat(telemetry): add structured security audit events for client inference endpoints
 
 # Audit checkpoint [2026-06-22]: feat(rag-security): implement vector database access control validation for client
+
+# Audit checkpoint [2026-08-10]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
