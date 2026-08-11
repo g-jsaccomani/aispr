@@ -1,0 +1,4 @@
+WARNING:AISPR-GCP-Auth:google-auth package is not installed. Please run 'pip install -r requirements.txt' to enable live Google Cloud ADC authentication.
+[16/Aug/2026 19:34:03] GET /api/health -> 200
+[16/Aug/2026 19:34:03] HEAD / -> Unsupported method ('HEAD')
+[16/Aug/2026 19:34:03] HEAD / -> 501
