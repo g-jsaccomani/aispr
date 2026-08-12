@@ -98,3 +98,5 @@ class AWSConnector:
 # Audit checkpoint [2026-07-03]: feat(telemetry): add structured security audit events for client inference endpoints
 
 # Audit checkpoint [2026-08-01]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
+
+# Audit checkpoint [2026-08-12]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
