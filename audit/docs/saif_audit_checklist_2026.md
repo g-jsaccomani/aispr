@@ -42,3 +42,5 @@ This document defines the verification criteria and audit checklist for continuo
 <!-- Checkpoint: 2026-07-11 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->
 
 <!-- Checkpoint: 2026-08-10 - sec(governance): update AI security checklist for external financial client -->
+
+<!-- Checkpoint: 2026-08-12 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
