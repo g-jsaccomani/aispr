@@ -240,3 +240,5 @@ class ModelArmorProtectiveEvaluator:
 # Audit checkpoint [2026-07-09]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
 
 # Audit checkpoint [2026-07-10]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
+
+# Audit checkpoint [2026-08-11]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
