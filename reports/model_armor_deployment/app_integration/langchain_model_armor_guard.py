@@ -20,3 +20,5 @@ model_armor_guard = RunnableLambda(model_armor_input_guard)
 # Audit checkpoint [2026-07-21]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
 
 # Audit checkpoint [2026-08-04]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
+
+# Audit checkpoint [2026-08-15]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
