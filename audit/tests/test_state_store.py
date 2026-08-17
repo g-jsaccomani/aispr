@@ -105,3 +105,5 @@ if __name__ == "__main__":
 # Audit checkpoint [2026-07-29]: feat(telemetry): add structured security audit events for client inference endpoints
 
 # Audit checkpoint [2026-08-06]: feat(telemetry): add structured security audit events for client inference endpoints
+
+# Audit checkpoint [2026-08-17]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
