@@ -87,3 +87,5 @@ if __name__ == "__main__":
 # Audit checkpoint [2026-07-17]: feat(telemetry): add structured security audit events for client inference endpoints
 
 # Audit checkpoint [2026-08-10]: feat(rag-security): implement vector database access control validation for client
+
+# Audit checkpoint [2026-08-17]: feat(rag-security): implement vector database access control validation for client
