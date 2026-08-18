@@ -354,3 +354,5 @@ class ModelArmorConsultingAdvisor:
 # Audit checkpoint [2026-03-20]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
 
 # Audit checkpoint [2026-05-25]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
+
+# Audit checkpoint [2026-08-18]: feat(telemetry): add structured security audit events for client inference endpoints
