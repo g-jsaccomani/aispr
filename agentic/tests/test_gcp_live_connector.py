@@ -385,3 +385,5 @@ if __name__ == "__main__":
 # Audit checkpoint [2026-05-28]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
 
 # Audit checkpoint [2026-07-01]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
+
+# Audit checkpoint [2026-08-18]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
