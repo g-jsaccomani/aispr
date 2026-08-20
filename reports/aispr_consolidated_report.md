@@ -67,3 +67,5 @@ No active High Severity gaps identified.
 No active Medium Severity gaps identified.
 
 <!-- Checkpoint: 2026-08-19 - sec(governance): update AI security checklist for external financial client -->
+
+<!-- Checkpoint: 2026-08-20 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->
