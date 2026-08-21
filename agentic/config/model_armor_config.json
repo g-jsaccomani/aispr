@@ -1,0 +1,48 @@
+{
+  "model_armor_configuration": {
+    "version": "2.0.0",
+    "managed_by": "@jsaccomani",
+    "safety_thresholds": {
+      "prompt_injection": "HIGH",
+      "jailbreak": "HIGH",
+      "system_prompt_extraction": "HIGH",
+      "harmful_content": "HIGH",
+      "malicious_urls": "HIGH",
+      "toxic_output": "MEDIUM"
+    },
+    "input_shielding": {
+      "enabled": true,
+      "max_prompt_length_chars": 32768,
+      "block_untrusted_delimiters": true,
+      "detect_indirect_injection": true
+    },
+    "output_shielding": {
+      "enabled": true,
+      "sanitize_code_blocks": true,
+      "block_unauthorized_external_urls": true
+    },
+    "sensitive_data_protection": {
+      "enabled": true,
+      "pii_redaction_strategy": "MASK",
+      "info_types": [
+        "EMAIL_ADDRESS",
+        "PHONE_NUMBER",
+        "CREDIT_CARD_NUMBER",
+        "US_SOCIAL_SECURITY_NUMBER",
+        "BRAZIL_CPF_NUMBER",
+        "AUTH_TOKEN_OR_API_KEY",
+        "GCP_CREDENTIALS"
+      ],
+      "deidentify_template": "projects/PROJECT_NUMBER/locations/global/deidentifyTemplates/AI_SPR_PII_REDACT_ID"
+    },
+    "human_in_the_loop_gate": {
+      "enabled": true,
+      "high_impact_actions": [
+        "DELETE_BUCKET_OBJECT",
+        "GRANT_IAM_BINDING",
+        "EXECUTE_DB_DROP"
+      ],
+      "approval_token_ttl_seconds": 300
+    }
+  }
+}

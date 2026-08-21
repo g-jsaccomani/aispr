@@ -1,0 +1,39 @@
+# Gemini Enterprise Agent Platform Runtime Config
+# Engineered by: @jsaccomani
+agent_metadata:
+  display_name: "aispr_agentic"
+  description: "Active SecOps monitoring, Model Armor semantic firewall, and threat hunting perimeter"
+  version: "2.0.0"
+  author: "@jsaccomani"
+  framework_alignment:
+    - "Google SAIF (Secure AI Framework)"
+    - "NIST AI RMF 1.0 (Measure & Manage)"
+    - "MITRE ATLAS"
+    - "ISO/IEC 42001 (Annex B)"
+
+model:
+  name: "gemini-2.5-pro"
+  temperature: 0.1
+  top_p: 0.95
+  max_output_tokens: 4096
+  safety_settings:
+    - category: HARM_CATEGORY_SEXUALLY_EXPLICIT
+      threshold: BLOCK_LOW_AND_ABOVE
+    - category: HARM_CATEGORY_DANGEROUS_CONTENT
+      threshold: BLOCK_LOW_AND_ABOVE
+    - category: HARM_CATEGORY_HATE_SPEECH
+      threshold: BLOCK_LOW_AND_ABOVE
+    - category: HARM_CATEGORY_HARASSMENT
+      threshold: BLOCK_LOW_AND_ABOVE
+
+runtime:
+  identity_type: "AGENT_IDENTITY" # Protected under SPIFFE/mTLS certificates, no static keys
+  network_perimeter: "projects/PROJECT_NUMBER/locations/global/servicePerimeters/VPC_SC_AI_PERIMETER"
+  private_service_connect: true
+  session_ttl: "604800s" # Persistent isolated session up to 7 days
+  human_in_the_loop:
+    enabled: true
+    require_approval_for_tools:
+      - "delete_storage_bucket"
+      - "modify_iam_policy"
+      - "execute_database_mutation"
