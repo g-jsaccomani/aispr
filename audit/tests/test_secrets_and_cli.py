@@ -112,13 +112,3 @@ class TestSecretManagerAndRedaction(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-# Audit checkpoint [2026-03-18]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
-
-# Audit checkpoint [2026-04-05]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
-
-# Audit checkpoint [2026-04-22]: feat(rag-security): implement vector database access control validation for client
-
-# Audit checkpoint [2026-04-22]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
-
-# Audit checkpoint [2026-08-21]: fix(guardrails): patch safety boundary bypass detection for client conversational agent

@@ -29,5 +29,3 @@ This document defines the defense controls, architectures, and governance guidel
    - Service accounts used by agents must have specific read-only scopes or limited tools (`roles/aiplatform.user` in dedicated scopes).
 3. **Automated Defenses in Runtime (Model Armor)**:
    - Application of toxicity filters, real-time Prompt Injection detection, and automatic obfuscation of banking/PII data.
-
-<!-- Checkpoint: 2026-07-24 - docs(delivery): finalize AI posture executive report for client security committee -->

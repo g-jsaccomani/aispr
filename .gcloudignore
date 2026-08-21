@@ -1,0 +1,7 @@
+.git
+.gitignore
+.gemini
+__pycache__
+*.pyc
+.pytest_cache
+lab/aispr-poc/venv

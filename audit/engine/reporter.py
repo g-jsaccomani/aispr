@@ -196,19 +196,3 @@ class ExecutiveReporter:
         with open(output_path, "w", encoding="utf-8") as f:
             f.write(md)
         return output_path
-
-# Audit checkpoint [2026-03-17]: feat(telemetry): add structured security audit events for client inference endpoints
-
-# Audit checkpoint [2026-04-15]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
-
-# Audit checkpoint [2026-04-28]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
-
-# Audit checkpoint [2026-05-05]: feat(rag-security): implement vector database access control validation for client
-
-# Audit checkpoint [2026-05-29]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
-
-# Audit checkpoint [2026-07-17]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
-
-# Audit checkpoint [2026-08-13]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
-
-# Audit checkpoint [2026-08-20]: feat(rag-security): implement vector database access control validation for client

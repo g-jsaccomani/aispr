@@ -327,9 +327,3 @@ DEMO_TOPOLOGY_EDGES: List[Dict[str, Any]] = [
     {"source": "node-gemini", "target": "node-bedrock-claude", "label": "Cross-Cloud Fallback", "encrypted": True},
     {"source": "node-gemini", "target": "node-azure-openai", "label": "Contract Review Flow", "encrypted": True}
 ]
-
-# Audit checkpoint [2026-03-05]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
-
-# Audit checkpoint [2026-03-31]: feat(rag-security): implement vector database access control validation for client
-
-# Audit checkpoint [2026-07-17]: feat(client-onboarding): add automated model card parser for tenant risk evaluation

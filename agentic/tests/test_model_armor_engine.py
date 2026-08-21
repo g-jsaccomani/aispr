@@ -162,9 +162,3 @@ class TestModelArmorEngine(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-# Audit checkpoint [2026-03-02]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
-
-# Audit checkpoint [2026-03-11]: feat(rag-security): implement vector database access control validation for client
-
-# Audit checkpoint [2026-06-08]: feat(client-onboarding): add automated model card parser for tenant risk evaluation

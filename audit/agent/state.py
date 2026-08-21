@@ -154,7 +154,3 @@ class SessionStateStore:
 
         # 3. In-memory cache fallback
         return self._in_memory_cache.get(self.session_id)
-
-# Audit checkpoint [2026-02-27]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
-
-# Audit checkpoint [2026-07-03]: fix(guardrails): patch safety boundary bypass detection for client conversational agent

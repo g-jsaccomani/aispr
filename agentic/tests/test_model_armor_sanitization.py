@@ -174,17 +174,3 @@ class TestModelArmorSanitization(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-# Audit checkpoint [2026-03-04]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
-
-# Audit checkpoint [2026-04-15]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
-
-# Audit checkpoint [2026-06-04]: feat(rag-security): implement vector database access control validation for client
-
-# Audit checkpoint [2026-06-09]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
-
-# Audit checkpoint [2026-07-21]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
-
-# Audit checkpoint [2026-07-31]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
-
-# Audit checkpoint [2026-08-19]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot

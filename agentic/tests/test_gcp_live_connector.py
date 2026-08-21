@@ -375,15 +375,3 @@ class TestGCPAuthAndLiveConnector(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-# Audit checkpoint [2026-02-19]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
-
-# Audit checkpoint [2026-04-13]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
-
-# Audit checkpoint [2026-05-06]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
-
-# Audit checkpoint [2026-05-28]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
-
-# Audit checkpoint [2026-07-01]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
-
-# Audit checkpoint [2026-08-18]: fix(guardrails): patch safety boundary bypass detection for client conversational agent

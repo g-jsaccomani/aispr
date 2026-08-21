@@ -89,7 +89,3 @@ class TestAuditEngine(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-# Audit checkpoint [2026-03-12]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
-
-# Audit checkpoint [2026-07-08]: feat(telemetry): add structured security audit events for client inference endpoints

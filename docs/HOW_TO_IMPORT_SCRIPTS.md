@@ -111,17 +111,3 @@ Google Cloud Shell is a free, pre-authenticated, browser-based terminal with `gc
 *Copyright © 2026 Google LLC. Developed by Joabson Saccomani (@jsaccomani).*
 *Role: Cloud Security Consultant | LinkedIn: https://www.linkedin.com/in/jsaccomani*
 *Licensed under the Apache License, Version 2.0.*
-
-<!-- Checkpoint: 2026-03-03 - docs(delivery): finalize AI posture executive report for client security committee -->
-
-<!-- Checkpoint: 2026-03-12 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->
-
-<!-- Checkpoint: 2026-04-21 - docs(delivery): finalize AI posture executive report for client security committee -->
-
-<!-- Checkpoint: 2026-05-05 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->
-
-<!-- Checkpoint: 2026-05-13 - sec(governance): update AI security checklist for external financial client -->
-
-<!-- Checkpoint: 2026-06-07 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->
-
-<!-- Checkpoint: 2026-07-29 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->

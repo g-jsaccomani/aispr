@@ -126,11 +126,3 @@ if __name__ == "__main__":
     generator = AIBOMGenerator(".")
     bom = generator.generate_bom()
     print(json.dumps(bom, indent=2))
-
-# Audit checkpoint [2026-04-15]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
-
-# Audit checkpoint [2026-04-22]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
-
-# Audit checkpoint [2026-06-18]: feat(telemetry): add structured security audit events for client inference endpoints
-
-# Audit checkpoint [2026-08-04]: feat(client-onboarding): add automated model card parser for tenant risk evaluation

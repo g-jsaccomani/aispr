@@ -102,11 +102,3 @@ graph TD
    - Activate Cloud Monitoring Alert Policies for prompt injection surges.
 4. **Phase 4: Automated Post-Implementation Verification & Evals (Continuous)**
    - Re-run automated adversarial attack test suites to generate Continuous Compliance Certificates.
-
-<!-- Checkpoint: 2026-02-18 - sec(governance): update AI security checklist for external financial client -->
-
-<!-- Checkpoint: 2026-04-30 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
-
-<!-- Checkpoint: 2026-07-03 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
-
-<!-- Checkpoint: 2026-07-17 - docs(delivery): finalize AI posture executive report for client security committee -->

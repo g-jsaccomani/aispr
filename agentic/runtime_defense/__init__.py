@@ -14,5 +14,3 @@ __all__ = [
     "LocalPromptFilter",
     "ModelArmorMiddleware"
 ]
-
-# Audit checkpoint [2026-05-18]: feat(client-onboarding): add automated model card parser for tenant risk evaluation

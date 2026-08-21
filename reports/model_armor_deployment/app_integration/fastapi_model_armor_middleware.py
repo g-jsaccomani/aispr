@@ -45,11 +45,3 @@ class ModelArmorMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
         response.headers["X-Model-Armor-Enforced"] = "true"
         return response
-
-# Audit checkpoint [2026-02-17]: feat(telemetry): add structured security audit events for client inference endpoints
-
-# Audit checkpoint [2026-04-16]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
-
-# Audit checkpoint [2026-06-10]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
-
-# Audit checkpoint [2026-07-17]: feat(rag-security): implement vector database access control validation for client

@@ -101,13 +101,3 @@ resource "google_org_policy_policy" "require_cmek" {
 """
 
         return remediations
-
-# Audit checkpoint [2026-03-03]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
-
-# Audit checkpoint [2026-03-24]: feat(telemetry): add structured security audit events for client inference endpoints
-
-# Audit checkpoint [2026-04-06]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
-
-# Audit checkpoint [2026-04-17]: feat(rag-security): implement vector database access control validation for client
-
-# Audit checkpoint [2026-08-12]: feat(telemetry): add structured security audit events for client inference endpoints

@@ -65,7 +65,3 @@ No active High Severity gaps identified.
 
 ### Priority 2: Medium Severity Gaps (Next 30-60 Days)
 No active Medium Severity gaps identified.
-
-<!-- Checkpoint: 2026-08-19 - sec(governance): update AI security checklist for external financial client -->
-
-<!-- Checkpoint: 2026-08-20 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->

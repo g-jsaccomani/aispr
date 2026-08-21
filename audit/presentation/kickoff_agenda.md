@@ -61,9 +61,3 @@ The **AI Security Posture Review (AI-SPR)** workshop is a structured, collaborat
 
 ---
 *Copyright © 2026 Google LLC / Joabson Saccomani. All rights reserved. Distributed under the Apache License 2.0.*
-
-<!-- Checkpoint: 2026-03-30 - sec(governance): update AI security checklist for external financial client -->
-
-<!-- Checkpoint: 2026-05-28 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
-
-<!-- Checkpoint: 2026-07-17 - sec(governance): update AI security checklist for external financial client -->

@@ -245,7 +245,3 @@ The engine is validated by comprehensive unit and integration test suites:
 ## 10. Conclusion
 
 The **AISPR Model Armor Implementation Engine** transforms point-in-time AI security audits into an active, verified, and automated defense infrastructure. By synthesizing raw assessment findings into consultative architecture blueprints, constructive Terraform packages, and protective evaluation certificates, the platform empowers enterprise organizations to deploy generative AI workloads with confidence, speed, and uncompromising security governance.
-
-<!-- Checkpoint: 2026-03-17 - docs(delivery): finalize AI posture executive report for client security committee -->
-
-<!-- Checkpoint: 2026-06-22 - sec(threat-intel): update adversarial attack taxonomy for client production models -->

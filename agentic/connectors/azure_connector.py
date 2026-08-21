@@ -79,15 +79,3 @@ class AzureConnector:
             "shadow_ai": shadow_ai_findings,
             "vulnerabilities": vulnerabilities
         }
-
-# Audit checkpoint [2026-03-04]: feat(rag-security): implement vector database access control validation for client
-
-# Audit checkpoint [2026-03-09]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment
-
-# Audit checkpoint [2026-05-13]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
-
-# Audit checkpoint [2026-07-03]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
-
-# Audit checkpoint [2026-07-05]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot
-
-# Audit checkpoint [2026-07-14]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout

@@ -9,15 +9,3 @@ Currently, all versions on the `main` branch receive security updates.
 Please **do not report security vulnerabilities publicly via GitHub issues**. 
 If you identify a security issue, send an email directly to jsaccomani@google.com. 
 Your report will be evaluated and responded to as soon as possible.
-
-<!-- Checkpoint: 2026-02-12 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
-
-<!-- Checkpoint: 2026-03-18 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
-
-<!-- Checkpoint: 2026-04-24 - sec(governance): update AI security checklist for external financial client -->
-
-<!-- Checkpoint: 2026-05-03 - sec(governance): update AI security checklist for external financial client -->
-
-<!-- Checkpoint: 2026-07-01 - docs(delivery): finalize AI posture executive report for client security committee -->
-
-<!-- Checkpoint: 2026-07-15 - sec(governance): update AI security checklist for external financial client -->

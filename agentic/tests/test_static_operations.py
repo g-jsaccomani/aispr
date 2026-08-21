@@ -82,7 +82,3 @@ model.predict("Hello " + user_input)
 
 if __name__ == "__main__":
     unittest.main()
-
-# Audit checkpoint [2026-07-01]: feat(rag-security): implement vector database access control validation for client
-
-# Audit checkpoint [2026-08-20]: refactor(scoring): calibrate model vulnerability scoring formula for client audit

@@ -92,11 +92,3 @@ class ModelArmorMiddleware(BaseHTTPMiddleware):
         # Proceed with downstream model handler
         response = await call_next(request)
         return response
-
-# Audit checkpoint [2026-05-25]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
-
-# Audit checkpoint [2026-07-16]: feat(rag-security): implement vector database access control validation for client
-
-# Audit checkpoint [2026-07-17]: feat(telemetry): add structured security audit events for client inference endpoints
-
-# Audit checkpoint [2026-08-21]: feat(telemetry): add structured security audit events for client inference endpoints

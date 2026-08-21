@@ -77,21 +77,3 @@ aispr/
 *Copyright © 2026 Google LLC. Developed by Joabson Saccomani (@jsaccomani).*
 *Role: Cloud Security Consultant | LinkedIn: https://www.linkedin.com/in/jsaccomani*
 *Licensed under the Apache License, Version 2.0.*
-
-<!-- Checkpoint: 2026-02-16 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->
-
-<!-- Checkpoint: 2026-03-11 - docs(delivery): finalize AI posture executive report for client security committee -->
-
-<!-- Checkpoint: 2026-03-17 - sec(governance): update AI security checklist for external financial client -->
-
-<!-- Checkpoint: 2026-03-25 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
-
-<!-- Checkpoint: 2026-04-07 - docs(delivery): finalize AI posture executive report for client security committee -->
-
-<!-- Checkpoint: 2026-04-15 - sec(governance): update AI security checklist for external financial client -->
-
-<!-- Checkpoint: 2026-04-22 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->
-
-<!-- Checkpoint: 2026-04-23 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
-
-<!-- Checkpoint: 2026-08-01 - sec(governance): update AI security checklist for external financial client -->

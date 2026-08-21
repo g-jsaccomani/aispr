@@ -675,5 +675,3 @@ class GCPConnector:
             "shadow_ai": shadow_ai_findings,
             "vulnerabilities": vulnerabilities
         }
-
-# Audit checkpoint [2026-07-07]: feat(client-onboarding): add automated model card parser for tenant risk evaluation

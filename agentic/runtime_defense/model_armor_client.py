@@ -311,5 +311,3 @@ class ModelArmorClient:
     # Aliases for compatibility
     inspect_prompt = sanitize_user_prompt
     inspect_output = sanitize_model_response
-
-# Audit checkpoint [2026-07-20]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout

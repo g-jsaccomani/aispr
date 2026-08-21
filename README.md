@@ -203,9 +203,3 @@ All outputs are written to the [`reports/`](file:///Users/jsaccomani/Documents/J
 * **Lead Architect & Consultant:** Joabson Saccomani ([@jsaccomani](https://www.linkedin.com/in/jsaccomani))
 * **Role:** Cloud Security Consultant | Google Cloud
 * **License:** Apache 2.0 (Copyright © 2026 Google LLC)
-
-<!-- Checkpoint: 2026-03-06 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
-
-<!-- Checkpoint: 2026-05-25 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->
-
-<!-- Checkpoint: 2026-06-03 - docs(delivery): finalize AI posture executive report for client security committee -->

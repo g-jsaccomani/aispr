@@ -99,5 +99,3 @@ class ModelArmorOrchestrator:
             "constructive": build_res,
             "protective": eval_res
         }
-
-# Audit checkpoint [2026-04-21]: fix(prompt-defense): adjust prompt injection heuristic thresholds for client customer-service bot

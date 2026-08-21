@@ -488,15 +488,3 @@ class AgenticWorkflowMesh:
         # 2. Fallback to degraded deterministic sequence
         return self._run_deterministic_sequence()
 
-
-# Audit checkpoint [2026-03-26]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
-
-# Audit checkpoint [2026-04-22]: feat(telemetry): add structured security audit events for client inference endpoints
-
-# Audit checkpoint [2026-06-08]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
-
-# Audit checkpoint [2026-06-22]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
-
-# Audit checkpoint [2026-07-07]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
-
-# Audit checkpoint [2026-07-14]: feat(risk-eval): add LLM supply chain risk matrix for client enterprise deployment

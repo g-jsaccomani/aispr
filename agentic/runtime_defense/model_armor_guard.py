@@ -95,5 +95,3 @@ class ModelArmorGuard:
                 logger.debug(f"Live Model Armor API output shielding bypassed ({exc}). Using local fallback.")
 
         return self.local_filter.inspect_output(generated_text)
-
-# Audit checkpoint [2026-02-20]: feat(telemetry): add structured security audit events for client inference endpoints

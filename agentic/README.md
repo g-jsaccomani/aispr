@@ -81,5 +81,3 @@ python3 -m unittest discover -s agentic/tests -p "test_*.py" -v
 
 ---
 *Developed and maintained by @jsaccomani.*
-
-<!-- Checkpoint: 2026-07-15 - docs(delivery): finalize AI posture executive report for client security committee -->

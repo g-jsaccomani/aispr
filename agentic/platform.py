@@ -111,13 +111,3 @@ class AISPRAgenticCore:
         Generates production-ready remediation configurations across GCP, AWS, Azure, and Terraform.
         """
         return RemediationEngine.generate_remediations(failed_controls)
-
-# Audit checkpoint [2026-02-16]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
-
-# Audit checkpoint [2026-04-10]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
-
-# Audit checkpoint [2026-06-18]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
-
-# Audit checkpoint [2026-07-05]: refactor(scoring): calibrate model vulnerability scoring formula for client audit
-
-# Audit checkpoint [2026-08-18]: refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
