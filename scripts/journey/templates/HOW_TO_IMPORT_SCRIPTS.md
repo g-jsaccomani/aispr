@@ -119,3 +119,5 @@ Google Cloud Shell is a free, pre-authenticated, browser-based terminal with `gc
 <!-- Checkpoint: 2026-08-10 - docs(delivery): finalize AI posture executive report for client security committee -->
 
 <!-- Checkpoint: 2026-08-17 - sec(red-teaming): incorporate automated prompt fuzzing test suite for client staging model -->
+
+<!-- Checkpoint: 2026-08-21 - sec(threat-intel): update adversarial attack taxonomy for client production models -->
