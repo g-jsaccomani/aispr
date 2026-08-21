@@ -1070,3 +1070,6 @@ All notable changes and security updates recorded below.
 ### [2026-08-21] sec(threat-intel): update adversarial attack taxonomy for client production models
 - Synchronized local threat definitions with latest MITRE ATLAS framework techniques.
 
+### [2026-08-21] refactor(evaluator): streamline multi-turn jailbreak evaluation pipeline for client rollout
+- Optimized stateful conversation evaluator to maintain session context across up to 10 dialogue turns.
+
