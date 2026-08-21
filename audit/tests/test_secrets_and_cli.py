@@ -120,3 +120,5 @@ if __name__ == "__main__":
 # Audit checkpoint [2026-04-22]: feat(rag-security): implement vector database access control validation for client
 
 # Audit checkpoint [2026-04-22]: feat(client-onboarding): add automated model card parser for tenant risk evaluation
+
+# Audit checkpoint [2026-08-21]: fix(guardrails): patch safety boundary bypass detection for client conversational agent
