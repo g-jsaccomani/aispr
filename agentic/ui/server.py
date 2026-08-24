@@ -64,112 +64,15 @@ from fixtures.demo_data import (
     DEMO_TOPOLOGY_NODES,
     DEMO_TOPOLOGY_EDGES,
 )
-
+from agentic.ui.auth import (
+    authenticate_request_headers,
+    AuthenticationError,
+    REQUIRE_IAP,
+    ALLOW_LOCAL_DEV,
+)
 
 TEMPLATES_DIR = os.path.join(project_root, "scripts", "journey", "templates")
 REPORTS_DIR = os.path.join(project_root, "reports")
-
-# Identity-Aware Proxy (IAP) & Local Dev Authentication Helpers
-def get_current_user(
-    request: Any = None,
-    x_goog_authenticated_user_email: Optional[str] = None,
-    x_goog_authenticated_user_id: Optional[str] = None,
-    x_goog_iap_jwt_assertion: Optional[str] = None,
-    authorization: Optional[str] = None
-) -> Dict[str, Any]:
-    """
-    Validates and extracts authenticated user identity from Google Cloud IAP headers or Bearer tokens.
-    """
-    require_iap = os.environ.get("REQUIRE_IAP", "false").lower() in ["true", "1", "yes"]
-
-    if x_goog_authenticated_user_email:
-        email = x_goog_authenticated_user_email.split(":")[-1]
-        user_id = x_goog_authenticated_user_id.split(":")[-1] if x_goog_authenticated_user_id else "unknown"
-        return {
-            "email": email,
-            "user_id": user_id,
-            "is_iap_authenticated": True,
-            "auth_type": "google_iap",
-            "jwt_assertion_present": bool(x_goog_iap_jwt_assertion),
-            "has_live_credentials": True
-        }
-
-    if authorization and authorization.startswith("Bearer "):
-        return {
-            "email": DEMO_BEARER_USER_EMAIL,
-            "user_id": "bearer-user",
-            "auth_type": "bearer_session",
-            "is_iap_authenticated": False,
-            "jwt_assertion_present": False,
-            "has_live_credentials": True
-        }
-
-    if require_iap:
-        raise PermissionError("Missing required Google Cloud Identity-Aware Proxy (IAP) assertion headers.")
-
-    return {
-        "email": DEMO_ADMIN_EMAIL,
-        "user_id": "local-dev-001",
-        "auth_type": "local_dev_fallback",
-        "is_iap_authenticated": False,
-        "jwt_assertion_present": False,
-        "has_live_credentials": True
-    }
-
-
-FASTAPI_AVAILABLE = False
-app = None
-try:
-    from fastapi import FastAPI
-    FASTAPI_AVAILABLE = True
-    app = FastAPI(title="Agentic AISPR - Cloud Run Enterprise AI-SPM Platform")
-
-    @app.get("/")
-    def _route_root():
-        return {"status": "AISPR Platform Online"}
-
-    @app.get("/api/auth/me")
-    def _route_me():
-        return get_current_user()
-
-    @app.post("/api/guard")
-    def _route_guard(payload: dict):
-        return {"verdict": "ALLOWED"}
-
-    @app.post("/api/audit/evaluate")
-    def _route_audit_evaluate(payload: dict):
-        return {"status": "SUCCESS"}
-
-    @app.post("/api/agentic/run_mesh")
-    def _route_run_mesh(payload: dict):
-        return {"status": "SUCCESS"}
-
-    @app.get("/api/scripts/download")
-    def _route_download_scripts():
-        return {"status": "SUCCESS"}
-
-    @app.get("/api/audit/controls/versions")
-    def _route_controls_versions():
-        return QuestionnaireHandler().get_framework_versions()
-
-    @app.post("/api/audit/controls/reload")
-    def _route_controls_reload():
-        return {"reloaded": QuestionnaireHandler().reload()}
-
-    @app.post("/api/audit/controls/import")
-    def _route_controls_import(payload: dict):
-        return QuestionnaireHandler().validate_and_diff(payload)
-
-    @app.get("/api/inventory/topology")
-    def _route_inventory_topology():
-        return {"topology": []}
-
-    @app.get("/api/inventory/export")
-    def _route_inventory_export():
-        return {"export": "SUCCESS"}
-
-except Exception:
-    pass
 
 guard = ModelArmorGuard()
 q_handler = QuestionnaireHandler()
@@ -3094,11 +2997,22 @@ class AISPRServerHandler(http.server.BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _check_auth(self) -> Optional[Dict[str, Any]]:
+        """Enforces cryptographic authentication via IAP or verified Bearer token."""
+        try:
+            return authenticate_request_headers(dict(self.headers))
+        except AuthenticationError as e:
+            self._send_json({"error": "Unauthorized", "detail": str(e)}, status_code=401)
+            return None
+        except Exception as e:
+            self._send_json({"error": "Internal Authentication Error", "detail": str(e)}, status_code=500)
+            return None
+
     def do_OPTIONS(self):
         self.send_response(200)
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Goog-Authenticated-User-Email, X-Goog-Authenticated-User-Id, X-Goog-IAP-JWT-Assertion")
         self.end_headers()
 
     def do_GET(self):
@@ -3107,6 +3021,24 @@ class AISPRServerHandler(http.server.BaseHTTPRequestHandler):
         
         if path in ["/", "/index.html"]:
             self._send_html(HTML_TEMPLATE)
+            return
+            
+        if path == "/api/health":
+            self._send_json({
+                "status": "UP",
+                "platform": "AISPR Enterprise v3.0",
+                "engine": "Posture Assessment Engine",
+                "auth_policy": "Google Cloud IAP Enforced" if REQUIRE_IAP else "Development Mode"
+            })
+            return
+
+        # Authenticate all other /api/ routes
+        auth_context = self._check_auth()
+        if not auth_context:
+            return
+
+        if path == "/api/auth/me":
+            self._send_json(auth_context)
         elif path == "/api/report/view":
             self._send_html(OFFICIAL_REPORT_HTML)
         elif path == "/api/report/download/json":
@@ -3168,8 +3100,8 @@ class AISPRServerHandler(http.server.BaseHTTPRequestHandler):
             md_text = f"""# GOOGLE CLOUD SECURITY CONSULTING
 # AI Security Posture Review (AI-SPR) - Executive Report
 
-**Client / Organization:** " + DEMO_CLIENT_NAME + "  
-**Assessment Scope:** " + DEMO_SCOPE_DESCRIPTION + "  
+**Client / Organization:** {DEMO_CLIENT_NAME}  
+**Assessment Scope:** {DEMO_SCOPE_DESCRIPTION}  
 **Lead Consultant:** Joabson Saccomani (@jsaccomani)  
 **Issue Date:** {datetime.datetime.now().strftime("%Y-%m-%d")}  
 **Reference Baselines:** Google SAIF 2.0 | NIST AI RMF 1.0 | ISO/IEC 42001:2023 | MITRE ATLAS | OWASP GenAI Top 10  
@@ -3206,8 +3138,8 @@ class AISPRServerHandler(http.server.BaseHTTPRequestHandler):
 ## 2. AI Bill of Materials (AI-BOM)
 | Asset / Component | Category | Provider | Location | Risk Status |
 |---|---|---|---|---|
-| vertex-gemini-1.5-pro | Foundation Model | Google Cloud " + f"| {DEMO_GCP_PROJECT_ID} / us-central1 |" + " Warning: Guardrails Inactive |
-" + f"| {DEMO_STORAGE_BUCKET} |" + " RAG Knowledge Base | Google Cloud " + f"| gs://{DEMO_STORAGE_BUCKET} |" + " CMEK Missing |
+| vertex-gemini-1.5-pro | Foundation Model | Google Cloud | {DEMO_GCP_PROJECT_ID} / us-central1 | Warning: Guardrails Inactive |
+| {DEMO_STORAGE_BUCKET} | RAG Knowledge Base | Google Cloud | gs://{DEMO_STORAGE_BUCKET} | CMEK Missing |
 | vm-payment-api (/api/v1/ai/chat) | AI Microservice | Google Cloud | 10.20.10.3:8080 (VPC Apps) | BOLA & Prompt Injection |
 | claude-3-5-sonnet | Foundation Model | AWS Bedrock | us-east-1 | Compliant |
 | gpt-4o-enterprise | Foundation Model | Azure OpenAI | eastus | Compliant |
@@ -3217,10 +3149,10 @@ class AISPRServerHandler(http.server.BaseHTTPRequestHandler):
 ---
 
 ## 3. Key Findings Discovered in Scan
-1. **[CRITICAL] INF-01:** " + f"Service Account '{DEMO_SERVICE_ACCOUNT}' holds 'roles/editor' in project {DEMO_GCP_PROJECT_ID}" + ".
-2. **[HIGH] DAT-01:** " + f"Bucket '{DEMO_STORAGE_BUCKET}' missing Customer-Managed Encryption Key (CMEK)" + ".
+1. **[CRITICAL] INF-01:** Service Account '{DEMO_SERVICE_ACCOUNT}' holds 'roles/editor' in project {DEMO_GCP_PROJECT_ID}.
+2. **[HIGH] DAT-01:** Bucket '{DEMO_STORAGE_BUCKET}' missing Customer-Managed Encryption Key (CMEK).
 3. **[HIGH] DAT-05:** SQL dump 'legacy_db_dump.sql' contains cleartext SSNs/CPFs without Cloud DLP masking.
-4. **[HIGH] APP-01:** Broken Object Level Authorization (BOLA/IDOR) on /api/v1/customers/{id}.
+4. **[HIGH] APP-01:** Broken Object Level Authorization (BOLA/IDOR) on /api/v1/customers/{{id}}.
 5. **[HIGH] APP-04:** Endpoint /api/v1/ai/chat vulnerable to direct Prompt Injection without Model Armor.
 6. **[MEDIUM] INF-04:** Subnet 'sb-apps-uscentral1' with VPC Flow Logs disabled.
 
@@ -3234,7 +3166,7 @@ class AISPRServerHandler(http.server.BaseHTTPRequestHandler):
 ---
 
 ## 5. Strategic Remediation Plan (CAPA Roadmap)
-- **Phase 1 (0-15 Days):** " + f"Enforce least privilege on {DEMO_SERVICE_ACCOUNT}, activate Model Armor on /api/v1/ai/chat, and fix BOLA." + "  
+- **Phase 1 (0-15 Days):** Enforce least privilege on {DEMO_SERVICE_ACCOUNT}, activate Model Armor on /api/v1/ai/chat, and fix BOLA.  
 - **Phase 2 (15-45 Days):** Activate Cloud KMS CMEK and enable inline Cloud DLP.  
 - **Phase 3 (45-90 Days):** Implement automated CI/CD validation and ISO/IEC 42001 governance.  
 
@@ -3242,8 +3174,6 @@ class AISPRServerHandler(http.server.BaseHTTPRequestHandler):
 *Confidential report generated by AISPR v3.0 - Google Cloud Security Consulting.*
 """
             self._send_file_download(md_text.encode("utf-8"), "text/markdown; charset=utf-8", "aispr_executive_report.md")
-        elif path == "/api/health":
-            self._send_json({"status": "UP", "platform": "AISPR v3.0", "engine": "Posture Assessment Engine"})
         elif path in ["/api/audit/questions", "/api/audit/questionnaire"]:
             flat_qs = []
             for domain_name, q_list in q_handler.question_db.items():
@@ -3284,6 +3214,12 @@ class AISPRServerHandler(http.server.BaseHTTPRequestHandler):
     def do_POST(self):
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
+        
+        # Enforce authentication on all POST endpoints
+        auth_context = self._check_auth()
+        if not auth_context:
+            return
+
         content_length = int(self.headers.get("Content-Length", 0))
         post_data = self.rfile.read(content_length) if content_length > 0 else b"{}"
         
