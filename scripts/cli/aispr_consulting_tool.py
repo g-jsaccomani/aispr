@@ -184,12 +184,29 @@ AI_SPR_QUESTION_DB = {
 }
 
 class AISPRConsultingTool:
-    def __init__(self):
+    def __init__(self, findings_map: Dict[str, Any] = None, reports_dir: str = None):
         self.client_name = ""
         self.project_name = ""
         self.assessor_name = "@jsaccomani"
         self.answers = {}  # Format: {question_id: {"score": 0/1/0.5, "status": "Y/N/P", "notes": "..."}}
         self.date = datetime.datetime.now().strftime("%Y-%m-%d")
+
+        # Load cloud findings
+        cur_d = os.path.dirname(os.path.abspath(__file__))
+        root_d = os.path.abspath(os.path.join(cur_d, "../.."))
+        rep_d = reports_dir or os.path.join(root_d, "reports")
+        if findings_map is None:
+            try:
+                from audit.engine.findings_correlator import CloudFindingsCorrelator
+                correlator = CloudFindingsCorrelator(
+                    project_id="enterprise-ai-scope",
+                    reports_dir=rep_d if os.path.isdir(rep_d) else None
+                )
+                self.findings_map = correlator.get_findings_map_dict()
+            except Exception:
+                self.findings_map = {}
+        else:
+            self.findings_map = findings_map
 
     def print_header(self):
         print("================================================================================")
@@ -202,23 +219,45 @@ class AISPRConsultingTool:
         self.client_name = input("Client Name: ").strip() or "Enterprise Customer"
         self.project_name = input("AI Project/Application Scope: ").strip() or "Gemini Platform Core"
         print(f"\n[+] Starting AI-SPR for {self.client_name} - Scope: {self.project_name}")
+        print(f"[+] Active Cloud Findings Loaded: {len(self.findings_map)} correlated control findings")
         print("[+] Instructions: For each question, answer [Y]es (fully met), [N]o (not met), or [P]artial.")
         print("    Add any qualitative findings, gaps, or architectural notes.\n")
 
         for domain, questions in AI_SPR_QUESTION_DB.items():
             print(f"\n--- Domain: {domain} ---")
             for q in questions:
-                print(f"\nID: {q['id']} [Criticality: {q['criticality']}]")
+                q_id = q['id']
+                print(f"\nID: {q_id} [Criticality: {q['criticality']}]")
                 print(f"Question: {q['question']}")
                 print(f"Mapping: {q['framework_mapping']}")
                 print(f"Rationale: {q['rationale']}")
                 
+                # Display Cloud Finding if detected
+                finding_data = self.findings_map.get(q_id)
+                suggested_status = "y"
+                if finding_data:
+                    f_str = finding_data.get("summary", str(finding_data)) if isinstance(finding_data, dict) else str(finding_data)
+                    f_sev = finding_data.get("severity", "HIGH") if isinstance(finding_data, dict) else "HIGH"
+                    suggested_status = (finding_data.get("suggested_status", "N") if isinstance(finding_data, dict) else "N").lower()
+                    print(f"🚨 CLOUD SCAN FINDING: {f_str} [Severity: {f_sev}]")
+                    print(f"👉 SUGGESTED ANSWER   : [{suggested_status.upper()}] (Auto-correlated from cloud scan)")
+                else:
+                    print("🛡️  CLOUD SCAN STATUS : No active deviations detected on evaluated scope.")
+
                 # Input loop
                 status = ""
+                default_prompt = f"[{suggested_status.upper()}]" if finding_data else "[Y]"
                 while status not in ["y", "n", "p", "na"]:
-                    status = input("Answer (Y/N/P/NA): ").strip().lower()
+                    raw_input = input(f"Answer (Y/N/P/NA, default {default_prompt}): ").strip().lower()
+                    if not raw_input:
+                        status = suggested_status
+                    else:
+                        status = raw_input
                 
+                default_notes = f"Cloud Scan Evidence: {finding_data}" if finding_data else ""
                 notes = input("Findings/Architectural Notes: ").strip()
+                if not notes and default_notes:
+                    notes = default_notes
                 
                 # Scoring mapping
                 score = 0.0
@@ -229,7 +268,7 @@ class AISPRConsultingTool:
                 elif status == "na":
                     score = -1.0 # Exclude from calculations
                     
-                self.answers[q["id"]] = {
+                self.answers[q_id] = {
                     "status": status.upper(),
                     "score": score,
                     "notes": notes if notes else "No specific comments documented.",

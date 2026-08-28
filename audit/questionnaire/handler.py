@@ -10,23 +10,26 @@ Engineered by: @jsaccomani
 
 import json
 import os
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Union
 from audit.engine.scorer import PostureScorer
 from audit.engine.reporter import ExecutiveReporter
+from audit.engine.findings_correlator import CloudFindingsCorrelator
 
 
 class QuestionnaireHandler:
     """
     Manages the progressive navigation and state tracking of the AI-SPR questionnaire,
-    supporting both interactive CLI walkthroughs and conversational agent loops.
+    supporting both interactive CLI walkthroughs and conversational agent loops,
+    enriching each control with real-time multi-cloud telemetry and threat findings.
     """
 
-    def __init__(self, questions_path: Optional[str] = None):
+    def __init__(self, questions_path: Optional[str] = None, findings_map: Optional[Dict[str, Any]] = None):
         if questions_path is None:
             current_dir = os.path.dirname(os.path.abspath(__file__))
             questions_path = os.path.join(current_dir, "questions.json")
 
         self.questions_path = questions_path
+        self.findings_map = findings_map or {}
         self.data = self._load_questions()
         self.question_db = self.data.get("domains", {})
         self.flat_questions = self._flatten_questions()
@@ -262,6 +265,14 @@ class QuestionnaireHandler:
 
         # Find question details
         q_obj = next((q for q in self.flat_questions if q["id"] == question_id), None)
+        # Auto-populate notes with cloud finding evidence if notes are empty
+        if not notes:
+            f_map = answers_dict.get("_findings_map") if answers_dict and "_findings_map" in answers_dict else self.findings_map
+            if f_map and question_id in f_map:
+                f_entry = f_map[question_id]
+                f_text = f_entry.get("summary", str(f_entry)) if isinstance(f_entry, dict) else str(f_entry)
+                notes = f"Cloud Scan Evidence: {f_text}"
+
         entry = {
             "status": status_norm,
             "score": score,
@@ -279,7 +290,8 @@ class QuestionnaireHandler:
 
     def get_next_step(self, user_input: str, session_state: Dict[str, Any]) -> str:
         """
-        Stateful step coordinator for conversational ADK / Copilot loops.
+        Stateful step coordinator for conversational ADK / Copilot loops,
+        injecting verified cloud findings and contextual recommendations directly into the prompt.
         """
         current_idx = session_state.get("current_question_index", 0)
 
@@ -292,6 +304,14 @@ class QuestionnaireHandler:
             parts = user_input.split("|", 1)
             status = parts[0].strip().upper() if parts else "N"
             notes = parts[1].strip() if len(parts) > 1 else ""
+            
+            # If user answered just status, check if there was a cloud finding to attach
+            findings_map = session_state.get("findings_map") or self.findings_map
+            if not notes and findings_map and prev_q["id"] in findings_map:
+                f_data = findings_map[prev_q["id"]]
+                f_str = f_data.get("summary", str(f_data)) if isinstance(f_data, dict) else str(f_data)
+                notes = f"Cloud Scan Evidence: {f_str}"
+
             self.record_answer(prev_q["id"], status, notes, session_state["answers"])
 
         # Check if completed
@@ -306,12 +326,40 @@ class QuestionnaireHandler:
 
         q = self.flat_questions[current_idx]
         session_state["current_question_index"] = current_idx + 1
+        qid = q["id"]
+
+        # Extract real-time cloud finding for this control
+        findings_map = session_state.get("findings_map") or self.findings_map
+        finding_entry = findings_map.get(qid) if findings_map else None
+
+        finding_snippet = ""
+        reply_hint = "*Reply format: `[Y/N/P/NA] | Your architectural findings/notes`*"
+
+        if finding_entry:
+            if isinstance(finding_entry, dict):
+                f_desc = finding_entry.get("summary") or finding_entry.get("description") or str(finding_entry)
+                f_sev = finding_entry.get("severity", "HIGH")
+                sug_status = finding_entry.get("suggested_status", "N")
+            else:
+                f_desc = str(finding_entry)
+                f_sev = "HIGH" if "critical" in f_desc.lower() or "high" in f_desc.lower() else "MEDIUM"
+                sug_status = "N"
+
+            finding_snippet = (
+                f"\n🚨 **Cloud Finding Detected on Verified Scope:**\n"
+                f"> {f_desc} *(Severity: **{f_sev}**)*\n"
+                f"👉 *Recommended Answer:* `[{sug_status}]` (Auto-correlated from Cloud Telemetry)\n"
+            )
+            reply_hint = f"*Reply format: `[{sug_status}/Y/P/NA] | Notes` (Reply `{sug_status}` to confirm finding)*"
+        else:
+            finding_snippet = "\n🛡️ *Automated Scan Status: No active cloud deviations detected on evaluated scope.*\n"
 
         return (
             f"**Domain:** {q['domain']}\n"
-            f"**Question ({current_idx + 1}/{len(self.flat_questions)}):** [{q['id']}] (Criticality: `{q.get('criticality', 'MEDIUM')}`)\n"
+            f"**Question ({current_idx + 1}/{len(self.flat_questions)}):** [{qid}] (Criticality: `{q.get('criticality', 'MEDIUM')}`)\n"
             f"> {q['question']}\n\n"
             f"🔍 *Mapping:* {q.get('framework_mapping', 'N/A')}\n"
-            f"💡 *Rationale:* {q.get('rationale', 'N/A')}\n\n"
-            "*Reply format: `[Y/N/P/NA] | Your architectural findings/notes`*"
+            f"💡 *Rationale:* {q.get('rationale', 'N/A')}\n"
+            f"{finding_snippet}\n"
+            f"{reply_hint}"
         )

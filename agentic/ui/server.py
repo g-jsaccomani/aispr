@@ -3175,12 +3175,22 @@ class AISPRServerHandler(http.server.BaseHTTPRequestHandler):
 """
             self._send_file_download(md_text.encode("utf-8"), "text/markdown; charset=utf-8", "aispr_executive_report.md")
         elif path in ["/api/audit/questions", "/api/audit/questionnaire"]:
+            # Dynamically correlate real multi-cloud scan findings from reports/ or active posture
+            from audit.engine.findings_correlator import CloudFindingsCorrelator
+            correlator = CloudFindingsCorrelator(reports_dir=REPORTS_DIR)
+            live_findings = correlator.get_findings_map_dict()
+            effective_findings = {**FINDINGS_MAP, **live_findings}
+
             flat_qs = []
             for domain_name, q_list in q_handler.question_db.items():
                 for q in q_list:
                     qid = q.get("id", "")
-                    finding_text = FINDINGS_MAP.get(qid, "No deviations detected during automated scan.")
-                    default_ans = "N" if qid in FINDINGS_MAP else "Y"
+                    has_deviation = qid in effective_findings
+                    finding_text = effective_findings.get(qid, "No deviations detected during automated scan.")
+                    default_ans = "N" if has_deviation else "Y"
+                    structured_f = correlator.get_finding_for_control(qid)
+                    sev = structured_f.get("severity", "HIGH") if structured_f else ("HIGH" if has_deviation else "LOW")
+                    
                     flat_qs.append({
                         "id": qid,
                         "question": q.get("question", ""),
@@ -3188,10 +3198,13 @@ class AISPRServerHandler(http.server.BaseHTTPRequestHandler):
                         "criticality": q.get("criticality", "MEDIUM"),
                         "rationale": q.get("rationale", ""),
                         "finding": finding_text,
+                        "has_finding": has_deviation,
+                        "severity": sev,
                         "default_answer": default_ans,
+                        "suggested_notes": f"Cloud Scan Evidence: {finding_text}" if has_deviation else "",
                         "domain": domain_name
                     })
-            self._send_json({"questions": flat_qs, "total": len(flat_qs)})
+            self._send_json({"questions": flat_qs, "total": len(flat_qs), "active_cloud_findings": len(effective_findings)})
         elif path == "/api/audit/controls/versions":
             self._send_json(q_handler.get_framework_versions())
         elif path == "/api/redteam/dataset":

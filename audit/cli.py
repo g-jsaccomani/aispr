@@ -23,18 +23,39 @@ if _proj_root not in sys.path:
 from audit.questionnaire.handler import QuestionnaireHandler
 from audit.engine.scorer import PostureScorer
 from audit.engine.reporter import ExecutiveReporter
+from audit.engine.findings_correlator import CloudFindingsCorrelator
 
 
 class AISPRAssessmentCLI:
     """
-    Interactive and automated CLI tool for executing AI Security Posture Reviews at enterprise clients.
+    Interactive and automated CLI tool for executing AI Security Posture Reviews at enterprise clients,
+    presenting real-time verified Cloud findings alongside the 104-Control taxonomy.
     """
 
-    def __init__(self, client_name: str = "Enterprise Customer", project_name: str = "Gemini AI Core", assessor_name: str = "@jsaccomani"):
+    def __init__(
+        self,
+        client_name: str = "Enterprise Customer",
+        project_name: str = "Gemini AI Core",
+        assessor_name: str = "@jsaccomani",
+        findings_map: Optional[Dict[str, Any]] = None,
+        reports_dir: Optional[str] = None
+    ):
         self.client_name = client_name
         self.project_name = project_name
         self.assessor_name = assessor_name
-        self.handler = QuestionnaireHandler()
+        
+        # Auto-load multi-cloud findings if not explicitly provided
+        rep_dir = reports_dir or os.path.join(_proj_root, "reports")
+        if findings_map is None:
+            correlator = CloudFindingsCorrelator(
+                project_id=project_name,
+                reports_dir=rep_dir if os.path.isdir(rep_dir) else None
+            )
+            self.findings_map = correlator.get_findings_map_dict()
+        else:
+            self.findings_map = findings_map
+
+        self.handler = QuestionnaireHandler(findings_map=self.findings_map)
         self.answers: Dict[str, Dict[str, Any]] = {}
 
     def print_banner(self):
@@ -47,6 +68,7 @@ class AISPRAssessmentCLI:
         self.print_banner()
         print(f"\n[+] Starting AI-SPR for Client: '{self.client_name}' - Scope: '{self.project_name}'")
         print(f"[+] Lead Assessor: {self.assessor_name}")
+        print(f"[+] Active Cloud Findings Loaded: {len(self.findings_map)} correlated control anomalies")
         print("[+] Instructions: For each question, answer [Y]es (fully met), [N]o (not met), [P]artial, or [NA] (Not Applicable).\n")
 
         for domain, questions in self.handler.question_db.items():
@@ -55,15 +77,36 @@ class AISPRAssessmentCLI:
                 q_id = q["id"]
                 crit = q.get("criticality", "MEDIUM")
                 print(f"\n🔹 Control ID: [{q_id}] (Criticality: {crit})")
-                print(f"   Question: {q['question']}")
-                print(f"   Mapping : {q.get('framework_mapping', 'N/A')}")
+                print(f"   Question : {q['question']}")
+                print(f"   Mapping  : {q.get('framework_mapping', 'N/A')}")
                 print(f"   Rationale: {q.get('rationale', 'N/A')}")
 
-                status = ""
-                while status not in ["y", "n", "p", "na"]:
-                    status = input("   👉 Status (Y/N/P/NA): ").strip().lower()
+                # Display Cloud Findings for this control if detected
+                finding_data = self.findings_map.get(q_id)
+                suggested_status = "Y"
+                if finding_data:
+                    f_str = finding_data.get("summary", str(finding_data)) if isinstance(finding_data, dict) else str(finding_data)
+                    f_sev = finding_data.get("severity", "HIGH") if isinstance(finding_data, dict) else "HIGH"
+                    suggested_status = finding_data.get("suggested_status", "N") if isinstance(finding_data, dict) else "N"
+                    print(f"   🚨 CLOUD FINDING : {f_str} [Severity: {f_sev}]")
+                    print(f"   👉 SUGGESTION    : [{suggested_status}] (Evidence auto-populated from cloud scan)")
+                else:
+                    print("   🛡️  CLOUD STATUS  : No active deviations detected on evaluated scope.")
 
-                notes = input("   📝 Findings / Architectural Evidence: ").strip()
+                status = ""
+                default_prompt = f"[{suggested_status}]" if finding_data else "[Y]"
+                while status not in ["y", "n", "p", "na"]:
+                    raw_input = input(f"   👉 Status (Y/N/P/NA, default {default_prompt}): ").strip().lower()
+                    if not raw_input:
+                        status = suggested_status.lower()
+                    else:
+                        status = raw_input
+
+                default_notes = f"Cloud Scan Evidence: {finding_data}" if finding_data else ""
+                notes = input(f"   📝 Findings / Architectural Evidence: ").strip()
+                if not notes and default_notes:
+                    notes = default_notes
+
                 self.handler.record_answer(q_id, status, notes, self.answers)
 
         self._finalize_and_report(output_file)
@@ -76,6 +119,7 @@ class AISPRAssessmentCLI:
         print("\n[!] Running in Automated Demonstration / Mock Mode...")
         print(f"[+] Target Client: {self.client_name}")
         print(f"[+] Scope: {self.project_name}")
+        print(f"[+] Correlated Cloud Findings: {len(self.findings_map)} detected")
 
         mock_data = {
             "DAT-01": ("Y", "Lineage tracked in Cloud Data Catalog. Data originates from vetted internal databases."),

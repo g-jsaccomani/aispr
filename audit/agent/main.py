@@ -52,7 +52,7 @@ class AISPRCopilot:
                     "please enter your **GCP Project ID**."
                 )
 
-        # Step 2: Trigger SCC Scan for Project ID
+        # Step 2: Trigger SCC Scan and Cloud Findings Correlation for Project ID
         if session_state.get("project_id") and not session_state.get("scc_scanned", False):
             project_id = session_state["project_id"]
             session_state["scc_scanned"] = True
@@ -60,12 +60,23 @@ class AISPRCopilot:
             findings = tools.fetch_scc_ai_findings(project_id)
             session_state["scc_findings"] = findings
             
+            # Correlate all available multi-cloud findings
+            from audit.engine.findings_correlator import CloudFindingsCorrelator
+            rep_dir = os.path.join(root_dir, "reports")
+            correlator = CloudFindingsCorrelator(
+                project_id=project_id,
+                scc_findings=findings,
+                reports_dir=rep_dir if os.path.exists(rep_dir) else None
+            )
+            findings_map = correlator.get_findings_map_dict()
+            session_state["findings_map"] = findings_map
+            
             return (
                 f"✅ Pre-flight security scan completed for project `{project_id}`.\n\n"
-                f"🚨 Detected **{len(findings)} active risks** in Security Command Center AI Protection:\n"
+                f"🚨 Detected **{len(findings)} active risks** in Security Command Center AI Protection and **{len(findings_map)} correlated control findings**:\n"
                 + "\n".join([f"  • {f}" for f in findings]) + "\n\n"
-                "We are ready to start the interactive AI-SPR Questionnaire.\n"
-                "Type **'Start Questionnaire'** to begin."
+                "All identified cloud deviations have been mapped directly to your 104-Control AI-SPR Questionnaire.\n"
+                "Type **'Start Questionnaire'** to begin the guided review."
             )
 
         # Step 3: Report Generation

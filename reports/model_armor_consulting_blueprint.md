@@ -2,7 +2,7 @@
 **Client / Organization:** Enterprise Client  
 **Target GCP Scope:** `test-enterprise-ai` (Region: `us-central1`)  
 **Guardrail Profile:** `BALANCED` (Template ID: `secops-guardrail-prod`)  
-**Issue Date:** 2026-08-24  
+**Issue Date:** 2026-08-28  
 **Lead Consultant:** Joabson Saccomani (@jsaccomani) | Cloud Security Consultant  
 **Framework Alignment:** Google SAIF • NIST AI RMF 1.0 • ISO/IEC 42001 • OWASP Top 10 for LLMs  
 
