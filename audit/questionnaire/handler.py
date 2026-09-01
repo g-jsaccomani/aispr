@@ -50,6 +50,34 @@ class QuestionnaireHandler:
     def get_total_questions(self) -> int:
         return len(self.flat_questions)
 
+    def get_canonical_controls(self) -> List[Any]:
+        """Returns all controls as strongly-typed canonical Control instances."""
+        from domain.models import Control, FrameworkMapping
+
+        canonical_controls = []
+        for item in self.flat_questions:
+            cid = item.get("id", "")
+            domain = item.get("domain", "")
+            q_text = item.get("question", "")
+            crit = item.get("criticality", "MEDIUM")
+            rat = item.get("rationale", "")
+            fw_map_str = item.get("framework_mapping", "")
+
+            fw_mappings = []
+            if fw_map_str:
+                fw_mappings.append(FrameworkMapping(framework="Standard", section_or_control=fw_map_str))
+
+            ctrl = Control(
+                control_id=cid,
+                domain=domain,
+                question=q_text,
+                criticality=crit,
+                rationale=rat,
+                framework_mappings=fw_mappings
+            )
+            canonical_controls.append(ctrl)
+        return canonical_controls
+
     def reload(self) -> int:
         """Hot-reloads questions from disk without server restart."""
         self.data = self._load_questions()

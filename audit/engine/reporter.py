@@ -78,13 +78,25 @@ class ExecutiveReporter:
         lines.append("")
         return "\n".join(lines)
 
-    def build_markdown_report(self, answers: Dict[str, Dict[str, Any]], question_db: Dict[str, List[Dict[str, Any]]]) -> str:
+    def build_markdown_report(
+        self,
+        answers: Dict[str, Dict[str, Any]],
+        question_db: Dict[str, List[Dict[str, Any]]],
+        findings: Optional[List[Any]] = None,
+        assessment_run: Optional[Any] = None
+    ) -> str:
         """Alias for consolidated report."""
-        return self.build_consolidated_report(answers, question_db)
+        return self.build_consolidated_report(answers, question_db, findings=findings, assessment_run=assessment_run)
 
-    def build_consolidated_report(self, answers: Dict[str, Dict[str, Any]], question_db: Dict[str, List[Dict[str, Any]]]) -> str:
+    def build_consolidated_report(
+        self,
+        answers: Dict[str, Dict[str, Any]],
+        question_db: Dict[str, List[Dict[str, Any]]],
+        findings: Optional[List[Any]] = None,
+        assessment_run: Optional[Any] = None
+    ) -> str:
         """
-        Generates the complete Consolidated Executive AI-SPR Report with topology graph, GRC scores, and CAPA.
+        Generates the complete Consolidated Executive AI-SPR Report with topology graph, GRC scores, CAPA, and Evidence Audit Trail.
         """
         scores = PostureScorer.calculate_scores(answers, question_db)
         high_gaps, med_gaps = PostureScorer.extract_prioritized_gaps(answers)
@@ -148,7 +160,94 @@ class ExecutiveReporter:
                 md.append(f"- **Target Control:** {gap['framework_mapping']}")
                 md.append(f"- **Recommended Mitigation:** Strengthen continuous telemetry and drift detection.\n")
 
+        # Section 4: Evidence-First Verification & Technical Audit Trail
+        if findings:
+            md.append(self.build_evidence_audit_trail_section(findings, assessment_run))
+
         return "\n".join(md)
+
+    @staticmethod
+    def render_finding_evidence_card(finding: Any) -> str:
+        """
+        Renders an evidence card matching the evidence-first audit specification:
+        Finding: ...
+        Severity: ...
+        Evidence: ...
+        Execution: ...
+        Verification: ...
+        Confidence: ...
+        """
+        from domain.models import SecurityFinding
+
+        title = getattr(finding, "title", str(finding))
+        severity = getattr(finding, "severity", "HIGH")
+        exec_mode = getattr(finding, "execution_mode", "SIMULATION")
+        confidence = getattr(finding, "propagated_confidence", 0.95)
+        
+        evidence_source = "Manual Assessment"
+        verification_status = "UNVERIFIED"
+        content_hash = "N/A"
+
+        evidence_items = getattr(finding, "evidence", [])
+        if evidence_items:
+            ev = evidence_items[0]
+            evidence_source = getattr(ev, "source", str(getattr(finding, "source", "Cloud Sensor")))
+            verification_status = getattr(ev, "status", "SIMULATED")
+            content_hash = getattr(ev, "content_hash", "")[:12] + "..." if getattr(ev, "content_hash", "") else "N/A"
+        elif getattr(finding, "is_live_verified", False):
+            verification_status = "VERIFIED"
+            exec_mode = "LIVE"
+        elif getattr(finding, "is_simulated", True):
+            verification_status = "SIMULATED"
+            exec_mode = "SIMULATION"
+
+        lines = [
+            f"**Finding:** {title}  ",
+            f"**Severity:** {severity}  ",
+            f"**Evidence:** {evidence_source}  ",
+            f"**Execution:** {exec_mode}  ",
+            f"**Verification:** {verification_status}  ",
+            f"**Confidence:** {confidence}  ",
+            f"**Content Hash (SHA-256):** `{content_hash}`  \n"
+        ]
+        return "\n".join(lines)
+
+    def build_evidence_audit_trail_section(self, findings: List[Any], assessment_run: Any = None) -> str:
+        """
+        Builds the formal evidence-first audit trail.
+        Strictly segregates Live Verified findings from Simulated / Fixture findings.
+        """
+        lines = [
+            "---",
+            "## 4. Evidence-First Verification & Technical Audit Trail",
+            "The following register details empirical artifacts, verification statuses, and cryptographic hashes.\n"
+        ]
+
+        if assessment_run:
+            lines.append(f"**Assessment Run ID:** `{getattr(assessment_run, 'run_id', 'RUN-UNKNOWN')}`  ")
+            lines.append(f"**Run Execution Mode:** `{getattr(assessment_run, 'execution_mode', 'SIMULATION')}`  ")
+            lines.append(f"**Tool Version:** `{getattr(assessment_run, 'tool_version', 'AISPR-2.0.0')}`  ")
+            lines.append(f"**Policy Version:** `{getattr(assessment_run, 'policy_version', '2026.Q3')}`  \n")
+
+        live_findings = [f for f in findings if getattr(f, "is_live_verified", False)]
+        sim_findings = [f for f in findings if not getattr(f, "is_live_verified", False)]
+
+        lines.append("### 4.1 Live Verified Findings (Observed in Production Cloud)")
+        if not live_findings:
+            lines.append("_No live production findings recorded for this evaluation scope._\n")
+        else:
+            for f in live_findings:
+                lines.append(self.render_finding_evidence_card(f))
+
+        lines.append("### 4.2 Simulated & Synthetic Findings (Non-Production / Emulated)")
+        lines.append("> ⚠️ **AUDIT NOTICE:** The following items originate from test fixtures or offline simulators. They are **NOT** verified production discoveries.\n")
+        if not sim_findings:
+            lines.append("_No simulated findings attached._\n")
+        else:
+            for f in sim_findings:
+                lines.append(self.render_finding_evidence_card(f))
+
+        return "\n".join(lines)
 
     def build_cloud_specific_report(self, answers: Dict[str, Dict[str, Any]]) -> str:
         """
@@ -190,8 +289,15 @@ class ExecutiveReporter:
 
         return "\n".join(md)
 
-    def save_report(self, answers: Dict[str, Dict[str, Any]], question_db: Dict[str, List[Dict[str, Any]]], output_path: str) -> str:
-        md = self.build_markdown_report(answers, question_db)
+    def save_report(
+        self,
+        answers: Dict[str, Dict[str, Any]],
+        question_db: Dict[str, List[Dict[str, Any]]],
+        output_path: str,
+        findings: Optional[List[Any]] = None,
+        assessment_run: Optional[Any] = None
+    ) -> str:
+        md = self.build_markdown_report(answers, question_db, findings=findings, assessment_run=assessment_run)
         os.makedirs(os.path.dirname(os.path.abspath(output_path)), exist_ok=True)
         with open(output_path, "w", encoding="utf-8") as f:
             f.write(md)

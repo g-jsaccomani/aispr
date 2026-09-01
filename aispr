@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# -*- coding: utf-8 -*-
+# Copyright © 2026 Google LLC. Developed by Joabson Saccomani (@jsaccomani).
+# Role: Cloud Security Consultant | LinkedIn: https://www.linkedin.com/in/jsaccomani
+# Licensed under the Apache License, Version 2.0.
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+export PYTHONPATH="${SCRIPT_DIR}:${PYTHONPATH}"
+exec python3 "${SCRIPT_DIR}/scripts/cli/aispr_cli.py" "$@"

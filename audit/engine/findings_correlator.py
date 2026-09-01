@@ -15,6 +15,15 @@ import json
 import logging
 from typing import Dict, List, Any, Optional, Union
 
+from audit.engine.correlator import (
+    FindingNormalizer,
+    FindingDeduplicator,
+    ControlMapper,
+    SeverityEngine,
+    EvidenceValidator,
+    DeterministicCorrelator,
+)
+
 logger = logging.getLogger("AISPR-FindingsCorrelator")
 
 
@@ -23,40 +32,11 @@ class CloudFindingsCorrelator:
     Correlates technical findings from cloud discovery scanners, Security Command Center (SCC),
     Shadow AI hunters, AST SAST scanners, and AI-BOM catalogues into corresponding
     AI-SPR questionnaire controls (DAT-xx, MOD-xx, APP-xx, INF-xx, ASR-xx, GOV-xx).
+    Acts as the entrypoint facade delegating to the deterministic 5-stage correlation pipeline.
     """
 
-    # Static taxonomy mapping keyword/resource patterns to Control IDs
-    FINDING_CONTROL_TAXONOMY: Dict[str, List[str]] = {
-        # 1. Data Security & Integrity (DAT)
-        "DAT-01": ["lineage", "origin", "authenticity", "rag_storage", "training_data", "dataset"],
-        "DAT-02": ["data_access", "fine_tuning_audit", "audit_log", "pipeline_log"],
-        "DAT-03": ["dlp", "pii", "cleartext", "ssn", "cpf", "classification", "sensitive_data"],
-        "DAT-04": ["rag_poisoning", "untrusted_data", "corpus_partition", "mixing_data"],
-        "DAT-05": ["sql_dump", "database_masking", "deidentification", "unmasked_pii"],
-        # 2. Model Hardening & Management (MOD)
-        "MOD-01": ["pre_trained", "foundation_model", "supply_chain", "unvetted_weights"],
-        "MOD-02": ["model_registry", "vertex_model_registry", "versioning", "catalog"],
-        "MOD-03": ["pickle", "serialization", "model_tampering", "unauthorized_modification", "creator_lock"],
-        "MOD-04": ["red_teaming", "adversarial_testing", "mitre_atlas", "jailbreak_testing"],
-        # 3. Application Security & Protection (APP)
-        "APP-01": ["prompt_injection", "jailbreak", "input_sanitization", "guardrail", "bedrock_guardrail", "bola", "idor"],
-        "APP-02": ["model_armor", "waf", "semantic_gateway", "content_safety", "azure_content_safety"],
-        "APP-03": ["output_leakage", "pii_redaction", "prompt_leakage", "system_prompt_exfiltration"],
-        "APP-04": ["excessive_agency", "tool_calling", "schema_validation", "rate_limiting", "plugin_boundary"],
-        # 4. Infrastructure Security & Isolation (INF)
-        "INF-01": ["cspr", "project_isolation", "cve-2026-2244", "startup_script", "token_exposure", "workbench_cve"],
-        "INF-02": ["vpc_sc", "vpc_service_controls", "psc", "private_service_connect", "public_ip", "network_perimeter"],
-        "INF-03": ["least_privilege", "roles/editor", "roles/owner", "service_account_iam", "excessive_iam"],
-        "INF-04": ["cmek", "kms", "customer_managed_key", "default_encryption", "unencrypted_bucket", "flow_logs"],
-        # 5. Security Assurance & Monitoring (ASR)
-        "ASR-01": ["prompt_logging", "invocation_logging", "siem", "soar", "centralized_logging", "telemetry_gap"],
-        "ASR-02": ["detection_rules", "jailbreak_alert", "validation_alert", "anomaly_detection"],
-        "ASR-03": ["incident_response", "ai_playbook", "runbook", "containment_strategy"],
-        # 6. AI Governance & Compliance (GOV)
-        "GOV-01": ["accountability", "ethics_committee", "roles_responsibilities", "governance_policy"],
-        "GOV-02": ["ai_bom", "shadow_ai", "ollama", "vllm", "tgi", "rogue_model", "inventory_gap", "cyclonedx"],
-        "GOV-03": ["iso_42001", "nist_ai_rmf", "eu_ai_act", "regulatory_mapping", "risk_assessment"]
-    }
+    # Static taxonomy reference preserved for direct backward compatibility
+    FINDING_CONTROL_TAXONOMY: Dict[str, List[str]] = ControlMapper.FALLBACK_TAXONOMY
 
     def __init__(
         self,
@@ -69,7 +49,8 @@ class CloudFindingsCorrelator:
         reports_dir: Optional[str] = None
     ):
         self.project_id = project_id
-        self.raw_findings: List[Dict[str, Any]] = []
+        self.pipeline = DeterministicCorrelator(project_id=project_id)
+        self.raw_findings = self.pipeline.raw_inputs
         self.correlated_map: Dict[str, Dict[str, Any]] = {}
 
         # 1. Ingest explicit sources
@@ -98,14 +79,14 @@ class CloudFindingsCorrelator:
         suggested_control_id: Optional[str] = None
     ):
         """Adds a normalized finding entry to the correlator."""
-        self.raw_findings.append({
-            "source": source,
-            "category": category,
-            "severity": severity.upper(),
-            "resource": resource,
-            "description": description,
-            "suggested_control_id": suggested_control_id
-        })
+        self.pipeline.add_raw_finding(
+            source=source,
+            category=category,
+            severity=severity,
+            resource=resource,
+            description=description,
+            suggested_control_id=suggested_control_id
+        )
 
     def ingest_scc_findings(self, scc_findings: List[Union[str, Dict[str, Any]]]):
         """Normalizes and ingests findings from Security Command Center AI Protection."""
@@ -319,103 +300,33 @@ class CloudFindingsCorrelator:
 
     def correlate(self) -> Dict[str, Dict[str, Any]]:
         """
-        Executes correlation between all ingested findings and the 104 AI-SPR Control IDs.
-        Returns a mapping:
-        {
-            "CONTROL-ID": {
-                "has_finding": True,
-                "findings": [ { "source": "...", "resource": "...", "description": "...", "severity": "HIGH" }, ... ],
-                "summary": "Consolidated summary string...",
-                "severity": "CRITICAL" | "HIGH" | "MEDIUM" | "LOW",
-                "suggested_status": "N" | "P" | "Y",
-                "suggested_notes": "Findings notes to pre-populate assessment..."
-            }
-        }
+        Executes deterministic 5-stage correlation pipeline between all ingested findings
+        and the 104 AI-SPR Control IDs.
         """
-        correlated: Dict[str, Dict[str, Any]] = {}
-
-        for finding in self.raw_findings:
-            desc = finding["description"]
-            desc_lower = desc.lower()
-            res_lower = finding["resource"].lower()
-            cat_lower = finding["category"].lower()
-            combined_text = f"{desc_lower} {res_lower} {cat_lower}"
-            sev = finding["severity"]
-
-            # 1. First priority: Explicit suggested control ID
-            target_ids = []
-            if finding.get("suggested_control_id"):
-                target_ids.append(finding["suggested_control_id"])
-
-            # 2. Second priority: Taxonomy keywords matching
-            for ctrl_id, keywords in self.FINDING_CONTROL_TAXONOMY.items():
-                if ctrl_id not in target_ids:
-                    for kw in keywords:
-                        if kw.lower() in combined_text:
-                            target_ids.append(ctrl_id)
-                            break
-
-            # Fallback if unassigned
-            if not target_ids:
-                if sev in ["CRITICAL", "HIGH"]:
-                    target_ids.append("INF-01")
-                else:
-                    target_ids.append("GOV-03")
-
-            for cid in target_ids:
-                if cid not in correlated:
-                    correlated[cid] = {
-                        "has_finding": True,
-                        "findings": [],
-                        "severity": "LOW",
-                        "suggested_status": "N",
-                        "summary": "",
-                        "suggested_notes": ""
-                    }
-
-                correlated[cid]["findings"].append(finding)
-
-                # Escalate severity if higher
-                sev_order = {"CRITICAL": 4, "HIGH": 3, "MEDIUM": 2, "LOW": 1}
-                curr_sev = correlated[cid]["severity"]
-                if sev_order.get(sev, 1) > sev_order.get(curr_sev, 1):
-                    correlated[cid]["severity"] = sev
-
-        # Build summaries and suggested notes for each correlated control
-        for cid, entry in correlated.items():
-            f_list = entry["findings"]
-            summaries = []
-            for idx, f in enumerate(f_list):
-                summaries.append(f"[{f['severity']}] {f['source']}: {f['description']} (Target: {f['resource']})")
-            
-            entry["summary"] = " | ".join(summaries)
-            entry["suggested_notes"] = f"Cloud Scan Evidence: {entry['summary']}"
-            if entry["severity"] in ["CRITICAL", "HIGH"]:
-                entry["suggested_status"] = "N"
-            else:
-                entry["suggested_status"] = "P"
-
-        self.correlated_map = correlated
-        return correlated
+        self.correlated_map = self.pipeline.correlate()
+        return self.correlated_map
 
     def get_findings_map_dict(self) -> Dict[str, str]:
         """
         Returns a simplified Dict[str, str] compatible with UI FINDINGS_MAP:
         { "INF-01": "Scan Finding: ...", "DAT-01": "Scan Finding: ..." }
         """
-        if not self.correlated_map:
-            self.correlate()
-
-        result: Dict[str, str] = {}
-        for cid, data in self.correlated_map.items():
-            result[cid] = f"Scan Finding: {data['summary']}"
-        return result
+        return self.pipeline.get_findings_map_dict()
 
     def get_finding_for_control(self, control_id: str) -> Optional[Dict[str, Any]]:
         """Returns the correlated finding record for a specific Control ID if present."""
-        if not self.correlated_map:
-            self.correlate()
-        return self.correlated_map.get(control_id)
+        return self.pipeline.get_finding_for_control(control_id)
+
+    def to_canonical_findings(self) -> List[Any]:
+        """
+        Converts all raw ingested findings into strongly-typed canonical SecurityFinding instances,
+        linking each to primary/secondary controls, AIAsset, and Evidence with epistemological status.
+        """
+        return self.pipeline.to_canonical_findings()
+
+    def get_findings_by_cloud(self) -> Dict[str, List[Any]]:
+        """Groups canonical findings by cloud provider (GCP, AWS, AZURE)."""
+        return self.pipeline.get_findings_by_cloud()
 
 
 def build_unified_cloud_findings(

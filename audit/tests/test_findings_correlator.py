@@ -153,6 +153,26 @@ class TestCloudFindingsCorrelator(unittest.TestCase):
         self.assertEqual(len(cli.findings_map), 1)
         self.assertIn("APP-01", cli.findings_map)
 
+    def test_correlator_to_canonical_findings(self):
+        correlator = CloudFindingsCorrelator(
+            project_id=self.project_id,
+            scc_findings=self.sample_scc,
+            shadow_findings=self.sample_shadow
+        )
+        canonical_findings = correlator.to_canonical_findings()
+        self.assertGreater(len(canonical_findings), 0)
+        
+        from domain.models import SecurityFinding
+        for f in canonical_findings:
+            self.assertIsInstance(f, SecurityFinding)
+            self.assertTrue(hasattr(f, "finding_id"))
+            self.assertTrue(hasattr(f, "asset"))
+            self.assertTrue(hasattr(f, "severity"))
+            self.assertGreaterEqual(len(f.evidence), 1)
+            # Verify primary control can be retrieved
+            if f.control_links:
+                self.assertIsNotNone(f.primary_control_id)
+
 
 if __name__ == "__main__":
     unittest.main()
