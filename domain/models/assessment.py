@@ -40,7 +40,7 @@ class Assessment(AISPRBaseModel):
             try:
                 return AssessmentStatus(v.upper())
             except ValueError:
-                return AssessmentStatus.PLANNED
+                raise ValueError(f"Invalid AssessmentStatus: '{v}'")
         return v
 
 

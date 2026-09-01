@@ -216,3 +216,41 @@ class ImplementationStatus(StrEnum):
     NOT_IMPLEMENTED = "NOT_IMPLEMENTED"
 
 
+class AssetCriticality(StrEnum):
+    """Operational tier and mission criticality of the AI/ML asset."""
+    TIER_1_CRITICAL = "TIER_1_CRITICAL"
+    TIER_2_PRODUCTION = "TIER_2_PRODUCTION"
+    TIER_3_INTERNAL = "TIER_3_INTERNAL"
+    TIER_4_DEVELOPMENT = "TIER_4_DEVELOPMENT"
+
+
+class DataSensitivity(StrEnum):
+    """Sensitivity and regulatory classification of data accessed or generated."""
+    RESTRICTED_PII_SECRETS = "RESTRICTED_PII_SECRETS"
+    CONFIDENTIAL = "CONFIDENTIAL"
+    INTERNAL = "INTERNAL"
+    PUBLIC = "PUBLIC"
+
+
+class EnvironmentExposure(StrEnum):
+    """Network reachability and ingress exposure of the asset."""
+    PUBLIC_INTERNET = "PUBLIC_INTERNET"
+    VPC_INTERNAL = "VPC_INTERNAL"
+    ISOLATED_AIR_GAPPED = "ISOLATED_AIR_GAPPED"
+
+
+class IdentityPrivilege(StrEnum):
+    """Privilege and authorization level of associated credentials/service accounts."""
+    ADMIN_OWNER = "ADMIN_OWNER"
+    WRITE_EXECUTE = "WRITE_EXECUTE"
+    READ_ONLY = "READ_ONLY"
+
+
+class PostureTier(StrEnum):
+    """Discrete security posture classification tiers."""
+    SECURE = "SECURE"
+    ADEQUATE = "ADEQUATE"
+    ELEVATED_RISK = "ELEVATED_RISK"
+    CRITICAL_VULNERABLE = "CRITICAL_VULNERABLE"
+
+

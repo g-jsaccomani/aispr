@@ -59,7 +59,7 @@ class AIAsset(AISPRBaseModel):
             try:
                 return CloudProvider(val)
             except ValueError:
-                return CloudProvider.UNKNOWN
+                raise ValueError(f"Invalid CloudProvider: '{v}'")
         return v
 
     @field_validator("asset_type", mode="before")
@@ -79,5 +79,5 @@ class AIAsset(AISPRBaseModel):
             try:
                 return AssetType(normalized)
             except ValueError:
-                return AssetType.INFERENCE_ENDPOINT
+                raise ValueError(f"Invalid AssetType: '{v}'")
         return v

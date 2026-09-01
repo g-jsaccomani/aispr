@@ -292,6 +292,62 @@ def cmd_controls(args):
         sys.exit(1)
 
 
+def cmd_risk(args):
+    """Handles 'risk' subcommand for Enterprise AI Risk Engine (Phase 5)."""
+    from audit.engine.risk_engine import EnterpriseRiskEngine
+    from audit.engine.findings_correlator import CloudFindingsCorrelator
+    from audit.questionnaire.handler import QuestionnaireHandler
+
+    engine = EnterpriseRiskEngine()
+    assessment_id = getattr(args, "assessment_id", "ASM-ENTERPRISE-01")
+
+    # Run cross-cloud correlation to collect findings and control results
+    correlator = CloudFindingsCorrelator(project_id="enterprise-ai-workload")
+    findings = correlator.to_canonical_findings()
+
+    # Map correlated findings into control evaluation statuses
+    eval_map = {}
+    for cid, finding_list in correlator.get_findings_map_dict().items():
+        if finding_list:
+            eval_map[cid] = {
+                "status": "N",
+                "rationale": f"Correlated {len(finding_list)} cloud security finding(s).",
+                "execution_mode": "LIVE"
+            }
+
+    result = engine.evaluate(
+        assessment_id=assessment_id,
+        findings=findings,
+        assets=[],
+        control_evaluations=eval_map,
+    )
+
+    print("\n" + "=" * 80)
+    print("🛡️  AISPR ENTERPRISE AI RISK ENGINE • EVALUATION REPORT")
+    print("=" * 80)
+    print(f"📋 Assessment ID          : {result.assessment_id}")
+    print(f"⚙️  Risk Model Version     : {result.risk_model_version}")
+    print(f"📐 Formula Version        : {result.formula_version}")
+    print(f"⏱️  Calculated At          : {result.calculated_at.isoformat()}")
+    print("-" * 80)
+    print("📊 SEPARATED ENTERPRISE METRICS:")
+    print(f"  1. Compliance Score     : {result.metrics.compliance_score}%")
+    print(f"  2. Security Posture     : {result.metrics.security_posture_score}/100 [{result.metrics.security_posture_tier}]")
+    print(f"  3. Residual Risk        : {result.metrics.residual_risk_score}/100 [{result.metrics.residual_risk_tier}] (Floor: {result.metrics.unmitigated_finding_floor})")
+    print(f"  4. Attack Surface Risk  : {result.metrics.attack_surface_risk_score}/100 [{result.metrics.attack_surface_risk_tier}]")
+    print(f"  5. Evidence Confidence  : {result.metrics.evidence_confidence_score}% (Live: {result.metrics.live_evidence_count}, Sim: {result.metrics.simulated_evidence_count}, Missing: {result.metrics.missing_evidence_count})")
+    print(f"  6. Control Coverage     : {result.metrics.control_coverage_score}% (Automated: {result.metrics.automated_controls_count}, Manual: {result.metrics.manual_controls_count})")
+    print("=" * 80)
+
+    if getattr(args, "trace", False):
+        print(f"\n🔍 CALCULATION TRACE ({len(result.calculation_trace)} entries):")
+        for t in result.calculation_trace[:15]:
+            print(f"  • [{t.rule_id}] Input={t.input_value} -> Norm={t.normalized_value} -> Res={t.calculation_result} ({t.description})")
+        if len(result.calculation_trace) > 15:
+            print(f"  ... and {len(result.calculation_trace) - 15} more trace entries.")
+    sys.exit(0)
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="AI Security Posture Review (AISPR) - Enterprise AI Security & Audit CLI",
@@ -365,6 +421,11 @@ Examples:
     val_p.add_argument("--matrix", action="store_true", default=False, help="Display the complete coverage matrix")
     mat_p = ctrl_sub.add_parser("matrix", help="Display the complete 104-control coverage matrix")
 
+    # Command: risk (Enterprise AI Risk Engine)
+    risk_p = subparsers.add_parser("risk", help="Evaluate deterministic Enterprise AI Risk metrics with separated scores")
+    risk_p.add_argument("--assessment-id", default="ASM-ENTERPRISE-01", help="Assessment ID scope")
+    risk_p.add_argument("--trace", action="store_true", default=False, help="Display complete machine-readable calculation trace")
+
     args = parser.parse_args()
 
     if args.command == "audit":
@@ -384,6 +445,8 @@ Examples:
         run_server(port=args.port)
     elif args.command == "controls":
         cmd_controls(args)
+    elif args.command == "risk":
+        cmd_risk(args)
     else:
         print_master_banner()
         parser.print_help()

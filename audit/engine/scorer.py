@@ -11,10 +11,14 @@ Engineered by: @jsaccomani
 from typing import Dict, List, Any, Tuple
 
 
+# Legacy PostureScorer preserved for backward compatibility (Phase 5).
+# For comprehensive deterministic risk evaluation with separated metrics, use EnterpriseRiskEngine.
 class PostureScorer:
     """
-    Evaluates assessment responses, computes domain-level and overall compliance scores,
+    [LEGACY COMPLIANCE SCORER]
+    Evaluates assessment questionnaire responses, computes domain-level and overall compliance scores,
     classifies the organizational security posture tier, and prioritizes remediation gaps.
+    Preserved for backward compatibility.
     """
 
     POSTURE_TIERS = {

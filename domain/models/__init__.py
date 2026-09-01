@@ -15,7 +15,13 @@ from domain.models.attack import AttackTechnique
 from domain.models.framework import FrameworkMapping
 from domain.models.control import Control, ControlLink, ControlResult
 from domain.models.remediation import Remediation
-from domain.models.risk import Risk
+from domain.models.risk import (
+    Risk,
+    RiskTraceEntry,
+    FindingRiskAssessment,
+    EnterpriseRiskMetrics,
+    EnterpriseRiskResult,
+)
 from domain.models.finding import SecurityFinding, Finding
 from domain.models.event import SecurityEvent
 from domain.models.assessment import Assessment, AssessmentRun
@@ -40,6 +46,10 @@ __all__ = [
     "ControlResult",
     "Remediation",
     "Risk",
+    "RiskTraceEntry",
+    "FindingRiskAssessment",
+    "EnterpriseRiskMetrics",
+    "EnterpriseRiskResult",
     "SecurityFinding",
     "Finding",
     "SecurityEvent",

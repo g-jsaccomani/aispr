@@ -55,6 +55,8 @@ class SecurityFinding(AISPRBaseModel):
     framework_mappings: List[FrameworkMapping] = Field(default_factory=list)
     attack_techniques: List[AttackTechnique] = Field(default_factory=list)
     remediations: List[Remediation] = Field(default_factory=list)
+    cve: Optional[str] = None
+    cvss_score: Optional[float] = None
     
     first_seen: datetime = Field(default_factory=utc_now)
     last_seen: datetime = Field(default_factory=utc_now)
