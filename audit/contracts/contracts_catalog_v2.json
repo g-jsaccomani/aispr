@@ -19,7 +19,8 @@
         "name": "Data Security Inspection: Know the origin, lineage, and authenticity",
         "description": "Inspects training datasets, vector stores, and encryption policies for DAT-01.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudFindingsCorrelator"
+        "collector_or_engine": "CloudFindingsCorrelator",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -111,7 +112,8 @@
         "name": "Data Security Inspection: Fine-tuning and embedding pipelines equipped with centralized",
         "description": "Inspects training datasets, vector stores, and encryption policies for DAT-02.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudFindingsCorrelator"
+        "collector_or_engine": "CloudFindingsCorrelator",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -203,7 +205,8 @@
         "name": "Data Security Inspection: An enterprise data classification schema (e.g., public,",
         "description": "Inspects training datasets, vector stores, and encryption policies for DAT-03.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudFindingsCorrelator"
+        "collector_or_engine": "CloudFindingsCorrelator",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -295,7 +298,8 @@
         "name": "Data Security Inspection: Strictly isolate untrusted third-party data from",
         "description": "Inspects training datasets, vector stores, and encryption policies for DAT-04.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudFindingsCorrelator"
+        "collector_or_engine": "CloudFindingsCorrelator",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -387,7 +391,8 @@
         "name": "Data Security Inspection: Cloud dlp or an equivalent engine actively",
         "description": "Inspects training datasets, vector stores, and encryption policies for DAT-05.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudFindingsCorrelator"
+        "collector_or_engine": "CloudFindingsCorrelator",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -479,7 +484,8 @@
         "name": "Data Security Inspection: Vector databases (e.g., vertex ai vector search,",
         "description": "Inspects training datasets, vector stores, and encryption policies for DAT-06.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudFindingsCorrelator"
+        "collector_or_engine": "CloudFindingsCorrelator",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -571,7 +577,8 @@
         "name": "Data Security Inspection: Validate the authenticity and integrity of",
         "description": "Inspects training datasets, vector stores, and encryption policies for DAT-07.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudFindingsCorrelator"
+        "collector_or_engine": "CloudFindingsCorrelator",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -663,7 +670,8 @@
         "name": "Data Security Inspection: User consent and data retention terms explicitly",
         "description": "Inspects training datasets, vector stores, and encryption policies for DAT-08.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudFindingsCorrelator"
+        "collector_or_engine": "CloudFindingsCorrelator",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -755,7 +763,8 @@
         "name": "Data Security Inspection: Have automated routines to detect and",
         "description": "Inspects training datasets, vector stores, and encryption policies for DAT-09.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudFindingsCorrelator"
+        "collector_or_engine": "CloudFindingsCorrelator",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -849,7 +858,8 @@
         "name": "Data Security Inspection: Data ingestion connectors (e.g., gcs buckets, bigquery,",
         "description": "Inspects training datasets, vector stores, and encryption policies for DAT-10.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudFindingsCorrelator"
+        "collector_or_engine": "CloudFindingsCorrelator",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -941,7 +951,8 @@
         "name": "Data Security Inspection: Chunked rag document metadata (author, classification, timestamp)",
         "description": "Inspects training datasets, vector stores, and encryption policies for DAT-11.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudFindingsCorrelator"
+        "collector_or_engine": "CloudFindingsCorrelator",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -1033,7 +1044,8 @@
         "name": "Data Security Inspection: Enforce data residency and geographic sovereignty",
         "description": "Inspects training datasets, vector stores, and encryption policies for DAT-12.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudFindingsCorrelator"
+        "collector_or_engine": "CloudFindingsCorrelator",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -1125,7 +1137,8 @@
         "name": "Data Security Inspection: Embedding caches (e.g., redis, memorystore) encrypted at",
         "description": "Inspects training datasets, vector stores, and encryption policies for DAT-13.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudFindingsCorrelator"
+        "collector_or_engine": "CloudFindingsCorrelator",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -1217,7 +1230,8 @@
         "name": "Data Security Inspection: Perform statistical anomaly detection on incoming",
         "description": "Inspects training datasets, vector stores, and encryption policies for DAT-14.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudFindingsCorrelator"
+        "collector_or_engine": "CloudFindingsCorrelator",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -1309,7 +1323,8 @@
         "name": "Data Security Inspection: There a formal data de-duplication and quality",
         "description": "Inspects training datasets, vector stores, and encryption policies for DAT-15.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudFindingsCorrelator"
+        "collector_or_engine": "CloudFindingsCorrelator",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -1401,7 +1416,8 @@
         "name": "Data Security Inspection: Training dataset backups isolated in immutable storage",
         "description": "Inspects training datasets, vector stores, and encryption policies for DAT-16.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudFindingsCorrelator"
+        "collector_or_engine": "CloudFindingsCorrelator",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -1493,7 +1509,8 @@
         "name": "Data Security Inspection: Have an automated process to scrub",
         "description": "Inspects training datasets, vector stores, and encryption policies for DAT-17.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudFindingsCorrelator"
+        "collector_or_engine": "CloudFindingsCorrelator",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -1585,7 +1602,8 @@
         "name": "Data Security Inspection: Data poisoning detection techniques applied during continuous",
         "description": "Inspects training datasets, vector stores, and encryption policies for DAT-18.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudFindingsCorrelator"
+        "collector_or_engine": "CloudFindingsCorrelator",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -1677,7 +1695,8 @@
         "name": "Data Security Inspection: Token entropy and randomness verified for session-based",
         "description": "Inspects training datasets, vector stores, and encryption policies for DAT-19.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudFindingsCorrelator"
+        "collector_or_engine": "CloudFindingsCorrelator",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -1769,7 +1788,8 @@
         "name": "Model Integrity Check: Evaluate pre-trained foundation models for known",
         "description": "Scans model registry, weights provenance, and vulnerability database for MOD-01.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "AIBOMCataloger"
+        "collector_or_engine": "AIBOMCataloger",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -1861,7 +1881,8 @@
         "name": "Model Integrity Check: Maintain an enterprise model registry (e.g.,",
         "description": "Scans model registry, weights provenance, and vulnerability database for MOD-02.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "AIBOMCataloger"
+        "collector_or_engine": "AIBOMCataloger",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -1953,7 +1974,8 @@
         "name": "Model Integrity Check: Model artifact serialization formats scanned to prevent",
         "description": "Scans model registry, weights provenance, and vulnerability database for MOD-03.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "AIBOMCataloger"
+        "collector_or_engine": "AIBOMCataloger",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -2045,7 +2067,8 @@
         "name": "Model Integrity Check: Conduct automated empirical red teaming and",
         "description": "Scans model registry, weights provenance, and vulnerability database for MOD-04.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "AIBOMCataloger"
+        "collector_or_engine": "AIBOMCataloger",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -2137,7 +2160,8 @@
         "name": "Model Integrity Check: Model weight files and checkpoint binaries cryptographically",
         "description": "Scans model registry, weights provenance, and vulnerability database for MOD-05.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "AIBOMCataloger"
+        "collector_or_engine": "AIBOMCataloger",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -2229,7 +2253,8 @@
         "name": "Model Integrity Check: Perform quantization and model compression checks",
         "description": "Scans model registry, weights provenance, and vulnerability database for MOD-06.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "AIBOMCataloger"
+        "collector_or_engine": "AIBOMCataloger",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -2321,7 +2346,8 @@
         "name": "Model Integrity Check: Fine-tuned lora (low-rank adaptation) adapters scanned for",
         "description": "Scans model registry, weights provenance, and vulnerability database for MOD-07.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "AIBOMCataloger"
+        "collector_or_engine": "AIBOMCataloger",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -2413,7 +2439,8 @@
         "name": "Model Integrity Check: Enforce model card documentation specifying intended",
         "description": "Scans model registry, weights provenance, and vulnerability database for MOD-08.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "AIBOMCataloger"
+        "collector_or_engine": "AIBOMCataloger",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -2505,7 +2532,8 @@
         "name": "Model Integrity Check: Model inversion and membership inference testing conducted",
         "description": "Scans model registry, weights provenance, and vulnerability database for MOD-09.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "AIBOMCataloger"
+        "collector_or_engine": "AIBOMCataloger",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -2599,7 +2627,8 @@
         "name": "Model Integrity Check: Third-party open-source libraries (transformers, vllm, langchain, llamaindex)",
         "description": "Scans model registry, weights provenance, and vulnerability database for MOD-10.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "AIBOMCataloger"
+        "collector_or_engine": "AIBOMCataloger",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -2691,7 +2720,8 @@
         "name": "Model Integrity Check: Implement watermarking or synthetic content attribution",
         "description": "Scans model registry, weights provenance, and vulnerability database for MOD-11.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "AIBOMCataloger"
+        "collector_or_engine": "AIBOMCataloger",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -2783,7 +2813,8 @@
         "name": "Model Integrity Check: Fine-tuning hyperparameters (learning rate, epochs) locked and",
         "description": "Scans model registry, weights provenance, and vulnerability database for MOD-12.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "AIBOMCataloger"
+        "collector_or_engine": "AIBOMCataloger",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -2875,7 +2906,8 @@
         "name": "Model Integrity Check: Maintain an isolated staging model environment",
         "description": "Scans model registry, weights provenance, and vulnerability database for MOD-13.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "AIBOMCataloger"
+        "collector_or_engine": "AIBOMCataloger",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -2967,7 +2999,8 @@
         "name": "Model Integrity Check: There a formal procedure for emergency model",
         "description": "Scans model registry, weights provenance, and vulnerability database for MOD-14.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "AIBOMCataloger"
+        "collector_or_engine": "AIBOMCataloger",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -3059,7 +3092,8 @@
         "name": "Model Integrity Check: Foundation model license agreements reviewed to ensure",
         "description": "Scans model registry, weights provenance, and vulnerability database for MOD-15.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "AIBOMCataloger"
+        "collector_or_engine": "AIBOMCataloger",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -3151,7 +3185,8 @@
         "name": "Model Integrity Check: Enforce hardware-level root of trust (tpm",
         "description": "Scans model registry, weights provenance, and vulnerability database for MOD-16.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "AIBOMCataloger"
+        "collector_or_engine": "AIBOMCataloger",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -3243,7 +3278,8 @@
         "name": "Model Integrity Check: Reinforcement learning reward models (rlhf / rlaif)",
         "description": "Scans model registry, weights provenance, and vulnerability database for MOD-17.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "AIBOMCataloger"
+        "collector_or_engine": "AIBOMCataloger",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -3335,7 +3371,8 @@
         "name": "Model Integrity Check: Model checkpoint hashes cryptographically verified against a",
         "description": "Scans model registry, weights provenance, and vulnerability database for MOD-18.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "AIBOMCataloger"
+        "collector_or_engine": "AIBOMCataloger",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -3427,7 +3464,8 @@
         "name": "Model Integrity Check: Maintain an automated rollback pipeline to",
         "description": "Scans model registry, weights provenance, and vulnerability database for MOD-19.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "AIBOMCataloger"
+        "collector_or_engine": "AIBOMCataloger",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -3519,14 +3557,16 @@
         "name": "Runtime Verification: User input prompts validated and sanitized in",
         "description": "Executes automated runtime evaluation and telemetry inspection for APP-01.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ModelArmorGuard"
+        "collector_or_engine": "ModelArmorGuard",
+        "implementation_status": "IMPLEMENTED"
       },
       {
         "test_id": "sast.app_01",
         "name": "Static Analysis: User input prompts validated and sanitized in",
         "description": "Inspects application source code and agent prompt templates for APP-01.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "PromptSAST"
+        "collector_or_engine": "PromptSAST",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -3624,14 +3664,16 @@
         "name": "Runtime Verification: Model output responses filtered for toxic completions,",
         "description": "Executes automated runtime evaluation and telemetry inspection for APP-02.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ModelArmorGuard"
+        "collector_or_engine": "ModelArmorGuard",
+        "implementation_status": "IMPLEMENTED"
       },
       {
         "test_id": "sast.app_02",
         "name": "Static Analysis: Model output responses filtered for toxic completions,",
         "description": "Inspects application source code and agent prompt templates for APP-02.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "PromptSAST"
+        "collector_or_engine": "PromptSAST",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -3729,14 +3771,16 @@
         "name": "Runtime Verification: Do autonomous agents and tool-calling plugins enforce strict",
         "description": "Executes automated runtime evaluation and telemetry inspection for APP-03.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ModelArmorGuard"
+        "collector_or_engine": "ModelArmorGuard",
+        "implementation_status": "IMPLEMENTED"
       },
       {
         "test_id": "sast.app_03",
         "name": "Static Analysis: Do autonomous agents and tool-calling plugins enforce strict",
         "description": "Inspects application source code and agent prompt templates for APP-03.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "PromptSAST"
+        "collector_or_engine": "PromptSAST",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -3834,14 +3878,16 @@
         "name": "Runtime Verification: Tool executions that perform high-impact mutations (e.g.,",
         "description": "Executes automated runtime evaluation and telemetry inspection for APP-04.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ModelArmorGuard"
+        "collector_or_engine": "ModelArmorGuard",
+        "implementation_status": "IMPLEMENTED"
       },
       {
         "test_id": "sast.app_04",
         "name": "Static Analysis: Tool executions that perform high-impact mutations (e.g.,",
         "description": "Inspects application source code and agent prompt templates for APP-04.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "PromptSAST"
+        "collector_or_engine": "PromptSAST",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -3939,14 +3985,16 @@
         "name": "Runtime Verification: Enforce token quotas, rate limiting, and",
         "description": "Executes automated runtime evaluation and telemetry inspection for APP-05.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ModelArmorGuard"
+        "collector_or_engine": "ModelArmorGuard",
+        "implementation_status": "IMPLEMENTED"
       },
       {
         "test_id": "sast.app_05",
         "name": "Static Analysis: Enforce token quotas, rate limiting, and",
         "description": "Inspects application source code and agent prompt templates for APP-05.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "PromptSAST"
+        "collector_or_engine": "PromptSAST",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -4044,14 +4092,16 @@
         "name": "Runtime Verification: System prompt confidentiality protected using multi-layer framing",
         "description": "Executes automated runtime evaluation and telemetry inspection for APP-06.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ModelArmorGuard"
+        "collector_or_engine": "ModelArmorGuard",
+        "implementation_status": "IMPLEMENTED"
       },
       {
         "test_id": "sast.app_06",
         "name": "Static Analysis: System prompt confidentiality protected using multi-layer framing",
         "description": "Inspects application source code and agent prompt templates for APP-06.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "PromptSAST"
+        "collector_or_engine": "PromptSAST",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -4151,14 +4201,16 @@
         "name": "Runtime Verification: Agentic tools restricted by egress network firewalls",
         "description": "Executes automated runtime evaluation and telemetry inspection for APP-07.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ModelArmorGuard"
+        "collector_or_engine": "ModelArmorGuard",
+        "implementation_status": "IMPLEMENTED"
       },
       {
         "test_id": "sast.app_07",
         "name": "Static Analysis: Agentic tools restricted by egress network firewalls",
         "description": "Inspects application source code and agent prompt templates for APP-07.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "PromptSAST"
+        "collector_or_engine": "PromptSAST",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -4256,14 +4308,16 @@
         "name": "Runtime Verification: Employ canary tokens and honey-prompts in",
         "description": "Executes automated runtime evaluation and telemetry inspection for APP-08.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ModelArmorGuard"
+        "collector_or_engine": "ModelArmorGuard",
+        "implementation_status": "IMPLEMENTED"
       },
       {
         "test_id": "sast.app_08",
         "name": "Static Analysis: Employ canary tokens and honey-prompts in",
         "description": "Inspects application source code and agent prompt templates for APP-08.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "PromptSAST"
+        "collector_or_engine": "PromptSAST",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -4363,14 +4417,16 @@
         "name": "Runtime Verification: File uploads (pdf, docx, images) processed in",
         "description": "Executes automated runtime evaluation and telemetry inspection for APP-09.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ModelArmorGuard"
+        "collector_or_engine": "ModelArmorGuard",
+        "implementation_status": "IMPLEMENTED"
       },
       {
         "test_id": "sast.app_09",
         "name": "Static Analysis: File uploads (pdf, docx, images) processed in",
         "description": "Inspects application source code and agent prompt templates for APP-09.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "PromptSAST"
+        "collector_or_engine": "PromptSAST",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -4468,14 +4524,16 @@
         "name": "Runtime Verification: Enforce cross-site scripting (xss) output encoding",
         "description": "Executes automated runtime evaluation and telemetry inspection for APP-10.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ModelArmorGuard"
+        "collector_or_engine": "ModelArmorGuard",
+        "implementation_status": "IMPLEMENTED"
       },
       {
         "test_id": "sast.app_10",
         "name": "Static Analysis: Enforce cross-site scripting (xss) output encoding",
         "description": "Inspects application source code and agent prompt templates for APP-10.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "PromptSAST"
+        "collector_or_engine": "PromptSAST",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -4573,14 +4631,16 @@
         "name": "Runtime Verification: Session state and conversation context memory isolated",
         "description": "Executes automated runtime evaluation and telemetry inspection for APP-11.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ModelArmorGuard"
+        "collector_or_engine": "ModelArmorGuard",
+        "implementation_status": "IMPLEMENTED"
       },
       {
         "test_id": "sast.app_11",
         "name": "Static Analysis: Session state and conversation context memory isolated",
         "description": "Inspects application source code and agent prompt templates for APP-11.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "PromptSAST"
+        "collector_or_engine": "PromptSAST",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -4678,14 +4738,16 @@
         "name": "Runtime Verification: Monitor and block recursive multi-agent communication",
         "description": "Executes automated runtime evaluation and telemetry inspection for APP-12.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ModelArmorGuard"
+        "collector_or_engine": "ModelArmorGuard",
+        "implementation_status": "IMPLEMENTED"
       },
       {
         "test_id": "sast.app_12",
         "name": "Static Analysis: Monitor and block recursive multi-agent communication",
         "description": "Inspects application source code and agent prompt templates for APP-12.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "PromptSAST"
+        "collector_or_engine": "PromptSAST",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -4783,14 +4845,16 @@
         "name": "Runtime Verification: Api keys and secrets stored strictly in",
         "description": "Executes automated runtime evaluation and telemetry inspection for APP-13.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ModelArmorGuard"
+        "collector_or_engine": "ModelArmorGuard",
+        "implementation_status": "IMPLEMENTED"
       },
       {
         "test_id": "sast.app_13",
         "name": "Static Analysis: Api keys and secrets stored strictly in",
         "description": "Inspects application source code and agent prompt templates for APP-13.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "PromptSAST"
+        "collector_or_engine": "PromptSAST",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -4888,14 +4952,16 @@
         "name": "Runtime Verification: Implement continuous sentiment and hallucination scoring",
         "description": "Executes automated runtime evaluation and telemetry inspection for APP-14.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ModelArmorGuard"
+        "collector_or_engine": "ModelArmorGuard",
+        "implementation_status": "IMPLEMENTED"
       },
       {
         "test_id": "sast.app_14",
         "name": "Static Analysis: Implement continuous sentiment and hallucination scoring",
         "description": "Inspects application source code and agent prompt templates for APP-14.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "PromptSAST"
+        "collector_or_engine": "PromptSAST",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -4993,14 +5059,16 @@
         "name": "Runtime Verification: Multimodal image/audio inputs scanned for steganographic payloads",
         "description": "Executes automated runtime evaluation and telemetry inspection for APP-15.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ModelArmorGuard"
+        "collector_or_engine": "ModelArmorGuard",
+        "implementation_status": "IMPLEMENTED"
       },
       {
         "test_id": "sast.app_15",
         "name": "Static Analysis: Multimodal image/audio inputs scanned for steganographic payloads",
         "description": "Inspects application source code and agent prompt templates for APP-15.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "PromptSAST"
+        "collector_or_engine": "PromptSAST",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -5100,14 +5168,16 @@
         "name": "Runtime Verification: Enforce strict cors and csrf protections",
         "description": "Executes automated runtime evaluation and telemetry inspection for APP-16.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ModelArmorGuard"
+        "collector_or_engine": "ModelArmorGuard",
+        "implementation_status": "IMPLEMENTED"
       },
       {
         "test_id": "sast.app_16",
         "name": "Static Analysis: Enforce strict cors and csrf protections",
         "description": "Inspects application source code and agent prompt templates for APP-16.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "PromptSAST"
+        "collector_or_engine": "PromptSAST",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -5205,14 +5275,16 @@
         "name": "Runtime Verification: Fallback mechanisms and graceful degradation policies defined",
         "description": "Executes automated runtime evaluation and telemetry inspection for APP-17.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ModelArmorGuard"
+        "collector_or_engine": "ModelArmorGuard",
+        "implementation_status": "IMPLEMENTED"
       },
       {
         "test_id": "sast.app_17",
         "name": "Static Analysis: Fallback mechanisms and graceful degradation policies defined",
         "description": "Inspects application source code and agent prompt templates for APP-17.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "PromptSAST"
+        "collector_or_engine": "PromptSAST",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -5310,14 +5382,16 @@
         "name": "Runtime Verification: Enforce cryptographic signing of agent-to-agent messages",
         "description": "Executes automated runtime evaluation and telemetry inspection for APP-18.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ModelArmorGuard"
+        "collector_or_engine": "ModelArmorGuard",
+        "implementation_status": "IMPLEMENTED"
       },
       {
         "test_id": "sast.app_18",
         "name": "Static Analysis: Enforce cryptographic signing of agent-to-agent messages",
         "description": "Inspects application source code and agent prompt templates for APP-18.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "PromptSAST"
+        "collector_or_engine": "PromptSAST",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -5415,14 +5489,16 @@
         "name": "Runtime Verification: Automated content moderation filters configured with deterministic",
         "description": "Executes automated runtime evaluation and telemetry inspection for APP-19.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ModelArmorGuard"
+        "collector_or_engine": "ModelArmorGuard",
+        "implementation_status": "IMPLEMENTED"
       },
       {
         "test_id": "sast.app_19",
         "name": "Static Analysis: Automated content moderation filters configured with deterministic",
         "description": "Inspects application source code and agent prompt templates for APP-19.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "PromptSAST"
+        "collector_or_engine": "PromptSAST",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -5520,7 +5596,8 @@
         "name": "Cloud Infrastructure Scan: Vertex ai workbench and custom training compute",
         "description": "Validates cloud infrastructure configuration via Cloud Asset Inventory and policy APIs for INF-01.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudAssetInventory"
+        "collector_or_engine": "CloudAssetInventory",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -5618,7 +5695,8 @@
         "name": "Cloud Infrastructure Scan: Vpc service controls (vpc-sc) perimeters active around",
         "description": "Validates cloud infrastructure configuration via Cloud Asset Inventory and policy APIs for INF-02.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudAssetInventory"
+        "collector_or_engine": "CloudAssetInventory",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -5716,7 +5794,8 @@
         "name": "Cloud Infrastructure Scan: Customer-managed encryption keys (cmek) via cloud kms",
         "description": "Validates cloud infrastructure configuration via Cloud Asset Inventory and policy APIs for INF-03.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudAssetInventory"
+        "collector_or_engine": "CloudAssetInventory",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -5814,7 +5893,8 @@
         "name": "Cloud Infrastructure Scan: Do ai service accounts adhere strictly to least",
         "description": "Validates cloud infrastructure configuration via Cloud Asset Inventory and policy APIs for INF-04.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudAssetInventory"
+        "collector_or_engine": "CloudAssetInventory",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -5912,7 +5992,8 @@
         "name": "Cloud Infrastructure Scan: Cloud nat and private google access configured",
         "description": "Validates cloud infrastructure configuration via Cloud Asset Inventory and policy APIs for INF-05.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudAssetInventory"
+        "collector_or_engine": "CloudAssetInventory",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -6010,7 +6091,8 @@
         "name": "Cloud Infrastructure Scan: Shielded vm features (secure boot, vtpm, integrity",
         "description": "Validates cloud infrastructure configuration via Cloud Asset Inventory and policy APIs for INF-06.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudAssetInventory"
+        "collector_or_engine": "CloudAssetInventory",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -6108,7 +6190,8 @@
         "name": "Cloud Infrastructure Scan: Use workload identity federation instead of",
         "description": "Validates cloud infrastructure configuration via Cloud Asset Inventory and policy APIs for INF-07.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudAssetInventory"
+        "collector_or_engine": "CloudAssetInventory",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -6206,7 +6289,8 @@
         "name": "Cloud Infrastructure Scan: Confidential computing (amd sev / intel tdx)",
         "description": "Validates cloud infrastructure configuration via Cloud Asset Inventory and policy APIs for INF-08.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudAssetInventory"
+        "collector_or_engine": "CloudAssetInventory",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -6304,7 +6388,8 @@
         "name": "Cloud Infrastructure Scan: Kubernetes clusters hosting ai workloads (gke /",
         "description": "Validates cloud infrastructure configuration via Cloud Asset Inventory and policy APIs for INF-09.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudAssetInventory"
+        "collector_or_engine": "CloudAssetInventory",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -6402,7 +6487,8 @@
         "name": "Cloud Infrastructure Scan: Enforce organization policies prohibiting the creation",
         "description": "Validates cloud infrastructure configuration via Cloud Asset Inventory and policy APIs for INF-10.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudAssetInventory"
+        "collector_or_engine": "CloudAssetInventory",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -6500,7 +6586,8 @@
         "name": "Cloud Infrastructure Scan: Private service connect (psc) endpoints used to",
         "description": "Validates cloud infrastructure configuration via Cloud Asset Inventory and policy APIs for INF-11.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudAssetInventory"
+        "collector_or_engine": "CloudAssetInventory",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -6598,7 +6685,8 @@
         "name": "Cloud Infrastructure Scan: Enforce automatic key rotation policies (e.g.,",
         "description": "Validates cloud infrastructure configuration via Cloud Asset Inventory and policy APIs for INF-12.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudAssetInventory"
+        "collector_or_engine": "CloudAssetInventory",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -6696,7 +6784,8 @@
         "name": "Cloud Infrastructure Scan: Ssh and rdp management ports strictly disabled",
         "description": "Validates cloud infrastructure configuration via Cloud Asset Inventory and policy APIs for INF-13.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudAssetInventory"
+        "collector_or_engine": "CloudAssetInventory",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -6794,7 +6883,8 @@
         "name": "Cloud Infrastructure Scan: Network traffic between distributed gpu training nodes",
         "description": "Validates cloud infrastructure configuration via Cloud Asset Inventory and policy APIs for INF-14.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudAssetInventory"
+        "collector_or_engine": "CloudAssetInventory",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -6892,7 +6982,8 @@
         "name": "Cloud Infrastructure Scan: Maintain segmented vpc subnets for development,",
         "description": "Validates cloud infrastructure configuration via Cloud Asset Inventory and policy APIs for INF-15.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudAssetInventory"
+        "collector_or_engine": "CloudAssetInventory",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -6990,7 +7081,8 @@
         "name": "Cloud Infrastructure Scan: Container registries hosting custom model serving containers",
         "description": "Validates cloud infrastructure configuration via Cloud Asset Inventory and policy APIs for INF-16.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudAssetInventory"
+        "collector_or_engine": "CloudAssetInventory",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -7088,7 +7180,8 @@
         "name": "Cloud Infrastructure Scan: Automated infrastructure-as-code (terraform) templates utilized to provision",
         "description": "Validates cloud infrastructure configuration via Cloud Asset Inventory and policy APIs for INF-17.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudAssetInventory"
+        "collector_or_engine": "CloudAssetInventory",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -7186,7 +7279,8 @@
         "name": "Cloud Infrastructure Scan: Gpu memory scrubbing procedures enforced between multi-tenant",
         "description": "Validates cloud infrastructure configuration via Cloud Asset Inventory and policy APIs for INF-18.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudAssetInventory"
+        "collector_or_engine": "CloudAssetInventory",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -7284,7 +7378,8 @@
         "name": "Cloud Infrastructure Scan: Infrastructure drift detection configured via cloud asset",
         "description": "Validates cloud infrastructure configuration via Cloud Asset Inventory and policy APIs for INF-19.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "CloudAssetInventory"
+        "collector_or_engine": "CloudAssetInventory",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -7382,7 +7477,8 @@
         "name": "Assurance Telemetry Check: Vertex ai data access logs, model armor",
         "description": "Audits SIEM ingestion, detection rules, and logging pipeline for ASR-01.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ShadowAIHunter"
+        "collector_or_engine": "ShadowAIHunter",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -7474,7 +7570,8 @@
         "name": "Assurance Telemetry Check: Have active threat detection rules for",
         "description": "Audits SIEM ingestion, detection rules, and logging pipeline for ASR-02.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ShadowAIHunter"
+        "collector_or_engine": "ShadowAIHunter",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -7565,8 +7662,9 @@
         "test_id": "telemetry.asr_03",
         "name": "Assurance Telemetry Check: Dedicated incident response playbooks established specifically for",
         "description": "Audits SIEM ingestion, detection rules, and logging pipeline for ASR-03.",
-        "execution_type": "AUTOMATED",
-        "collector_or_engine": "ShadowAIHunter"
+        "execution_type": "SEMI_AUTOMATED",
+        "collector_or_engine": "ShadowAIHunter",
+        "implementation_status": "PARTIAL"
       }
     ],
     "evidence_requirements": [
@@ -7658,7 +7756,8 @@
         "name": "Assurance Telemetry Check: Perform periodic automated shadow ai scans",
         "description": "Audits SIEM ingestion, detection rules, and logging pipeline for ASR-04.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ShadowAIHunter"
+        "collector_or_engine": "ShadowAIHunter",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -7750,7 +7849,8 @@
         "name": "Assurance Telemetry Check: Security command center (scc) ai posture findings",
         "description": "Audits SIEM ingestion, detection rules, and logging pipeline for ASR-05.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ShadowAIHunter"
+        "collector_or_engine": "ShadowAIHunter",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -7842,7 +7942,8 @@
         "name": "Assurance Telemetry Check: Maintain an immutable audit log of",
         "description": "Audits SIEM ingestion, detection rules, and logging pipeline for ASR-06.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ShadowAIHunter"
+        "collector_or_engine": "ShadowAIHunter",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -7934,7 +8035,8 @@
         "name": "Assurance Telemetry Check: Model prediction latency and error rates monitored",
         "description": "Audits SIEM ingestion, detection rules, and logging pipeline for ASR-07.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ShadowAIHunter"
+        "collector_or_engine": "ShadowAIHunter",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -8027,8 +8129,9 @@
         "test_id": "telemetry.asr_08",
         "name": "Assurance Telemetry Check: Conduct simulated tabletop exercises with executive",
         "description": "Audits SIEM ingestion, detection rules, and logging pipeline for ASR-08.",
-        "execution_type": "AUTOMATED",
-        "collector_or_engine": "ShadowAIHunter"
+        "execution_type": "SEMI_AUTOMATED",
+        "collector_or_engine": "ShadowAIHunter",
+        "implementation_status": "PARTIAL"
       }
     ],
     "evidence_requirements": [
@@ -8120,7 +8223,8 @@
         "name": "Assurance Telemetry Check: Prompt and completion log data retention policy",
         "description": "Audits SIEM ingestion, detection rules, and logging pipeline for ASR-09.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ShadowAIHunter"
+        "collector_or_engine": "ShadowAIHunter",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -8212,7 +8316,8 @@
         "name": "Assurance Telemetry Check: Use user and entity behavior analytics",
         "description": "Audits SIEM ingestion, detection rules, and logging pipeline for ASR-10.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ShadowAIHunter"
+        "collector_or_engine": "ShadowAIHunter",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -8304,7 +8409,8 @@
         "name": "Assurance Telemetry Check: Model drift metrics (kl divergence, psi) computed",
         "description": "Audits SIEM ingestion, detection rules, and logging pipeline for ASR-11.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ShadowAIHunter"
+        "collector_or_engine": "ShadowAIHunter",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -8396,7 +8502,8 @@
         "name": "Assurance Telemetry Check: Participate in threat intelligence sharing communities",
         "description": "Audits SIEM ingestion, detection rules, and logging pipeline for ASR-12.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ShadowAIHunter"
+        "collector_or_engine": "ShadowAIHunter",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -8488,7 +8595,8 @@
         "name": "Assurance Telemetry Check: External bug bounty programs or third-party penetration",
         "description": "Audits SIEM ingestion, detection rules, and logging pipeline for ASR-13.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ShadowAIHunter"
+        "collector_or_engine": "ShadowAIHunter",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -8580,7 +8688,8 @@
         "name": "Assurance Telemetry Check: Have automated synthetic probe agents continuously",
         "description": "Audits SIEM ingestion, detection rules, and logging pipeline for ASR-14.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ShadowAIHunter"
+        "collector_or_engine": "ShadowAIHunter",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -8672,7 +8781,8 @@
         "name": "Assurance Telemetry Check: Automated canary requests continuously injected into production",
         "description": "Audits SIEM ingestion, detection rules, and logging pipeline for ASR-15.",
         "execution_type": "AUTOMATED",
-        "collector_or_engine": "ShadowAIHunter"
+        "collector_or_engine": "ShadowAIHunter",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -8764,7 +8874,8 @@
         "name": "Governance Review: Established an ai governance committee with",
         "description": "Evaluates organizational policy, documentation artifacts, and committee records for GOV-01.",
         "execution_type": "MANUAL",
-        "collector_or_engine": "ManualAssessment"
+        "collector_or_engine": "ManualAssessment",
+        "implementation_status": "DECLARED_ONLY"
       }
     ],
     "evidence_requirements": [
@@ -8854,9 +8965,10 @@
       {
         "test_id": "governance.gov_02",
         "name": "Governance Review: Maintain an updated ai software bill",
-        "description": "Evaluates organizational policy, documentation artifacts, and committee records for GOV-02.",
-        "execution_type": "MANUAL",
-        "collector_or_engine": "ManualAssessment"
+        "description": "Evaluates automated AI-BOM and SBOM catalogs for GOV-02.",
+        "execution_type": "AUTOMATED",
+        "collector_or_engine": "CloudFindingsCorrelator",
+        "implementation_status": "IMPLEMENTED"
       }
     ],
     "evidence_requirements": [
@@ -8946,9 +9058,10 @@
       {
         "test_id": "governance.gov_03",
         "name": "Governance Review: Ai-specific risk assessments (ai dpia / impact",
-        "description": "Evaluates organizational policy, documentation artifacts, and committee records for GOV-03.",
-        "execution_type": "MANUAL",
-        "collector_or_engine": "ManualAssessment"
+        "description": "Evaluates semi-automated risk assessment records and DPIA templates for GOV-03.",
+        "execution_type": "SEMI_AUTOMATED",
+        "collector_or_engine": "PolicyReviewer",
+        "implementation_status": "PARTIAL"
       }
     ],
     "evidence_requirements": [
@@ -9038,9 +9151,10 @@
       {
         "test_id": "governance.gov_04",
         "name": "Governance Review: Have documented policies outlining acceptable use",
-        "description": "Evaluates organizational policy, documentation artifacts, and committee records for GOV-04.",
-        "execution_type": "MANUAL",
-        "collector_or_engine": "ManualAssessment"
+        "description": "Evaluates semi-automated risk assessment records and DPIA templates for GOV-04.",
+        "execution_type": "SEMI_AUTOMATED",
+        "collector_or_engine": "PolicyReviewer",
+        "implementation_status": "PARTIAL"
       }
     ],
     "evidence_requirements": [
@@ -9132,7 +9246,8 @@
         "name": "Governance Review: Models evaluated for demographic bias, disparate impact,",
         "description": "Evaluates organizational policy, documentation artifacts, and committee records for GOV-05.",
         "execution_type": "MANUAL",
-        "collector_or_engine": "ManualAssessment"
+        "collector_or_engine": "ManualAssessment",
+        "implementation_status": "DECLARED_ONLY"
       }
     ],
     "evidence_requirements": [
@@ -9224,7 +9339,8 @@
         "name": "Governance Review: There a formal appeal mechanism for end",
         "description": "Evaluates organizational policy, documentation artifacts, and committee records for GOV-06.",
         "execution_type": "MANUAL",
-        "collector_or_engine": "ManualAssessment"
+        "collector_or_engine": "ManualAssessment",
+        "implementation_status": "DECLARED_ONLY"
       }
     ],
     "evidence_requirements": [
@@ -9316,7 +9432,8 @@
         "name": "Governance Review: Provide mandatory ai security and prompt",
         "description": "Evaluates organizational policy, documentation artifacts, and committee records for GOV-07.",
         "execution_type": "MANUAL",
-        "collector_or_engine": "ManualAssessment"
+        "collector_or_engine": "ManualAssessment",
+        "implementation_status": "DECLARED_ONLY"
       }
     ],
     "evidence_requirements": [
@@ -9408,7 +9525,8 @@
         "name": "Governance Review: Ai vendors and third-party saas integrations audited",
         "description": "Evaluates organizational policy, documentation artifacts, and committee records for GOV-08.",
         "execution_type": "MANUAL",
-        "collector_or_engine": "ManualAssessment"
+        "collector_or_engine": "ManualAssessment",
+        "implementation_status": "DECLARED_ONLY"
       }
     ],
     "evidence_requirements": [
@@ -9500,7 +9618,8 @@
         "name": "Governance Review: Maintain formal records of ai system",
         "description": "Evaluates organizational policy, documentation artifacts, and committee records for GOV-09.",
         "execution_type": "MANUAL",
-        "collector_or_engine": "ManualAssessment"
+        "collector_or_engine": "ManualAssessment",
+        "implementation_status": "DECLARED_ONLY"
       }
     ],
     "evidence_requirements": [
@@ -9592,7 +9711,8 @@
         "name": "Governance Review: There a designated ai ethics and safety",
         "description": "Evaluates organizational policy, documentation artifacts, and committee records for GOV-10.",
         "execution_type": "MANUAL",
-        "collector_or_engine": "ManualAssessment"
+        "collector_or_engine": "ManualAssessment",
+        "implementation_status": "DECLARED_ONLY"
       }
     ],
     "evidence_requirements": [
@@ -9684,7 +9804,8 @@
         "name": "Governance Review: Intellectual property ownership rights and patent boundaries",
         "description": "Evaluates organizational policy, documentation artifacts, and committee records for GOV-11.",
         "execution_type": "MANUAL",
-        "collector_or_engine": "ManualAssessment"
+        "collector_or_engine": "ManualAssessment",
+        "implementation_status": "DECLARED_ONLY"
       }
     ],
     "evidence_requirements": [
@@ -9776,7 +9897,8 @@
         "name": "Governance Review: Review and update ai security posture",
         "description": "Evaluates organizational policy, documentation artifacts, and committee records for GOV-12.",
         "execution_type": "MANUAL",
-        "collector_or_engine": "ManualAssessment"
+        "collector_or_engine": "ManualAssessment",
+        "implementation_status": "DECLARED_ONLY"
       }
     ],
     "evidence_requirements": [
@@ -9866,9 +9988,10 @@
       {
         "test_id": "governance.gov_13",
         "name": "Governance Review: An enterprise ai risk register maintained and",
-        "description": "Evaluates organizational policy, documentation artifacts, and committee records for GOV-13.",
-        "execution_type": "MANUAL",
-        "collector_or_engine": "ManualAssessment"
+        "description": "Evaluates semi-automated risk assessment records and DPIA templates for GOV-13.",
+        "execution_type": "SEMI_AUTOMATED",
+        "collector_or_engine": "PolicyReviewer",
+        "implementation_status": "PARTIAL"
       }
     ],
     "evidence_requirements": [

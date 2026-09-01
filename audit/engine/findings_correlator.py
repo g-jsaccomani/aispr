@@ -102,21 +102,13 @@ class CloudFindingsCorrelator:
                     sev = "LOW"
                 
                 # Check for control hints in text
-                ctrl_id = None
-                if "AI-SEC-001" in f or "IAM" in f or "Excessive Agency" in f:
-                    ctrl_id = "INF-03"
-                elif "AI-SEC-002" in f or "Public ingress" in f or "PSC" in f:
-                    ctrl_id = "INF-02"
-                elif "AI-SEC-003" in f or "CMEK" in f or "encryption" in f.lower():
-                    ctrl_id = "INF-04"
-
                 self.add_raw_finding(
                     source="GCP Security Command Center (SCC)",
                     category="SCC AI Protection",
                     severity=sev,
                     resource=f"projects/{self.project_id}",
                     description=f,
-                    suggested_control_id=ctrl_id
+                    suggested_control_id=None
                 )
             elif isinstance(f, dict):
                 sev = f.get("severity", "HIGH")
@@ -158,15 +150,6 @@ class CloudFindingsCorrelator:
             cve_id = item.get("cve")
             cluster = item.get("cluster") or item.get("resource_name") or item.get("resource") or "Compute Instance"
             risk = item.get("risk") or item.get("description") or "Unmanaged AI Workload"
-            
-            # Determine mapped control
-            ctrl_id = "GOV-02"
-            if "cve" in str(item).lower() or "token" in str(item).lower() or "startup" in str(item).lower():
-                ctrl_id = "INF-01"
-            elif "public ip" in str(item).lower() or "internet access" in str(item).lower():
-                ctrl_id = "INF-02"
-            elif "ollama" in str(item).lower() or "vllm" in str(item).lower() or "shadow" in str(item).lower():
-                ctrl_id = "GOV-02"
 
             tag = f"[{cve_id}] " if cve_id else f"[{engine}] "
             self.add_raw_finding(
@@ -175,7 +158,7 @@ class CloudFindingsCorrelator:
                 severity=sev,
                 resource=cluster,
                 description=f"{tag}{risk}",
-                suggested_control_id=ctrl_id
+                suggested_control_id=item.get("control_id")
             )
 
     def ingest_sast_findings(self, sast_findings: List[Dict[str, Any]]):
@@ -185,9 +168,6 @@ class CloudFindingsCorrelator:
             file_path = f.get("file", "app.py")
             line = f.get("line", 1)
             msg = f.get("message") or f.get("issue") or "Insecure Prompt Interpolation"
-            ctrl_id = "APP-01"
-            if "tool" in msg.lower() or "function" in msg.lower():
-                ctrl_id = "APP-04"
 
             self.add_raw_finding(
                 source="AISPR Prompt SAST Scanner",
@@ -195,7 +175,7 @@ class CloudFindingsCorrelator:
                 severity=sev,
                 resource=f"{file_path}:{line}",
                 description=f"SAST Finding at line {line}: {msg}",
-                suggested_control_id=ctrl_id
+                suggested_control_id=f.get("control_id")
             )
 
     def ingest_multicloud_findings(self, multicloud_data: Dict[str, Any]):
@@ -226,20 +206,20 @@ class CloudFindingsCorrelator:
             if not model.get("model_armor_enabled", False) and not model.get("guardrails_enabled", False):
                 self.add_raw_finding(
                     source=f"{provider} AI-BOM Discovery",
-                    category="Missing AI Guardrails",
+                    category="missing_guardrails",
                     severity="HIGH",
                     resource=name,
                     description=f"{provider} Foundation Model '{name}' deployed without active Model Armor / Guardrails protection.",
-                    suggested_control_id="APP-02"
+                    suggested_control_id=model.get("control_id")
                 )
             if not model.get("cmek_enabled", True):
                 self.add_raw_finding(
                     source=f"{provider} AI-BOM Discovery",
-                    category="Cryptographic Sovereignty Gap",
+                    category="cmek_missing",
                     severity="HIGH",
                     resource=name,
                     description=f"Model artifacts for '{name}' encrypted with default Google-managed keys rather than Customer-Managed Keys (CMEK).",
-                    suggested_control_id="INF-04"
+                    suggested_control_id=model.get("control_id")
                 )
 
         # 2. Shadow AI findings in BOM
@@ -255,7 +235,7 @@ class CloudFindingsCorrelator:
                     severity=v.get("severity", "CRITICAL"),
                     resource=v.get("resource", "Cloud Resource"),
                     description=v.get("description", "Vulnerability detected on AI infrastructure."),
-                    suggested_control_id="INF-01"
+                    suggested_control_id=v.get("control_id")
                 )
 
     def ingest_reports_directory(self, reports_dir: str):

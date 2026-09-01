@@ -142,14 +142,13 @@ class TestCanonicalSecurityDataModel(unittest.TestCase):
             AIAsset()  # missing name
 
     def test_invalid_severity_handling(self):
-        """Tests that invalid severity strings fall back to safe default or validate."""
-        # FindingSeverity validation in SecurityFinding parses safe HIGH fallback
-        finding = SecurityFinding(
-            asset=self.sample_asset,
-            title="Test Finding",
-            severity="NON_EXISTENT_SEVERITY"
-        )
-        self.assertEqual(finding.severity, FindingSeverity.HIGH)
+        """Tests that invalid severity strings raise ValidationError with zero silent fallback."""
+        with self.assertRaises(ValidationError):
+            SecurityFinding(
+                asset=self.sample_asset,
+                title="Test Finding",
+                severity="NON_EXISTENT_SEVERITY"
+            )
 
     def test_multi_control_findings_differentiation(self):
         """Tests explicit distinction between PRIMARY, SECONDARY, and RELATED controls."""

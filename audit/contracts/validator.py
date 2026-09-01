@@ -72,9 +72,19 @@ class ControlContractValidator:
         if missing_ids:
             errors.append(f"Missing expected control IDs: {sorted(list(missing_ids))}.")
 
-        # 4. Field Integrity per Control
+        # 4. Field and Schema Integrity per Control
         for c in contracts:
             cid = c.control_id
+
+            # ID format validation
+            import re
+            if not re.match(r"^(DAT|MOD|APP|INF|ASR|GOV)-\d{2}$", cid):
+                errors.append(f"[{cid}] Invalid ID format. Must match ^(DAT|MOD|APP|INF|ASR|GOV)-\\d{{2}}$")
+
+            # Domain/prefix consistency
+            prefix = cid.split("-")[0] if "-" in cid else ""
+            if f"({prefix})" not in c.domain and prefix not in c.domain:
+                errors.append(f"[{cid}] Domain/prefix inconsistency: prefix '{prefix}' does not match domain '{c.domain}'.")
 
             # Required string fields
             if not c.title or not c.title.strip():
@@ -86,36 +96,60 @@ class ControlContractValidator:
             if not c.remediation or not c.remediation.strip():
                 errors.append(f"[{cid}] Missing mandatory field 'remediation'.")
 
+            # Valid severity
+            try:
+                FindingSeverity(c.severity)
+            except (ValueError, TypeError):
+                errors.append(f"[{cid}] Invalid severity: '{c.severity}'.")
+
+            # Valid assessment type
+            try:
+                AssessmentType(c.assessment_type)
+            except (ValueError, TypeError):
+                errors.append(f"[{cid}] Invalid assessment_type: '{c.assessment_type}'.")
+
+            # Valid automation level
+            try:
+                AutomationLevel(c.automation_level)
+            except (ValueError, TypeError):
+                errors.append(f"[{cid}] Invalid automation_level: '{c.automation_level}'.")
+
             # Valid providers
             if not c.applicable_providers:
                 errors.append(f"[{cid}] applicable_providers cannot be empty.")
             for p in c.applicable_providers:
-                if not isinstance(p, CloudProvider):
-                    try:
-                        CloudProvider(p)
-                    except ValueError:
-                        errors.append(f"[{cid}] Invalid cloud provider: '{p}'.")
+                try:
+                    CloudProvider(p)
+                except (ValueError, TypeError):
+                    errors.append(f"[{cid}] Invalid cloud provider: '{p}'.")
 
-            # Valid test definitions
+            # Valid test definitions & duplicate test check
             if not c.test_definitions:
                 errors.append(f"[{cid}] Must define at least one TestDefinition.")
+            seen_test_ids: Set[str] = set()
             for t in c.test_definitions:
                 if not t.test_id or "." not in t.test_id:
                     errors.append(f"[{cid}] Test definition '{t.test_id}' must follow dot-notation '<category>.<test>'.")
                 if not t.name:
                     errors.append(f"[{cid}] Test definition '{t.test_id}' is missing a name.")
+                if t.test_id in seen_test_ids:
+                    errors.append(f"[{cid}] Duplicate test ID '{t.test_id}' within control contract.")
+                seen_test_ids.add(t.test_id)
 
-            # Valid evidence requirements
+            # Valid evidence requirements & duplicate requirement check
             if not c.evidence_requirements:
                 errors.append(f"[{cid}] Must define at least one EvidenceRequirement.")
+            seen_req_ids: Set[str] = set()
             for req in c.evidence_requirements:
                 if not req.requirement_id:
                     errors.append(f"[{cid}] EvidenceRequirement missing requirement_id.")
-                if not isinstance(req.evidence_type, EvidenceType):
-                    try:
-                        EvidenceType(req.evidence_type)
-                    except ValueError:
-                        errors.append(f"[{cid}] Invalid EvidenceType in requirement: '{req.evidence_type}'.")
+                try:
+                    EvidenceType(req.evidence_type)
+                except (ValueError, TypeError):
+                    errors.append(f"[{cid}] Invalid EvidenceType in requirement: '{req.evidence_type}'.")
+                if req.requirement_id in seen_req_ids:
+                    errors.append(f"[{cid}] Duplicate evidence requirement ID '{req.requirement_id}' within control contract.")
+                seen_req_ids.add(req.requirement_id)
 
             # Framework mappings validation
             fw_names_in_contract: Set[str] = set()
@@ -138,6 +172,13 @@ class ControlContractValidator:
             missing_fws = self.SUPPORTED_FRAMEWORKS - fw_names_in_contract
             if missing_fws:
                 errors.append(f"[{cid}] Incomplete framework model; missing: {sorted(list(missing_fws))}.")
+
+        # 5. Questionnaire Consistency Check (Task 9)
+        try:
+            from audit.questionnaire.handler import QuestionnaireHandler
+            QuestionnaireHandler.verify_canonical_consistency(contracts_catalog_path=self.registry.catalog_path)
+        except Exception as q_err:
+            errors.append(f"Questionnaire canonical consistency failure: {q_err}")
 
         return (len(errors) == 0, errors)
 

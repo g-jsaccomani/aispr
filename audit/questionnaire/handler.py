@@ -30,9 +30,52 @@ class QuestionnaireHandler:
 
         self.questions_path = questions_path
         self.findings_map = findings_map or {}
+        # Enforce canonical consistency with contracts catalog (Task 9)
+        self.verify_canonical_consistency(questions_path=self.questions_path)
         self.data = self._load_questions()
         self.question_db = self.data.get("domains", {})
         self.flat_questions = self._flatten_questions()
+
+    @classmethod
+    def verify_canonical_consistency(
+        cls,
+        questions_path: Optional[str] = None,
+        contracts_catalog_path: Optional[str] = None
+    ) -> bool:
+        """
+        Validates that the questionnaire is synchronized with the canonical contracts catalog:
+        canonical control IDs == questionnaire control IDs.
+        Raises ValueError if they differ.
+        """
+        from audit.contracts.registry import ControlContractRegistry
+        registry = ControlContractRegistry(catalog_path=contracts_catalog_path)
+        canonical_ids = set(registry._contracts.keys())
+
+        q_path = questions_path
+        if q_path is None:
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            q_path = os.path.join(current_dir, "questions.json")
+
+        if not os.path.exists(q_path):
+            raise FileNotFoundError(f"Questionnaire file not found at: {q_path}")
+
+        with open(q_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        q_ids = set()
+        for domain, q_list in data.get("domains", {}).items():
+            for q in q_list:
+                q_ids.add(q["id"].strip().upper())
+
+        if canonical_ids != q_ids:
+            missing = canonical_ids - q_ids
+            unexpected = q_ids - canonical_ids
+            raise ValueError(
+                f"Questionnaire integrity violation: Questionnaire control IDs do not match canonical contracts catalog!\n"
+                f"Missing in questionnaire: {sorted(list(missing))}\n"
+                f"Unexpected in questionnaire: {sorted(list(unexpected))}"
+            )
+        return True
 
     def _load_questions(self) -> Dict[str, Any]:
         if os.path.exists(self.questions_path):

@@ -82,7 +82,9 @@ class Evidence(AISPRBaseModel):
                     return FindingSource.AI_BOM
                 if "multicloud" in v_lower or "posture" in v_lower or "aws" in v_lower or "azure" in v_lower:
                     return FindingSource.MULTI_CLOUD_SCANNER
-                return FindingSource.MANUAL_AUDIT
+                if "manual" in v_lower:
+                    return FindingSource.MANUAL_AUDIT
+                raise ValueError(f"Invalid FindingSource: '{v}'")
         return v
 
     @field_validator("status", mode="before")
@@ -90,9 +92,9 @@ class Evidence(AISPRBaseModel):
     def parse_status(cls, v: Any) -> EvidenceStatus:
         if isinstance(v, str):
             try:
-                return EvidenceStatus(v.upper())
+                return EvidenceStatus(v.upper().strip())
             except ValueError:
-                return EvidenceStatus.UNVERIFIED
+                raise ValueError(f"Invalid EvidenceStatus: '{v}'")
         return v
 
     @field_validator("execution_mode", mode="before")
@@ -100,20 +102,26 @@ class Evidence(AISPRBaseModel):
     def parse_execution_mode(cls, v: Any) -> ExecutionMode:
         if isinstance(v, str):
             try:
-                return ExecutionMode(v.upper())
+                return ExecutionMode(v.upper().strip())
             except ValueError:
-                return ExecutionMode.SIMULATION
+                raise ValueError(f"Invalid ExecutionMode: '{v}'")
         return v
 
     @field_validator("provider", mode="before")
     @classmethod
     def parse_provider(cls, v: Any) -> CloudProvider:
         if isinstance(v, str):
-            val = v.lower()
+            val = v.lower().strip()
+            if val in ("gcp", "google"):
+                return CloudProvider.GCP
+            if val in ("aws", "amazon"):
+                return CloudProvider.AWS
+            if val in ("azure", "microsoft"):
+                return CloudProvider.AZURE
             try:
                 return CloudProvider(val)
             except ValueError:
-                return CloudProvider.GCP
+                raise ValueError(f"Invalid CloudProvider: '{v}'")
         return v
 
     @field_validator("evidence_type", mode="before")
@@ -133,7 +141,7 @@ class Evidence(AISPRBaseModel):
             try:
                 return EvidenceType(val)
             except ValueError:
-                return EvidenceType.CONFIGURATION
+                raise ValueError(f"Invalid EvidenceType: '{v}'")
         return v
 
     @model_validator(mode="before")
@@ -161,10 +169,10 @@ class Evidence(AISPRBaseModel):
             data["content_hash"] = compute_sha256(sanitized)
 
         # Invariant checks: SIMULATION execution cannot be VERIFIED status
-        exec_mode = str(data.get("execution_mode", "SIMULATION")).upper()
-        stat = str(data.get("status", "UNVERIFIED")).upper()
+        exec_mode = str(data.get("execution_mode", "SIMULATION")).upper().strip()
+        stat = str(data.get("status", "UNVERIFIED")).upper().strip()
         if exec_mode in ("SIMULATION", "FIXTURE", "MOCK") and stat == "VERIFIED":
-            data["status"] = EvidenceStatus.SIMULATED
+            raise ValueError(f"Simulation integrity violation: Evidence with execution mode '{exec_mode}' cannot have VERIFIED status.")
 
         return data
 

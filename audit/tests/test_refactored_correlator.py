@@ -211,7 +211,7 @@ class TestRefactoredCorrelatorPipeline(unittest.TestCase):
         mapper = ControlMapper()
         mapped = mapper.map_controls(finding)
         self.assertEqual(mapped.primary_control_id, "DAT-03")
-        self.assertEqual(mapped.metadata.get("mapping_level"), "KEYWORD_HEURISTIC_FALLBACK")
+        self.assertEqual(mapped.metadata.get("mapping_level"), "KEYWORD_FALLBACK")
 
     def test_conflicting_severity_resolution(self):
         """7. SeverityEngine must deterministically escalate to the most conservative risk tier."""

@@ -207,3 +207,12 @@ class FrameworkName(StrEnum):
     OWASP_AGENTIC = "OWASP Agentic Security"
     NOT_MAPPED = "NOT_MAPPED"
 
+
+class ImplementationStatus(StrEnum):
+    """Verification and implementation status of security controls and tests."""
+    IMPLEMENTED = "IMPLEMENTED"
+    PARTIAL = "PARTIAL"
+    DECLARED_ONLY = "DECLARED_ONLY"
+    NOT_IMPLEMENTED = "NOT_IMPLEMENTED"
+
+

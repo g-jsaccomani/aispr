@@ -33,7 +33,7 @@ class ControlLink(AISPRBaseModel):
             try:
                 return ControlRelationType(normalized)
             except ValueError:
-                return ControlRelationType.RELATED_CONTROL
+                raise ValueError(f"Invalid ControlRelationType: '{v}'")
         return v
 
 
@@ -54,9 +54,9 @@ class Control(AISPRBaseModel):
     def parse_criticality(cls, v: Any) -> FindingSeverity:
         if isinstance(v, str):
             try:
-                return FindingSeverity(v.upper())
+                return FindingSeverity(v.upper().strip())
             except ValueError:
-                return FindingSeverity.MEDIUM
+                raise ValueError(f"Invalid FindingSeverity: '{v}'")
         return v
 
 
@@ -90,7 +90,7 @@ class ControlResult(AISPRBaseModel):
             try:
                 return ControlEvaluation(val)
             except ValueError:
-                return ControlEvaluation.UNASSESSED
+                raise ValueError(f"Invalid ControlEvaluation: '{v}'")
         return v
 
     @field_validator("score", mode="before")

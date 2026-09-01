@@ -103,36 +103,35 @@ class TestEvidenceFirstAssessmentEngine(unittest.TestCase):
                 execution_mode=ExecutionMode.LIVE,
                 evidence=[sim_evidence]
             )
-        self.assertIn("Um finding LIVE não pode ser criado apenas a partir de fixture", str(ctx.exception))
+        self.assertTrue("LIVE finding integrity violation" in str(ctx.exception) or "Um finding LIVE" in str(ctx.exception))
 
     def test_simulation_finding_cannot_be_verified(self):
         """Tests that a SIMULATION finding cannot contain or appear as VERIFIED."""
-        # Creating an evidence item in SIMULATION mode with VERIFIED status auto-normalizes or raises error
-        sim_evidence = Evidence(
-            source=FindingSource.SHADOW_AI_HUNTER,
-            status=EvidenceStatus.VERIFIED,
-            execution_mode=ExecutionMode.SIMULATION,
-            sanitized_content="Simulation of Ollama container"
-        )
-        # Evidence model validator normalizes SIMULATION + VERIFIED to SIMULATED
-        self.assertEqual(sim_evidence.status, EvidenceStatus.SIMULATED)
+        # Creating an evidence item in SIMULATION mode with VERIFIED status MUST raise ValidationError (Task 3)
+        with self.assertRaises(ValidationError):
+            Evidence(
+                source=FindingSource.SHADOW_AI_HUNTER,
+                status=EvidenceStatus.VERIFIED,
+                execution_mode=ExecutionMode.SIMULATION,
+                sanitized_content="Simulation of Ollama container"
+            )
 
-        # Force verified on simulation finding raises ValueError
-        with self.assertRaises(ValueError) as ctx:
-            finding = SecurityFinding(
+        # A simulation finding cannot contain verified evidence
+        with self.assertRaises(ValidationError) as ctx:
+            SecurityFinding(
                 asset=self.sample_asset,
                 title="Simulated Finding",
-                execution_mode=ExecutionMode.SIMULATION
+                execution_mode=ExecutionMode.SIMULATION,
+                evidence=[
+                    Evidence(
+                        source=FindingSource.GCP_SCC,
+                        status=EvidenceStatus.VERIFIED,
+                        execution_mode=ExecutionMode.LIVE,
+                        sanitized_content="Verified finding"
+                    )
+                ]
             )
-            # Directly appending an illegally forced verified evidence
-            fake_verified = Evidence(
-                status=EvidenceStatus.UNVERIFIED,
-                execution_mode=ExecutionMode.LIVE
-            )
-            object.__setattr__(fake_verified, "status", EvidenceStatus.VERIFIED)
-            finding.evidence.append(fake_verified)
-            finding.validate_epistemology()
-        self.assertIn("Um finding SIMULATION não pode aparecer como VERIFIED", str(ctx.exception))
+        self.assertTrue("Simulation finding integrity violation" in str(ctx.exception) or "SIMULATION" in str(ctx.exception))
 
     def test_fixture_finding_behavior(self):
         """Tests that fixture findings are strictly identified as simulated and not verified."""

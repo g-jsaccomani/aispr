@@ -66,16 +66,29 @@ class DeterministicCorrelator:
         """Directly ingests a pre-built canonical SecurityFinding into the pipeline."""
         self.canonical_findings.append(finding)
 
+    PIPELINE_ORDER = [
+        "NORMALIZE",
+        "EVIDENCE_VALIDATION",
+        "DEDUPLICATION",
+        "CONTROL_MAPPING",
+        "SEVERITY",
+        "CANONICAL_FINDING"
+    ]
+
     def execute_pipeline(self) -> List[SecurityFinding]:
         """
-        Executes the 5-stage deterministic pipeline:
-        Stage 1: Normalizer (Raw to Canonical)
-        Stage 2: Deduplicator (Deterministic Fingerprint & Evidence Merging)
-        Stage 3: ControlMapper (5-Level Precedence Mapping)
-        Stage 4: SeverityEngine (Risk Analysis & Conflict Resolution)
-        Stage 5: EvidenceValidator (Cryptographic Hashing & Confidence Propagation)
+        Executes the canonical 6-stage deterministic pipeline in exact order:
+        Stage 1: Normalize (Raw to Canonical)
+        Stage 2: Evidence Validation (Cryptographic Hashing & Epistemological Health)
+        Stage 3: Deduplication (Deterministic Fingerprint & Evidence Merging)
+        Stage 4: Control Mapping (5-Level Precedence Mapping)
+        Stage 5: Severity (Risk Analysis & Conflict Resolution)
+        Stage 6: Canonical Finding (Final Canonical Aggregation)
         """
+        self.execution_order: List[str] = []
+
         # Stage 1: Normalize raw inputs into canonical findings
+        self.execution_order.append("NORMALIZE")
         normalized_list = list(self.canonical_findings)
         for raw in self.raw_inputs:
             f = self.normalizer.normalize_raw_finding(
@@ -89,20 +102,29 @@ class DeterministicCorrelator:
             )
             normalized_list.append(f)
 
-        # Stage 2: Deduplicate
-        deduplicated = self.deduplicator.deduplicate(normalized_list)
+        # Stage 2: Evidence Validation (Validate evidence on normalized findings)
+        self.execution_order.append("EVIDENCE_VALIDATION")
+        evidence_validated = self.evidence_validator.validate_all(normalized_list)
 
-        # Stage 3: Map Controls (Primary, Secondary, Related)
+        # Stage 3: Deduplicate (Deterministically merge duplicate findings without evidence loss)
+        self.execution_order.append("DEDUPLICATION")
+        deduplicated = self.deduplicator.deduplicate(evidence_validated)
+
+        # Stage 4: Map Controls (Primary, Secondary, Related)
+        self.execution_order.append("CONTROL_MAPPING")
         mapped = [self.control_mapper.map_controls(f) for f in deduplicated]
 
-        # Stage 4: Evaluate Severity & Blast Radius
+        # Stage 5: Evaluate Severity & Conflict Resolution
+        self.execution_order.append("SEVERITY")
         severity_assessed = [self.severity_engine.evaluate_finding_severity(f) for f in mapped]
 
-        # Stage 5: Validate Evidence Quality & Cryptographic Hashes
-        validated = self.evidence_validator.validate_all(severity_assessed)
+        # Stage 6: Canonical Finding (Final verified canonical findings)
+        self.execution_order.append("CANONICAL_FINDING")
+        for f in severity_assessed:
+            f.metadata["pipeline_stages"] = list(self.execution_order)
 
-        self.canonical_findings = validated
-        return validated
+        self.canonical_findings = severity_assessed
+        return severity_assessed
 
     def correlate(self) -> Dict[str, Dict[str, Any]]:
         """

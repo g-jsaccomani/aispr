@@ -78,6 +78,7 @@ __all__ = [
     "AutomationLevel",
     "MappingConfidence",
     "FrameworkName",
+    "ImplementationStatus",
     # Models
     "AISPRBaseModel",
     "utc_now",

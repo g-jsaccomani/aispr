@@ -21,6 +21,15 @@ class ControlContractRegistry:
     Central registry and catalog for the 104 AISPR Security Control Contracts.
     """
 
+    EXPECTED_CONTROL_IDS: set = (
+        {f"DAT-{i:02d}" for i in range(1, 20)} |
+        {f"MOD-{i:02d}" for i in range(1, 20)} |
+        {f"APP-{i:02d}" for i in range(1, 20)} |
+        {f"INF-{i:02d}" for i in range(1, 20)} |
+        {f"ASR-{i:02d}" for i in range(1, 16)} |
+        {f"GOV-{i:02d}" for i in range(1, 14)}
+    )
+
     CATALOG_FILE = os.path.join(os.path.dirname(__file__), "contracts_catalog_v2.json")
 
     def __init__(self, catalog_path: Optional[str] = None):
@@ -35,6 +44,33 @@ class ControlContractRegistry:
 
         with open(self.catalog_path, "r", encoding="utf-8") as f:
             raw_list = json.load(f)
+
+        if not isinstance(raw_list, list):
+            raise ValueError(f"Catalog JSON must contain a list of controls, found {type(raw_list)}")
+
+        # Validate raw list BEFORE dictionary indexing
+        seen_raw_ids = set()
+        for idx, item in enumerate(raw_list):
+            if not isinstance(item, dict):
+                raise ValueError(f"Catalog entry at index {idx} must be a dictionary")
+            cid = item.get("control_id")
+            if not cid:
+                raise ValueError(f"Catalog entry at index {idx} is missing 'control_id'")
+            cid = cid.strip().upper()
+            if cid in seen_raw_ids:
+                raise ValueError(f"Duplicate control ID detected in raw catalog before indexing: '{cid}'")
+            seen_raw_ids.add(cid)
+
+        if len(seen_raw_ids) != 104:
+            raise ValueError(f"Invalid total control count: expected exactly 104, found {len(seen_raw_ids)}")
+
+        missing_ids = self.EXPECTED_CONTROL_IDS - seen_raw_ids
+        if missing_ids:
+            raise ValueError(f"Missing required control IDs in catalog: {sorted(list(missing_ids))}")
+
+        unknown_ids = seen_raw_ids - self.EXPECTED_CONTROL_IDS
+        if unknown_ids:
+            raise ValueError(f"Unknown control IDs outside required 104 taxonomy: {sorted(list(unknown_ids))}")
 
         self._contracts.clear()
         for item in raw_list:

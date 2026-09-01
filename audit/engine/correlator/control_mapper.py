@@ -14,9 +14,18 @@ Enforces strict precedence:
 5. Keyword Heuristic (strict fallback only)
 """
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Any
 from domain.models import SecurityFinding
-from domain.enums import ControlRelationType
+from domain.enums import ControlRelationType, StrEnum
+
+
+class MappingPrecedence(StrEnum):
+    """Strict precedence levels for control correlation."""
+    EXPLICIT_MAPPING = "EXPLICIT_MAPPING"
+    CONTROL_METADATA = "CONTROL_METADATA"
+    DETERMINISTIC_FINDING_TYPE = "DETERMINISTIC_FINDING_TYPE"
+    ATTACK_TECHNIQUE = "ATTACK_TECHNIQUE"
+    KEYWORD_FALLBACK = "KEYWORD_FALLBACK"
 
 
 class ControlMapper:
@@ -141,28 +150,31 @@ class ControlMapper:
     def map_controls(self, finding: SecurityFinding) -> SecurityFinding:
         """
         Evaluates control mapping in strict order of precedence:
-        1. Explicit mapping
-        2. Control metadata
-        3. Deterministic finding type mapping
-        4. Attack technique mapping
-        5. Keyword heuristic fallback
+        1. EXPLICIT_MAPPING (verified explicit scanner/operator mapping)
+        2. CONTROL_METADATA (control ID directly present in asset/finding metadata)
+        3. DETERMINISTIC_FINDING_TYPE (curated rule match on finding type/CVE/BOM gap)
+        4. ATTACK_TECHNIQUE (MITRE ATLAS / OWASP attack technique ID)
+        5. KEYWORD_FALLBACK (keyword heuristic / legacy suggestion fallback)
         """
-        # Step 1: Explicit Control Mapping
-        explicit_cid = finding.metadata.get("suggested_control_id")
+        # Step 1: EXPLICIT_MAPPING
+        # Legacy heuristics MUST NOT be classified as explicit mappings.
+        explicit_cid = finding.metadata.get("explicit_control_id")
+        if not explicit_cid and finding.metadata.get("is_explicit_mapping", False):
+            explicit_cid = finding.metadata.get("suggested_control_id")
+
         if explicit_cid:
             finding.set_primary_control(explicit_cid, "Explicit scanner mapping")
+            finding.metadata["mapping_level"] = MappingPrecedence.EXPLICIT_MAPPING
             return finding
 
-        # If already has a primary control link, keep it
-        if finding.primary_control_id:
+        # Step 2: CONTROL_METADATA
+        metadata_cid = finding.metadata.get("control_id") or finding.asset.metadata.get("control_id")
+        if metadata_cid:
+            finding.set_primary_control(metadata_cid, "Metadata control specification")
+            finding.metadata["mapping_level"] = MappingPrecedence.CONTROL_METADATA
             return finding
 
-        # Step 2: Control Metadata Mapping
-        if "control_id" in finding.metadata:
-            finding.set_primary_control(finding.metadata["control_id"], "Metadata control specification")
-            return finding
-
-        # Step 3: Deterministic Finding Type Mapping
+        # Step 3: DETERMINISTIC_FINDING_TYPE
         desc_lower = finding.description.lower()
         cat_lower = str(finding.metadata.get("category", "")).lower()
         combined = f"{desc_lower} {cat_lower}"
@@ -174,10 +186,10 @@ class ControlMapper:
                     finding.add_secondary_control(sec, rule["rationale"])
                 for rel in rule.get("related", []):
                     finding.add_related_control(rel, rule["rationale"])
-                finding.metadata["mapping_level"] = "DETERMINISTIC_TYPE"
+                finding.metadata["mapping_level"] = MappingPrecedence.DETERMINISTIC_FINDING_TYPE
                 return finding
 
-        # Step 4: Attack Technique Mapping
+        # Step 4: ATTACK_TECHNIQUE
         for tech in finding.attack_techniques:
             tid = tech.technique_id.strip()
             if tid in self.ATTACK_TECHNIQUE_MAP:
@@ -185,10 +197,10 @@ class ControlMapper:
                 finding.set_primary_control(rule["primary"], rule["rationale"])
                 for sec in rule.get("secondary", []):
                     finding.add_secondary_control(sec, rule["rationale"])
-                finding.metadata["mapping_level"] = "ATTACK_TECHNIQUE"
+                finding.metadata["mapping_level"] = MappingPrecedence.ATTACK_TECHNIQUE
                 return finding
 
-        # Step 5: Keyword Heuristic as Strict Fallback Only
+        # Step 5: KEYWORD_FALLBACK (strict fallback only)
         res_lower = finding.asset.resource_uri.lower()
         search_text = f"{desc_lower} {cat_lower} {res_lower}"
 
@@ -203,13 +215,24 @@ class ControlMapper:
             finding.set_primary_control(matched_cids[0], "Heuristic fallback keyword match")
             for secondary_cid in matched_cids[1:3]:
                 finding.add_secondary_control(secondary_cid, "Secondary heuristic correlation")
-            finding.metadata["mapping_level"] = "KEYWORD_HEURISTIC_FALLBACK"
+            finding.metadata["mapping_level"] = MappingPrecedence.KEYWORD_FALLBACK
             return finding
 
-        # Final generic fallback based on severity
+        # Suggested control without explicit flag is treated as keyword fallback
+        suggested = finding.metadata.get("suggested_control_id")
+        if suggested:
+            finding.set_primary_control(suggested, "Legacy suggestion fallback")
+            finding.metadata["mapping_level"] = MappingPrecedence.KEYWORD_FALLBACK
+            return finding
+
+        if finding.primary_control_id:
+            finding.metadata["mapping_level"] = MappingPrecedence.KEYWORD_FALLBACK
+            return finding
+
+        # Default severity fallback
         if finding.severity in ("CRITICAL", "HIGH"):
             finding.set_primary_control("INF-01", "Default high-severity cloud perimeter fallback")
         else:
             finding.set_primary_control("GOV-03", "Default risk assessment governance fallback")
-        finding.metadata["mapping_level"] = "DEFAULT_SEVERITY_FALLBACK"
+        finding.metadata["mapping_level"] = MappingPrecedence.KEYWORD_FALLBACK
         return finding

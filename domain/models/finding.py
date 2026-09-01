@@ -65,25 +65,27 @@ class SecurityFinding(AISPRBaseModel):
     def parse_source(cls, v: Any) -> FindingSource:
         if isinstance(v, str):
             val = v.strip()
-            # Map legacy text
-            if "SCC" in val or "Security Command Center" in val:
+            val_lower = val.lower()
+            if "scc" in val_lower or "security command center" in val_lower:
                 return FindingSource.GCP_SCC
-            if "Shadow" in val:
+            if "shadow" in val_lower:
                 return FindingSource.SHADOW_AI_HUNTER
-            if "SAST" in val:
+            if "sast" in val_lower or "prompt" in val_lower:
                 return FindingSource.PROMPT_SAST
-            if "Red Team" in val:
+            if "red team" in val_lower:
                 return FindingSource.AI_RED_TEAM
-            if "Model Armor" in val:
+            if "model armor" in val_lower or "armor" in val_lower:
                 return FindingSource.MODEL_ARMOR
-            if "MultiCloud" in val:
+            if "multicloud" in val_lower or "posture" in val_lower or "aws" in val_lower or "azure" in val_lower:
                 return FindingSource.MULTI_CLOUD_SCANNER
-            if "AI-BOM" in val or "BOM" in val:
+            if "ai-bom" in val_lower or "bom" in val_lower:
                 return FindingSource.AI_BOM
+            if "manual" in val_lower:
+                return FindingSource.MANUAL_AUDIT
             try:
                 return FindingSource(val)
             except ValueError:
-                return FindingSource.MANUAL_AUDIT
+                raise ValueError(f"Invalid FindingSource: '{v}'")
         return v
 
     @field_validator("provider", mode="before")
@@ -100,7 +102,7 @@ class SecurityFinding(AISPRBaseModel):
             try:
                 return CloudProvider(val)
             except ValueError:
-                return CloudProvider.UNKNOWN
+                raise ValueError(f"Invalid CloudProvider: '{v}'")
         return v
 
     @field_validator("severity", mode="before")
@@ -110,7 +112,7 @@ class SecurityFinding(AISPRBaseModel):
             try:
                 return FindingSeverity(v.upper().strip())
             except ValueError:
-                return FindingSeverity.HIGH
+                raise ValueError(f"Invalid FindingSeverity: '{v}'")
         return v
 
     @field_validator("status", mode="before")
@@ -120,7 +122,7 @@ class SecurityFinding(AISPRBaseModel):
             try:
                 return FindingStatus(v.upper().strip())
             except ValueError:
-                return FindingStatus.OPEN
+                raise ValueError(f"Invalid FindingStatus: '{v}'")
         return v
 
     @field_validator("confidence", mode="before")
@@ -130,7 +132,7 @@ class SecurityFinding(AISPRBaseModel):
             try:
                 return ConfidenceLevel(v.upper().strip())
             except ValueError:
-                return ConfidenceLevel.HIGH
+                raise ValueError(f"Invalid ConfidenceLevel: '{v}'")
         return v
 
     @model_validator(mode="before")
@@ -290,16 +292,22 @@ class SecurityFinding(AISPRBaseModel):
         2. A SIMULATION finding cannot contain or appear as VERIFIED.
         3. An INFERRED finding must explicitly indicate its origin.
         """
-        # Rule 1: Live finding cannot be built exclusively from fixtures/simulations
-        if self.execution_mode == ExecutionMode.LIVE and self.evidence:
-            if all(ev.is_simulated for ev in self.evidence):
-                raise ValueError("Um finding LIVE não pode ser criado apenas a partir de fixture ou simulação.")
+        # Rule 1: LIVE finding integrity
+        if self.execution_mode == ExecutionMode.LIVE:
+            if not self.evidence or len(self.evidence) == 0:
+                raise ValueError("LIVE finding integrity violation: Finding with execution_mode=LIVE must have attached evidence.")
+            has_live_ev = any(ev.execution_mode == ExecutionMode.LIVE for ev in self.evidence)
+            if not has_live_ev:
+                raise ValueError("LIVE finding integrity violation: Finding with execution_mode=LIVE must contain at least one LIVE evidence.")
+            has_valid_provenance = any(ev.status == EvidenceStatus.VERIFIED or (ev.status != EvidenceStatus.SIMULATED and ev.execution_mode == ExecutionMode.LIVE) for ev in self.evidence)
+            if not has_valid_provenance:
+                raise ValueError("LIVE finding integrity violation: Finding with execution_mode=LIVE must have valid evidence provenance.")
 
         # Rule 2: Simulation finding cannot be verified
         if self.execution_mode in (ExecutionMode.SIMULATION, ExecutionMode.FIXTURE, ExecutionMode.MOCK):
             for ev in self.evidence:
                 if ev.status == EvidenceStatus.VERIFIED:
-                    raise ValueError("Um finding SIMULATION não pode aparecer como VERIFIED.")
+                    raise ValueError("Simulation finding integrity violation: Finding with SIMULATION mode cannot contain VERIFIED evidence.")
 
         # Rule 3: Inferred finding must specify origin
         has_inferred = any(ev.status == EvidenceStatus.INFERRED for ev in self.evidence)

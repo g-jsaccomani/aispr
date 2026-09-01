@@ -20,6 +20,7 @@ from domain.enums import (
     EvidenceType,
     MappingConfidence,
     FrameworkName,
+    ImplementationStatus,
 )
 from domain.models.base import AISPRBaseModel
 
@@ -42,7 +43,7 @@ class RegulatoryMapping(AISPRBaseModel):
             try:
                 return MappingConfidence(v.upper().strip())
             except ValueError:
-                return MappingConfidence.HIGH
+                raise ValueError(f"Invalid MappingConfidence: '{v}'")
         return v
 
 
@@ -55,6 +56,7 @@ class TestDefinition(AISPRBaseModel):
     description: str = Field(default="", description="Technical verification procedure")
     execution_type: AssessmentType = Field(default=AssessmentType.AUTOMATED)
     collector_or_engine: str = Field(default="", description="Collector engine, e.g. ModelArmorAdvisor, CloudAssetInventory, PromptSAST")
+    implementation_status: ImplementationStatus = Field(default=ImplementationStatus.IMPLEMENTED)
 
     @field_validator("execution_type", mode="before")
     @classmethod
@@ -63,7 +65,17 @@ class TestDefinition(AISPRBaseModel):
             try:
                 return AssessmentType(v.upper().strip())
             except ValueError:
-                return AssessmentType.AUTOMATED
+                raise ValueError(f"Invalid AssessmentType: '{v}'")
+        return v
+
+    @field_validator("implementation_status", mode="before")
+    @classmethod
+    def parse_impl_status(cls, v: Any) -> ImplementationStatus:
+        if isinstance(v, str):
+            try:
+                return ImplementationStatus(v.upper().strip())
+            except ValueError:
+                raise ValueError(f"Invalid ImplementationStatus: '{v}'")
         return v
 
 
@@ -83,7 +95,7 @@ class EvidenceRequirement(AISPRBaseModel):
             try:
                 return EvidenceType(v.upper().strip())
             except ValueError:
-                return EvidenceType.CONFIGURATION
+                raise ValueError(f"Invalid EvidenceType: '{v}'")
         return v
 
 
@@ -118,9 +130,11 @@ class SecurityControlContract(AISPRBaseModel):
                     try:
                         parsed.append(CloudProvider(item.lower().strip()))
                     except ValueError:
-                        parsed.append(CloudProvider.GCP)
+                        raise ValueError(f"Invalid CloudProvider: '{item}'")
                 elif isinstance(item, CloudProvider):
                     parsed.append(item)
+                else:
+                    raise ValueError(f"Invalid CloudProvider type: '{type(item)}'")
             return parsed
         return v
 
@@ -131,7 +145,7 @@ class SecurityControlContract(AISPRBaseModel):
             try:
                 return FindingSeverity(v.upper().strip())
             except ValueError:
-                return FindingSeverity.HIGH
+                raise ValueError(f"Invalid FindingSeverity: '{v}'")
         return v
 
     @field_validator("assessment_type", mode="before")
@@ -141,7 +155,7 @@ class SecurityControlContract(AISPRBaseModel):
             try:
                 return AssessmentType(v.upper().strip())
             except ValueError:
-                return AssessmentType.AUTOMATED
+                raise ValueError(f"Invalid AssessmentType: '{v}'")
         return v
 
     @field_validator("automation_level", mode="before")
@@ -151,7 +165,7 @@ class SecurityControlContract(AISPRBaseModel):
             try:
                 return AutomationLevel(v.upper().strip())
             except ValueError:
-                return AutomationLevel.FULL
+                raise ValueError(f"Invalid AutomationLevel: '{v}'")
         return v
 
     def get_framework_mapping(self, framework_name: str) -> Optional[RegulatoryMapping]:
