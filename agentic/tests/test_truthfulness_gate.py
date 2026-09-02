@@ -305,6 +305,81 @@ class TestProductionAssuranceAndTruthfulnessGate(unittest.TestCase):
         self.assertEqual(result_zero.metrics.control_coverage_score, 0.0)
         self.assertEqual(result_zero.metrics.declared_coverage, 100.0)
 
+    def test_control_coverage_edge_case_zero_contracts(self):
+        """Edge case: 0 total contracts -> coverage metrics evaluate safely to 0.0 without division by zero."""
+        mock_registry = MagicMock(spec=ControlContractRegistry)
+        mock_registry.list_contracts.return_value = []
+        engine = EnterpriseRiskEngine(registry=mock_registry)
+        result = engine.evaluate(
+            assessment_id="ASM-ZERO-CONTRACTS-TEST",
+            findings=[],
+            assets=[self.sample_asset],
+            control_evaluations={},
+        )
+        self.assertEqual(result.metrics.implemented_controls_count, 0)
+        self.assertEqual(result.metrics.partial_controls_count, 0)
+        self.assertEqual(result.metrics.declared_controls_count, 0)
+        self.assertEqual(result.metrics.implementation_coverage, 0.0)
+        self.assertEqual(result.metrics.control_coverage_score, 0.0)
+        self.assertEqual(result.metrics.declared_coverage, 0.0)
+
+    def test_control_coverage_edge_case_all_implemented(self):
+        """Edge case: 104/104 implemented -> 100.0% implementation coverage, 0.0% declared."""
+        engine = EnterpriseRiskEngine()
+        registry = ControlContractRegistry()
+        all_contracts = registry.list_contracts()
+        evaluations = {c.control_id: {"implementation_status": "IMPLEMENTED", "verdict": "PASS"} for c in all_contracts}
+        result = engine.evaluate(
+            assessment_id="ASM-ALL-IMPLEMENTED-TEST",
+            findings=[],
+            assets=[self.sample_asset],
+            control_evaluations=evaluations,
+        )
+        self.assertEqual(result.metrics.implemented_controls_count, 104)
+        self.assertEqual(result.metrics.partial_controls_count, 0)
+        self.assertEqual(result.metrics.declared_controls_count, 0)
+        self.assertEqual(result.metrics.implementation_coverage, 100.0)
+        self.assertEqual(result.metrics.control_coverage_score, 100.0)
+        self.assertEqual(result.metrics.declared_coverage, 0.0)
+
+    def test_control_coverage_edge_case_all_partial(self):
+        """Edge case: 104/104 partial -> 50.0% implementation coverage, 0.0% declared."""
+        engine = EnterpriseRiskEngine()
+        registry = ControlContractRegistry()
+        all_contracts = registry.list_contracts()
+        evaluations = {c.control_id: {"implementation_status": "PARTIAL", "verdict": "PARTIAL"} for c in all_contracts}
+        result = engine.evaluate(
+            assessment_id="ASM-ALL-PARTIAL-TEST",
+            findings=[],
+            assets=[self.sample_asset],
+            control_evaluations=evaluations,
+        )
+        self.assertEqual(result.metrics.implemented_controls_count, 0)
+        self.assertEqual(result.metrics.partial_controls_count, 104)
+        self.assertEqual(result.metrics.declared_controls_count, 0)
+        self.assertEqual(result.metrics.implementation_coverage, 50.0)
+        self.assertEqual(result.metrics.control_coverage_score, 50.0)
+        self.assertEqual(result.metrics.declared_coverage, 0.0)
+
+    def test_control_coverage_edge_case_all_declared(self):
+        """Edge case: 104/104 declared -> 0.0% implementation coverage, 100.0% declared."""
+        engine = EnterpriseRiskEngine()
+        registry = ControlContractRegistry()
+        all_contracts = registry.list_contracts()
+        evaluations = {c.control_id: {"implementation_status": "DECLARED_ONLY", "verdict": "NOT_MET"} for c in all_contracts}
+        result = engine.evaluate(
+            assessment_id="ASM-ALL-DECLARED-TEST",
+            findings=[],
+            assets=[self.sample_asset],
+            control_evaluations=evaluations,
+        )
+        self.assertEqual(result.metrics.implemented_controls_count, 0)
+        self.assertEqual(result.metrics.partial_controls_count, 0)
+        self.assertEqual(result.metrics.declared_controls_count, 104)
+        self.assertEqual(result.metrics.implementation_coverage, 0.0)
+        self.assertEqual(result.metrics.control_coverage_score, 0.0)
+        self.assertEqual(result.metrics.declared_coverage, 100.0)
+
     # ==========================================================================
     # SECTION 6: SHADOW AI IMPLEMENTATION MATCHES SPECS (OPTION A)
     # ==========================================================================

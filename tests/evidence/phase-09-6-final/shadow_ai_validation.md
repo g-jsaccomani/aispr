@@ -1,10 +1,10 @@
 # Validation
 
 ## Timestamp
-2026-09-02T18:59:14.931572+00:00
+2026-09-02T19:41:13.097192+00:00
 
 ## Git SHA Before Validation
-24119484fd57f2904d5520ec796ac75b45d0128d
+7cc05dd006d6d817e2725a3cec65b85698faf62b
 
 ## Command
 Practical execution of `ShadowAIHunter.run_full_scan()` across:
@@ -53,7 +53,7 @@ Practical execution of `ShadowAIHunter.run_full_scan()` across:
         "asset": "gke-credit-risk-prod/credit-risk-analytics/ollama-inference-daemon-7b89f",
         "provider": "gcp",
         "source": "cloud resources",
-        "timestamp": "2026-09-02T19:00:27.661884+00:00",
+        "timestamp": "2026-09-02T19:42:25.377316+00:00",
         "confidence": "SUSPECTED",
         "execution_mode": "SIMULATION",
         "fixture_classification": "SIMULATION_SCENARIO",
@@ -79,7 +79,7 @@ Practical execution of `ShadowAIHunter.run_full_scan()` across:
         "asset": "gce-sandbox/default/ml-dev-sandbox-vm",
         "provider": "gcp",
         "source": "cloud resources",
-        "timestamp": "2026-09-02T19:00:27.661884+00:00",
+        "timestamp": "2026-09-02T19:42:25.377316+00:00",
         "confidence": "SUSPECTED",
         "execution_mode": "SIMULATION",
         "fixture_classification": "SIMULATION_SCENARIO",
@@ -107,7 +107,7 @@ Practical execution of `ShadowAIHunter.run_full_scan()` across:
         "asset": "projects/demo-enterprise/zones/southamerica-east1-a/instances/workbench-analyst-gpu-01",
         "provider": "gcp",
         "source": "infrastructure metadata",
-        "timestamp": "2026-09-02T19:00:27.661917+00:00",
+        "timestamp": "2026-09-02T19:42:25.377334+00:00",
         "confidence": "INFERRED",
         "execution_mode": "SIMULATION",
         "fixture_classification": "SIMULATION_SCENARIO",
@@ -130,7 +130,7 @@ Practical execution of `ShadowAIHunter.run_full_scan()` across:
         "asset": "projects/demo-enterprise/zones/southamerica-east1-a/instances/workbench-analyst-gpu-01",
         "provider": "gcp",
         "source": "infrastructure metadata",
-        "timestamp": "2026-09-02T19:00:27.661917+00:00",
+        "timestamp": "2026-09-02T19:42:25.377334+00:00",
         "confidence": "SUSPECTED",
         "execution_mode": "SIMULATION",
         "fixture_classification": "SIMULATION_SCENARIO",
@@ -176,7 +176,7 @@ Practical execution of `ShadowAIHunter.run_full_scan()` across:
         "asset": "projects/live-corp/clusters/us-central1-k8s/namespaces/ml-infra/pods/vllm-serving-7x",
         "provider": "gcp",
         "source": "cloud resources",
-        "timestamp": "2026-09-02T19:00:27.662076+00:00",
+        "timestamp": "2026-09-02T19:42:25.377455+00:00",
         "confidence": "OBSERVED",
         "execution_mode": "LIVE",
         "status": "OBSERVED",
@@ -229,7 +229,7 @@ Practical execution of `ShadowAIHunter.run_full_scan()` across:
     "attempted_operation": "gcp:shadow_ai_live_discovery",
     "failure_reason": "GCP Cloud Asset Inventory API 503 Service Unavailable",
     "fallback_source": "DEGRADED_LOCAL_SCAN",
-    "timestamp": "2026-09-02T19:00:27.662185+00:00"
+    "timestamp": "2026-09-02T19:42:25.377549+00:00"
   }
 }
 ```

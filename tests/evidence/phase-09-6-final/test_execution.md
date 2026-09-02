@@ -1,10 +1,10 @@
 # Validation
 
 ## Timestamp
-2026-09-02T18:59:14.931572+00:00
+2026-09-02T19:41:13.097192+00:00
 
 ## Git SHA Before Validation
-24119484fd57f2904d5520ec796ac75b45d0128d
+7cc05dd006d6d817e2725a3cec65b85698faf62b
 
 ## Command
 Suite of real repository verification commands:
@@ -19,8 +19,8 @@ Suite of real repository verification commands:
 
 ## Expected Result
 * Bytecode compiles cleanly with exit code 0.
-* Dedicated truthfulness gate passes all 19 epistemological tests.
-* Full agentic test suite passes (142 tests).
+* Dedicated truthfulness gate passes all 23 epistemological tests.
+* Full agentic test suite passes (146 tests).
 * Full audit test suite passes (97 tests).
 * Regulatory control contract validation passes all 104 contracts across SAIF, NIST, ISO 42001, MITRE ATLAS, EU AI Act.
 * Top-level `make test` succeeds.
@@ -32,14 +32,14 @@ Suite of real repository verification commands:
 | :--- | :--- | :--- | :--- |
 | `python3 -m compileall .` | 0 | PASS | All Python source modules compiled cleanly. |
 | `pytest -q` | N/A | NOT AVAILABLE | `pytest` is not installed; standard `unittest` used as documented. |
-| `python3 -m unittest agentic/tests/test_truthfulness_gate.py -v` | 0 | PASS | 19/19 dedicated truthfulness tests passed. |
-| `python3 -m unittest discover -s agentic/tests -p 'test_*.py'` | 0 | PASS | 142 tests in agentic platform passed. |
+| `python3 -m unittest agentic/tests/test_truthfulness_gate.py -v` | 0 | PASS | 23/23 dedicated truthfulness tests passed. |
+| `python3 -m unittest discover -s agentic/tests -p 'test_*.py'` | 0 | PASS | 146 tests in agentic platform passed. |
 | `python3 -m unittest discover -s audit/tests -p 'test_*.py'` | 0 | PASS | 97 tests in audit engine passed. |
 | `mypy .` | N/A | NOT AVAILABLE | `mypy` is not installed in this environment. |
 | `./aispr controls validate` | 0 | PASS | 104/104 regulatory control contracts verified. |
 | `make test` | 0 | PASS | Unified target passes all audit and agentic tests. |
 
-### Dedicated Truthfulness Gate Output (19 Tests)
+### Dedicated Truthfulness Gate Output (23 Tests)
 ```text
 Command: python3 -m unittest agentic/tests/test_truthfulness_gate.py -v
 Exit Code: 0
@@ -49,6 +49,14 @@ ok
 test_azure_connector_simulation_and_fallback_propagation (agentic.tests.test_truthfulness_gate.TestProductionAssuranceAndTruthfulnessGate.test_azure_connector_simulation_and_fallback_propagation)
 Section 8 & 9: ... Azure Live discovery failed (Azure Management SDK 'azure-mgmt-cognitiveservices' is not installed.). Falling back to simulated metadata with explicit FALLBACK mode.
 ok
+test_control_coverage_edge_case_all_declared (agentic.tests.test_truthfulness_gate.TestProductionAssuranceAndTruthfulnessGate.test_control_coverage_edge_case_all_declared)
+Edge case: 104/104 declared -> 0.0% implementation coverage, 100.0% declared. ... ok
+test_control_coverage_edge_case_all_implemented (agentic.tests.test_truthfulness_gate.TestProductionAssuranceAndTruthfulnessGate.test_control_coverage_edge_case_all_implemented)
+Edge case: 104/104 implemented -> 100.0% implementation coverage, 0.0% declared. ... ok
+test_control_coverage_edge_case_all_partial (agentic.tests.test_truthfulness_gate.TestProductionAssuranceAndTruthfulnessGate.test_control_coverage_edge_case_all_partial)
+Edge case: 104/104 partial -> 50.0% implementation coverage, 0.0% declared. ... ok
+test_control_coverage_edge_case_zero_contracts (agentic.tests.test_truthfulness_gate.TestProductionAssuranceAndTruthfulnessGate.test_control_coverage_edge_case_zero_contracts)
+Edge case: 0 total contracts -> coverage metrics evaluate safely to 0.0 without division by zero. ... ok
 test_control_coverage_mathematical_separation_scenario (agentic.tests.test_truthfulness_gate.TestProductionAssuranceAndTruthfulnessGate.test_control_coverage_mathematical_separation_scenario)
 Section 5 Requirement: ... ok
 test_critical_finding_cannot_be_diluted_by_low_findings (agentic.tests.test_truthfulness_gate.TestProductionAssuranceAndTruthfulnessGate.test_critical_finding_cannot_be_diluted_by_low_findings)
@@ -90,7 +98,7 @@ test_simulation_mock_fixture_fallback_with_verified_evidence_fails (agentic.test
 SIMULATION, MOCK, FIXTURE, and FALLBACK with VERIFIED evidence MUST fail validation. ... ok
 
 ----------------------------------------------------------------------
-Ran 19 tests in 0.021s
+Ran 23 tests in 0.039s
 
 OK
 ```
@@ -110,9 +118,9 @@ Exit Code: 0
 ```
 
 ### Summary of Executed Tests
-* Agentic Suite: 142 tests (100% PASS)
+* Agentic Suite: 146 tests (100% PASS)
 * Audit Suite: 97 tests (100% PASS)
-* Total Tests Executed: 239 tests (100% PASS)
+* Total Tests Executed: 243 tests (100% PASS)
 * Total Control Contracts Verified: 104 contracts (100% PASS)
 
 ## Result

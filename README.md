@@ -190,7 +190,7 @@ python3 -m unittest discover -s audit/tests -p "test_*.py"
 
 ### Operational Modes & Epistemological Guardrails
 * **Model Armor Runtime Defense**: Live semantic inspection connects to `modelarmor.googleapis.com` via Google Cloud Application Default Credentials (ADC). When credentials or APIs are unavailable, the platform enters an explicit `LOCAL_FALLBACK` mode utilizing local regex filters. Local fallback blocks are never attributed to Google Cloud Model Armor.
-* **Shadow AI Discovery**: Supports both explicit offline simulation (`ExecutionMode.SIMULATION`) for threat scenarios and live read-only cloud discovery (`ExecutionMode.LIVE`). Simulated scenario assets (`gke-credit-risk-prod`, `gce-sandbox`, etc.) are strictly classified as fixtures with simulated evidence and are never promoted to verified live findings.
+* **Shadow AI Discovery**: Supports both explicit offline simulation (`ExecutionMode.SIMULATION`) for threat scenarios and live read-only cloud discovery (`ExecutionMode.LIVE`). Simulated scenario assets (`gke-credit-risk-prod`, `gce-sandbox`, etc.) are strictly classified as fixtures with simulated evidence and are never promoted to verified live findings. Live discovery requires configured cloud credentials (ADC for GCP) and live provider access; in the absence of cloud APIs or upon connection failure, the scanner gracefully degrades to `FALLBACK` mode with zero fabricated findings.
 
 ---
 
