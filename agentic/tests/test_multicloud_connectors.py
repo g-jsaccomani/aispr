@@ -55,7 +55,20 @@ from agentic.connectors import (
     ReadOnlyEnforcementError,
     CloudSDKMissingError,
 )
-from agentic.platform import AISPRAgenticCore
+from agentic.core_platform import AISPRAgenticCore
+
+try:
+    import boto3
+    import botocore
+    HAS_BOTO3 = True
+except ImportError:
+    HAS_BOTO3 = False
+
+try:
+    import azure.core
+    HAS_AZURE = True
+except ImportError:
+    HAS_AZURE = False
 
 
 # ==============================================================================
@@ -282,6 +295,7 @@ class TestMockedProviderDiscovery(unittest.TestCase):
 class TestAuthenticationFailures(unittest.TestCase):
     """Verifies that invalid credentials or expired tokens raise CloudAuthenticationError."""
 
+    @unittest.skipUnless(HAS_BOTO3, "boto3 not installed")
     def test_aws_authentication_failure(self):
         """6. AWS credentials error raises CloudAuthenticationError."""
         mock_session = MagicMock()
@@ -297,6 +311,7 @@ class TestAuthenticationFailures(unittest.TestCase):
         with self.assertRaises(CloudAuthenticationError):
             connector.discover_resources_live(regions=["us-east-1"])
 
+    @unittest.skipUnless(HAS_AZURE, "azure not installed")
     def test_azure_authentication_failure(self):
         """7. Azure 401 Unauthorized raises CloudAuthenticationError."""
         mock_cog = MagicMock()
@@ -319,6 +334,7 @@ class TestAuthenticationFailures(unittest.TestCase):
 class TestPermissionFailures(unittest.TestCase):
     """Verifies that IAM 403 / AccessDenied errors raise CloudPermissionDeniedError."""
 
+    @unittest.skipUnless(HAS_BOTO3, "boto3 not installed")
     def test_aws_permission_denied_failure(self):
         """8. AWS AccessDenied raises CloudPermissionDeniedError."""
         mock_session = MagicMock()
@@ -333,6 +349,7 @@ class TestPermissionFailures(unittest.TestCase):
         with self.assertRaises(CloudPermissionDeniedError):
             connector.discover_resources_live(regions=["us-east-1"])
 
+    @unittest.skipUnless(HAS_AZURE, "azure not installed")
     def test_azure_permission_denied_failure(self):
         """9. Azure 403 Forbidden raises CloudPermissionDeniedError."""
         mock_cog = MagicMock()

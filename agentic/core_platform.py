@@ -9,7 +9,7 @@ Engineered by: @jsaccomani
 """
 
 import logging
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Callable
 
 from .connectors.gcp_connector import GCPConnector
 from .connectors.aws_connector import AWSConnector

@@ -67,7 +67,7 @@ print(f'   ✅ Executive Audit Report written to: {report_path}')
 echo ""
 echo "▶️ [3/3] Generating Customer-Owned Remediation as Code (Terraform Blueprints)..."
 python3 -c "
-from agentic.platform import AISPRAgenticCore
+from agentic.core_platform import AISPRAgenticCore
 import json
 
 core = AISPRAgenticCore(tenant_id='Enterprise Customer')

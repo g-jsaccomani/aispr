@@ -20,7 +20,7 @@ for p in [root_dir, agentic_dir]:
     if p not in sys.path:
         sys.path.insert(0, p)
 
-from agentic.platform import AISPRAgenticCore
+from agentic.core_platform import AISPRAgenticCore
 from agentic.connectors.gcp_connector import GCPConnector
 from agentic.connectors.aws_connector import AWSConnector
 from agentic.connectors.azure_connector import AzureConnector

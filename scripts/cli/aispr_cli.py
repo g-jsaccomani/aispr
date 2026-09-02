@@ -26,7 +26,7 @@ from audit.cli import AISPRAssessmentCLI
 from agentic.threat_operations.shadow_ai_hunter import ShadowAIHunter
 from agentic.threat_operations.ai_red_team_simulator import AIRedTeamSimulator
 from agentic.runtime_defense.model_armor_guard import ModelArmorGuard
-from agentic.platform import AISPRAgenticCore
+from agentic.core_platform import AISPRAgenticCore
 
 
 def redact_sensitive_info(text: Any, verbose: bool = False) -> str:

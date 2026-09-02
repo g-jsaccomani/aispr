@@ -14,7 +14,7 @@ import unittest
 from unittest.mock import patch, MagicMock
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
-from config.secrets import SecretManagerStore, store_multicloud_credentials, get_multicloud_credentials
+from config.secret_manager import SecretManagerStore, store_multicloud_credentials, get_multicloud_credentials
 from scripts.cli.aispr_cli import redact_sensitive_info
 
 

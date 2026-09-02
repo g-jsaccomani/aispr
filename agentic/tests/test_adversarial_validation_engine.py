@@ -44,7 +44,7 @@ from agentic.adversarial_engine import (
     DestructiveActionBlockedError,
 )
 from agentic.security_runtime import AgenticSecurityRuntime
-from agentic.platform import AISPRAgenticCore
+from agentic.core_platform import AISPRAgenticCore
 
 
 # ==============================================================================

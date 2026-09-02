@@ -8,7 +8,7 @@ Phase 9: Enterprise Shadow AI Discovery - Deduplication Engine.
 Corroborates findings across multiple detection sensors and merges duplicate discoveries.
 """
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 from .models import ShadowAIDiscovery, ShadowConfidence
 
 
@@ -21,7 +21,7 @@ class ShadowAIDeduplicator:
     def __init__(self):
         self._inventory: Dict[str, ShadowAIDiscovery] = {}
 
-    def ingest(self, discovery: ShadowAIDiscovery) -> Tuple_Merged:
+    def ingest(self, discovery: ShadowAIDiscovery) -> Tuple[ShadowAIDiscovery, bool]:
         """
         Ingests a discovery. If a duplicate exists, merges telemetry and updates confidence.
         Returns (discovery, is_new_boolean).

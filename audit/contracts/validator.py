@@ -9,7 +9,7 @@ Strict validation engine that enforces integrity across all 104 Security Control
 Fails with non-zero exit code if any orphan, malformed, or unverified regulatory mapping is found.
 """
 
-from typing import List, Tuple, Dict, Set
+from typing import List, Tuple, Dict, Set, Optional
 from domain.enums import CloudProvider, AssessmentType, AutomationLevel, FindingSeverity, EvidenceType, MappingConfidence, FrameworkName
 from domain.models import SecurityControlContract
 from audit.contracts.registry import ControlContractRegistry

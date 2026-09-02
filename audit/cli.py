@@ -12,7 +12,7 @@ Engineered by: @jsaccomani
 import sys
 import os
 import argparse
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 # Ensure project root is in sys.path
 _cur_dir = os.path.dirname(os.path.abspath(__file__))

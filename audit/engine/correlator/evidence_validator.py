@@ -9,6 +9,7 @@ Validates evidence quality, detects tampering via SHA-256, degrades confidence
 when evidence is missing, and ensures absence of evidence is never converted into PASS.
 """
 
+from typing import List
 from domain.models import SecurityFinding, Evidence
 from domain.enums import (
     EvidenceStatus,

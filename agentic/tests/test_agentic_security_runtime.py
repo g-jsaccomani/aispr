@@ -48,7 +48,7 @@ from agentic.security_runtime import (
     DataExfiltrationError,
     UntrustedToolOutputError,
 )
-from agentic.platform import AISPRAgenticCore
+from agentic.core_platform import AISPRAgenticCore
 
 
 # ==============================================================================

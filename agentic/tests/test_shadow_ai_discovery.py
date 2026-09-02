@@ -41,7 +41,7 @@ from agentic.shadow_ai import (
     ShadowAIDeduplicator,
     ShadowAIRiskEngine,
 )
-from agentic.platform import AISPRAgenticCore
+from agentic.core_platform import AISPRAgenticCore
 
 
 class TestShadowAIDiscovery(unittest.TestCase):

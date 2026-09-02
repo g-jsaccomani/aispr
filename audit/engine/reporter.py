@@ -11,7 +11,7 @@ AI-SPR Enterprise Deliverable & Dual Reporting Engine:
 
 import os
 import datetime
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 from .scorer import PostureScorer
 from agentic.threat_operations.ai_interconnection_graph import AIInterconnectionGraph
 
