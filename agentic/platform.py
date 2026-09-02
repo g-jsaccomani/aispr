@@ -22,6 +22,7 @@ from domain.enums import ExecutionMode
 from .runtime_defense.model_armor_guard import ModelArmorGuard
 from .security_runtime import AgenticSecurityRuntime, AgentAction
 from .adversarial_engine import AdversarialValidationEngine, AdversarialCampaignReport
+from .shadow_ai import EnterpriseShadowAIDiscoveryEngine, ShadowAIDiscoveryReport
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("AISPR-Agentic-Core")
@@ -174,4 +175,35 @@ class AISPRAgenticCore:
             security_runtime=self.security_runtime,
         )
         return engine.run_campaign(target=target, mode=mode, custom_tests=custom_tests)
+
+    def discover_shadow_ai(
+        self,
+        cloud_resources: Optional[List[Dict[str, Any]]] = None,
+        network_flows: Optional[List[Dict[str, Any]]] = None,
+        host_processes: Optional[List[Dict[str, Any]]] = None,
+        saas_records: Optional[List[Dict[str, Any]]] = None,
+        api_logs: Optional[List[Dict[str, Any]]] = None,
+        model_endpoints: Optional[List[Dict[str, Any]]] = None,
+        infrastructure_metadata: Optional[List[Dict[str, Any]]] = None,
+        execution_mode: Optional[ExecutionMode] = None,
+    ) -> ShadowAIDiscoveryReport:
+        """
+        Executes enterprise Shadow AI discovery across all 7 mandated detection sources.
+        Guarantees provenance, canonical evidence, multi-vector risk evaluation,
+        and confidence differentiation (OBSERVED, INFERRED, SUSPECTED).
+        """
+        engine = EnterpriseShadowAIDiscoveryEngine(
+            default_mode=execution_mode or ExecutionMode.SIMULATION
+        )
+        return engine.discover(
+            cloud_resources=cloud_resources,
+            network_flows=network_flows,
+            host_processes=host_processes,
+            saas_records=saas_records,
+            api_logs=api_logs,
+            model_endpoints=model_endpoints,
+            infrastructure_metadata=infrastructure_metadata,
+            execution_mode=execution_mode,
+        )
+
 
