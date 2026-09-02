@@ -19,6 +19,7 @@ from .dynamic_assessment import DynamicAssessmentEngine
 from .remediation_engine import RemediationEngine
 from .threat_operations.ai_red_team_simulator import AIRedTeamSimulator
 from .runtime_defense.model_armor_guard import ModelArmorGuard
+from .security_runtime import AgenticSecurityRuntime, AgentAction
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("AISPR-Agentic-Core")
@@ -34,6 +35,7 @@ class AISPRAgenticCore:
         self.tenant_id = tenant_id
         self.connectors: Dict[str, Any] = {}
         self.guard = ModelArmorGuard()
+        self.security_runtime = AgenticSecurityRuntime()
         logger.info(f"Initialized AISPR Agentic Core for tenant: {tenant_id}")
 
     def register_cloud_connector(self, cloud_provider: str, credentials_payload: Optional[Dict[str, Any]] = None):
@@ -128,3 +130,28 @@ class AISPRAgenticCore:
         Generates production-ready remediation configurations across GCP, AWS, Azure, and Terraform.
         """
         return RemediationEngine.generate_remediations(failed_controls)
+
+    def execute_controlled_action(
+        self,
+        agent_id: str,
+        requested_action: str,
+        target: str,
+        tool_callable: Optional[Callable[..., Any]] = None,
+        tool_args: Optional[Dict[str, Any]] = None,
+        approval_token: Optional[str] = None,
+        metadata: Optional[Dict[str, Any]] = None,
+    ) -> AgentAction:
+        """
+        Executes an agent action within the controlled Agentic Security Runtime perimeter.
+        Enforces least-privilege (READ_ONLY by default), prompt injection shielding,
+        untrusted tool output defense, and cryptographic audit logging.
+        """
+        return self.security_runtime.execute_action(
+            agent_id=agent_id,
+            requested_action=requested_action,
+            target=target,
+            tool_callable=tool_callable,
+            tool_args=tool_args,
+            approval_token=approval_token,
+            metadata=metadata
+        )
