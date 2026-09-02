@@ -11,6 +11,20 @@
 
 ---
 
+## 0. GLOBAL RULES FOR THIS REPOSITORY (Apply to Every Phase)
+
+1. **Work hands-on.** Clone the repo, install dependencies, and RUN the code. Never report a result you did not personally execute.
+   ```bash
+   cd /home/claude && rm -rf aispr && git clone https://github.com/g-jsaccomani/aispr.git
+   cd aispr && export PYTHONPATH=$(pwd)
+   ```
+2. **Every claim in your final report must be backed by pasted terminal output with a visible exit code.** "It should work" is not acceptable.
+3. **Never weaken, skip, or delete a test to make a suite pass.** If a test is wrong, fix the test and say explicitly why it was wrong.
+4. **The Epistemic Truthfulness Model is inviolable.** No new code may allow `SIMULATION` / `MOCK` / `FIXTURE` / `FALLBACK` evidence to be marked `VERIFIED`, or allow `confidence > 0` with zero evidence.
+5. **All scanning stays read-only.** Any write operation must be gated behind an explicit human approval token.
+
+---
+
 ## 1. Executive Summary & Objective for Claude
 
 You are receiving this handoff document to perform an **independent, adversarial, and ruthlessly critical double-check** of the **AISPR (AI Security Posture Reviewer & Mesh)** platform.
