@@ -308,35 +308,159 @@ class TestProductionAssuranceAndTruthfulnessGate(unittest.TestCase):
     # ==========================================================================
     # SECTION 6: SHADOW AI IMPLEMENTATION MATCHES SPECS (OPTION A)
     # ==========================================================================
-    def test_shadow_ai_hunter_is_explicit_simulation_engine(self):
+    def test_shadow_ai_simulation_mode_produces_simulated_evidence_only(self):
         """
-        Section 6 (Option A):
-        ShadowAIHunter is explicitly an offline simulation fixture harness.
-        - Emits SIMULATION execution_mode
-        - Emits SIMULATED evidence
-        - Emits SUSPECTED or INFERRED confidence
-        - Does not claim live telemetry
-        - Rejects LIVE mode with ValueError
+        Phase 9.6.1 Test 1:
+        SIMULATION mode:
+        -> synthetic assets allowed
+        -> evidence is SIMULATED
+        -> no VERIFIED evidence
         """
-        # 1. Simulation execution
         hunter = ShadowAIHunter(project_id="demo-enterprise", mode=ExecutionMode.SIMULATION)
         report = hunter.run_full_scan()
 
         self.assertEqual(report["execution_mode"], "SIMULATION")
         self.assertEqual(report["engine_classification"], "OFFLINE_SIMULATION_HARNESS")
 
-        for finding in report["findings"]["shadow_ai"] + report["findings"]["workbench_vulnerabilities"]:
+        all_findings = report["findings"]["shadow_ai"] + report["findings"]["workbench_vulnerabilities"]
+        self.assertGreater(len(all_findings), 0)
+
+        for finding in all_findings:
             self.assertEqual(finding["execution_mode"], "SIMULATION")
             self.assertEqual(finding["fixture_classification"], "SIMULATION_SCENARIO")
             self.assertEqual(finding["evidence"]["status"], "SIMULATED")
+            self.assertNotEqual(finding["evidence"]["status"], "VERIFIED")
             self.assertIn(finding["confidence"], ("SUSPECTED", "INFERRED"))
             self.assertNotEqual(finding["confidence"], "OBSERVED")
             self.assertTrue(len(finding["provenance"]) > 0)
             self.assertTrue(len(finding["discovery_method"]) > 0)
 
-        # 2. Attempting LIVE mode MUST raise ValueError
-        with self.assertRaises(ValueError):
-            ShadowAIHunter(project_id="demo-enterprise", mode=ExecutionMode.LIVE)
+    def test_shadow_ai_live_mode_with_mocked_provider_response(self):
+        """
+        Phase 9.6.1 Test 2:
+        Mock a successful provider discovery response:
+        provider API -> returns real test asset -> Shadow AI
+        Expected:
+        execution_mode = LIVE
+        asset comes from mocked provider response
+        evidence = VERIFIED
+        confidence/status = OBSERVED
+        The test MUST prove that the asset was obtained from the mocked provider response rather than from a hardcoded fixture.
+        """
+        real_test_asset = "projects/live-corp/clusters/k8s-prod-cluster/namespaces/ai-team/pods/custom-vllm-daemon-89ab"
+        mock_connector = MagicMock()
+        mock_connector.discover_resources_live.return_value = {
+            "provider": "gcp",
+            "project_id": "live-corp-project",
+            "shadow_ai": [
+                {
+                    "finding_id": "SHADOW-LIVE-DISCOVERED-01",
+                    "asset": real_test_asset,
+                    "engine": "vLLM-Production",
+                    "severity": "CRITICAL",
+                    "cluster": "k8s-prod-cluster",
+                    "namespace": "ai-team",
+                    "pod_name": "custom-vllm-daemon-89ab",
+                }
+            ],
+            "vulnerabilities": []
+        }
+
+        hunter = ShadowAIHunter(project_id="live-corp-project", mode=ExecutionMode.LIVE, connector=mock_connector)
+        report = hunter.run_full_scan()
+
+        self.assertEqual(report["execution_mode"], "LIVE")
+        self.assertEqual(report["engine_classification"], "LIVE_ENTERPRISE_DISCOVERY")
+        self.assertEqual(len(report["findings"]["shadow_ai"]), 1)
+
+        finding = report["findings"]["shadow_ai"][0]
+        # Asset MUST come from mocked provider response, not from hardcoded fixtures
+        self.assertEqual(finding["asset"], real_test_asset)
+        self.assertNotIn("gke-credit-risk-prod", finding["asset"])
+        self.assertEqual(finding["execution_mode"], "LIVE")
+        self.assertEqual(finding["confidence"], "OBSERVED")
+        self.assertEqual(finding["status"], "OBSERVED")
+        self.assertEqual(finding["evidence"]["status"], "VERIFIED")
+        self.assertEqual(finding["discovery_method"], "LIVE_GCP_API_DISCOVERY")
+
+    def test_shadow_ai_live_mode_provider_failure_degrades_to_fallback(self):
+        """
+        Phase 9.6.1 Test 3:
+        Mock provider discovery failure:
+        LIVE requested -> API exception
+        Expected:
+        NO fabricated LIVE asset
+        If fallback is enabled:
+        execution_mode = FALLBACK
+        evidence != VERIFIED
+        """
+        mock_failing_connector = MagicMock()
+        mock_failing_connector.discover_resources_live.side_effect = RuntimeError("GCP API 503 Service Unavailable")
+
+        # Case A: fallback_on_error = True
+        hunter_fb = ShadowAIHunter(
+            project_id="live-corp-project",
+            mode=ExecutionMode.LIVE,
+            connector=mock_failing_connector,
+            fallback_on_error=True
+        )
+        report = hunter_fb.run_full_scan()
+
+        self.assertEqual(hunter_fb.mode, ExecutionMode.FALLBACK)
+        self.assertEqual(report["execution_mode"], "FALLBACK")
+        # Assert NO fabricated LIVE assets
+        self.assertEqual(report["total_findings"], 0)
+        self.assertIsNotNone(report.get("fallback_metadata"))
+        self.assertIn("GCP API 503 Service Unavailable", report["fallback_metadata"]["failure_reason"])
+
+        # Case B: fallback_on_error = False (fail closed)
+        hunter_strict = ShadowAIHunter(
+            project_id="live-corp-project",
+            mode=ExecutionMode.LIVE,
+            connector=mock_failing_connector,
+            fallback_on_error=False
+        )
+        with self.assertRaises(RuntimeError):
+            hunter_strict.run_full_scan()
+
+    def test_shadow_ai_simulation_fixtures_cannot_appear_as_verified_live(self):
+        """
+        Phase 9.6.1 Test 4:
+        Explicitly assert that known simulation fixtures such as:
+        gke-credit-risk-prod
+        gce-sandbox
+        workbench-analyst-gpu-01
+        cannot appear as VERIFIED LIVE assets unless they were actually returned by the mocked live provider.
+        """
+        known_fixtures = [
+            "gke-credit-risk-prod",
+            "gce-sandbox",
+            "workbench-analyst-gpu-01",
+        ]
+
+        # 1. In LIVE mode with distinct real asset, fixtures MUST NOT appear
+        real_asset = "projects/live-corp/clusters/real-k8s/namespaces/prod/pods/llama3-8b"
+        mock_connector = MagicMock()
+        mock_connector.discover_resources_live.return_value = {
+            "provider": "gcp",
+            "project_id": "live-corp",
+            "shadow_ai": [{"asset": real_asset, "engine": "Ollama", "severity": "HIGH"}],
+            "vulnerabilities": []
+        }
+        hunter_live = ShadowAIHunter(project_id="live-corp", mode=ExecutionMode.LIVE, connector=mock_connector)
+        live_report = hunter_live.run_full_scan()
+
+        for f in live_report["findings"]["shadow_ai"] + live_report["findings"]["workbench_vulnerabilities"]:
+            for fixture in known_fixtures:
+                self.assertNotIn(fixture, f["asset"])
+
+        # 2. In SIMULATION mode, fixtures appear BUT NEVER as VERIFIED LIVE
+        hunter_sim = ShadowAIHunter(project_id="live-corp", mode=ExecutionMode.SIMULATION)
+        sim_report = hunter_sim.run_full_scan()
+        for f in sim_report["findings"]["shadow_ai"] + sim_report["findings"]["workbench_vulnerabilities"]:
+            self.assertNotEqual(f["execution_mode"], "LIVE")
+            self.assertNotEqual(f["confidence"], "OBSERVED")
+            self.assertNotEqual(f["evidence"]["status"], "VERIFIED")
 
     def test_enterprise_shadow_ai_engine_epistemological_safety(self):
         """Section 6 & Phase 9 Discovery Engine: Inferred flows cannot be classified as OBSERVED."""

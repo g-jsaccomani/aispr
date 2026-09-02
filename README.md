@@ -175,13 +175,22 @@ Once deployed via Cloud Run or locally:
 
 ---
 
-## Unit Testing & Validation
+## Unit Testing & Epistemological Validation
 
-To run the complete automated test suite (62 unit tests across audit, agentic, runtime defense, and Looker BI engines):
+To run the complete automated test suite (238 unit and integration tests across audit engine, multi-cloud connectors, runtime defense, and dedicated truthfulness gates):
 
 ```bash
-make test
+# Run all unit tests across agentic and audit engines
+python3 -m unittest discover -s agentic/tests -p "test_*.py"
+python3 -m unittest discover -s audit/tests -p "test_*.py"
+
+# Validate all 104 regulatory control contracts
+./aispr controls validate
 ```
+
+### Operational Modes & Epistemological Guardrails
+* **Model Armor Runtime Defense**: Live semantic inspection connects to `modelarmor.googleapis.com` via Google Cloud Application Default Credentials (ADC). When credentials or APIs are unavailable, the platform enters an explicit `LOCAL_FALLBACK` mode utilizing local regex filters. Local fallback blocks are never attributed to Google Cloud Model Armor.
+* **Shadow AI Discovery**: Supports both explicit offline simulation (`ExecutionMode.SIMULATION`) for threat scenarios and live read-only cloud discovery (`ExecutionMode.LIVE`). Simulated scenario assets (`gke-credit-risk-prod`, `gce-sandbox`, etc.) are strictly classified as fixtures with simulated evidence and are never promoted to verified live findings.
 
 ---
 

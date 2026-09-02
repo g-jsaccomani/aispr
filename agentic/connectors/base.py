@@ -105,6 +105,11 @@ class NormalizedDiscoveryResult(AISPRBaseModel):
     def total_evidence(self) -> int:
         return len(self.evidence)
 
+    @property
+    def fallback_metadata(self) -> Dict[str, Any]:
+        """Returns structured failure and fallback metadata if discovery degraded to fallback."""
+        return self.raw_discovery.get("fallback_metadata", {})
+
 
 # ==============================================================================
 # 3. BASE CONNECTOR ABSTRACT CLASS

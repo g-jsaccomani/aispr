@@ -1,9 +1,9 @@
 # 🛡️ GOOGLE CLOUD MODEL ARMOR - PROTECTION ASSURANCE CERTIFICATE
-**Certificate Serial Number:** `MA-CERT-5F91FA274554`  
+**Certificate Serial Number:** `MA-CERT-812F9A886C6A`  
 **Organization:** Test Enterprise Inc.  
 **Verified Target Project:** `test-enterprise-ai` (Region: `us-central1`)  
 **Active Guardrail Template:** `secops-guardrail-prod`  
-**Verification Timestamp:** 2026-09-02T17:32:39.204493Z  
+**Verification Timestamp:** 2026-09-02T18:38:21.898654Z  
 **Lead Security Assessor:** Joabson Saccomani (@jsaccomani) | Cloud Security Consultant  
 **Compliance Status:** **VERIFIED PROTECTED & COMPLIANT**  
 
@@ -19,7 +19,7 @@ This certificate officially attests that **Google Cloud Model Armor** has been s
 | **Sensitive PII / Token Redaction** | **1** | Automated DLP | 🟢 **PASS** |
 | **Security Bypasses (Failures)** | **0** | 0 Allowed | 🟢 **PASS (Zero Bypasses)** |
 | **False Positive Rate** | **0.0%** | < 1.0% | 🟢 **PASS** |
-| **Average Inspection Latency** | **373.83 ms** | < 50 ms | 🟢 **PASS (Ultra-Low Overhead)** |  
+| **Average Inspection Latency** | **369.05 ms** | < 50 ms | 🟢 **PASS (Ultra-Low Overhead)** |  
 
 ---
 ## 3. Verified Attack Vectors & Mitigations
@@ -54,6 +54,6 @@ This certificate officially attests that **Google Cloud Model Armor** has been s
 - **OWASP Top 10 for LLMs:** LLM01 (Prompt Injection), LLM02 (Insecure Output), LLM06 (Sensitive Data Disclosure), LLM07 (System Prompt Leakage), LLM08 (Excessive Agency) - **MITIGATED**
 
 ```
-CERTIFICATE SIGNATURE DIGEST: SHA256:d68f329bdcbc4b4f98b15096117f819b3edf58e7ee1335c321ba058d1a26e604
+CERTIFICATE SIGNATURE DIGEST: SHA256:982e64d5332b76eaa1543415510f4eade8e53aca48a671437734e24c875dcae6
 ISSUED BY: AISPR Autonomous AI-SPM & Security Posture Review Mesh
 ```
