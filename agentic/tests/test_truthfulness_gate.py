@@ -475,6 +475,11 @@ class TestProductionAssuranceAndTruthfulnessGate(unittest.TestCase):
         self.assertEqual(disc.confidence, ShadowConfidence.INFERRED)
         self.assertNotEqual(disc.confidence, ShadowConfidence.OBSERVED)
 
+    def test_shadow_ai_hunter_invalid_mode_fails_fast(self):
+        """Passing an invalid execution mode to ShadowAIHunter MUST fail fast with ValueError."""
+        with self.assertRaises(ValueError):
+            ShadowAIHunter(mode="UNRECOGNIZED_MODE_STRING")
+
     # ==========================================================================
     # SECTION 7: MODEL ARMOR SOURCE ATTRIBUTION
     # ==========================================================================

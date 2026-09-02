@@ -47,6 +47,13 @@ class ShadowAIHunter:
         fallback_on_error: bool = False,
     ):
         self.project_id = project_id
+        if isinstance(mode, str):
+            try:
+                mode = ExecutionMode(mode.upper())
+            except ValueError:
+                raise ValueError(f"Invalid ExecutionMode '{mode}'. Valid modes: {[e.value for e in ExecutionMode]}")
+        elif not isinstance(mode, ExecutionMode):
+            raise ValueError(f"Invalid ExecutionMode '{mode}'. Expected ExecutionMode instance.")
         self.mode = mode
         self.fallback_on_error = fallback_on_error
         self._connector = connector

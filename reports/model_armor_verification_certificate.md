@@ -1,11 +1,11 @@
 # 🛡️ GOOGLE CLOUD MODEL ARMOR - PROTECTION ASSURANCE CERTIFICATE
-**Certificate Serial Number:** `MA-CERT-812F9A886C6A`  
-**Organization:** Test Enterprise Inc.  
-**Verified Target Project:** `test-enterprise-ai` (Region: `us-central1`)  
-**Active Guardrail Template:** `secops-guardrail-prod`  
-**Verification Timestamp:** 2026-09-02T18:38:21.898654Z  
-**Lead Security Assessor:** Joabson Saccomani (@jsaccomani) | Cloud Security Consultant  
-**Compliance Status:** **VERIFIED PROTECTED & COMPLIANT**  
+**Certificate Serial Number:** `MA-CERT-B1F2D37CA3F9`
+**Organization:** Test Enterprise Inc.
+**Verified Target Project:** `test-enterprise-ai` (Region: `us-central1`)
+**Active Guardrail Template:** `secops-guardrail-prod`
+**Verification Timestamp:** 2026-09-02T19:00:18.212112Z
+**Lead Security Assessor:** Joabson Saccomani (@jsaccomani) | Cloud Security Consultant
+**Compliance Status:** **VERIFIED PROTECTED & COMPLIANT**
 
 ---
 ## 1. Executive Attestation of Protection
@@ -19,7 +19,7 @@ This certificate officially attests that **Google Cloud Model Armor** has been s
 | **Sensitive PII / Token Redaction** | **1** | Automated DLP | 🟢 **PASS** |
 | **Security Bypasses (Failures)** | **0** | 0 Allowed | 🟢 **PASS (Zero Bypasses)** |
 | **False Positive Rate** | **0.0%** | < 1.0% | 🟢 **PASS** |
-| **Average Inspection Latency** | **369.05 ms** | < 50 ms | 🟢 **PASS (Ultra-Low Overhead)** |  
+| **Average Inspection Latency** | **339.77 ms** | < 50 ms | 🟢 **PASS (Ultra-Low Overhead)** |
 
 ---
 ## 3. Verified Attack Vectors & Mitigations
@@ -54,6 +54,6 @@ This certificate officially attests that **Google Cloud Model Armor** has been s
 - **OWASP Top 10 for LLMs:** LLM01 (Prompt Injection), LLM02 (Insecure Output), LLM06 (Sensitive Data Disclosure), LLM07 (System Prompt Leakage), LLM08 (Excessive Agency) - **MITIGATED**
 
 ```
-CERTIFICATE SIGNATURE DIGEST: SHA256:982e64d5332b76eaa1543415510f4eade8e53aca48a671437734e24c875dcae6
+CERTIFICATE SIGNATURE DIGEST: SHA256:ca8bc5651dd6975d3527cc51205541297f55b241195836992d52056f39d2975a
 ISSUED BY: AISPR Autonomous AI-SPM & Security Posture Review Mesh
 ```
