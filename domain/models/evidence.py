@@ -171,10 +171,19 @@ class Evidence(AISPRBaseModel):
         # Invariant checks: SIMULATION execution cannot be VERIFIED status
         exec_mode = str(data.get("execution_mode", "SIMULATION")).upper().strip()
         stat = str(data.get("status", "UNVERIFIED")).upper().strip()
-        if exec_mode in ("SIMULATION", "FIXTURE", "MOCK") and stat == "VERIFIED":
+        if exec_mode in ("SIMULATION", "FIXTURE", "MOCK", "FALLBACK") and stat == "VERIFIED":
             raise ValueError(f"Simulation integrity violation: Evidence with execution mode '{exec_mode}' cannot have VERIFIED status.")
 
         return data
+
+    @model_validator(mode="after")
+    def validate_simulation_evidence_not_verified(self) -> "Evidence":
+        if self.execution_mode in (ExecutionMode.SIMULATION, ExecutionMode.FIXTURE, ExecutionMode.MOCK, ExecutionMode.FALLBACK):
+            if self.status == EvidenceStatus.VERIFIED:
+                raise ValueError(
+                    f"Simulation integrity violation: Evidence with execution mode '{self.execution_mode}' cannot have VERIFIED status."
+                )
+        return self
 
     def set_content(self, content: Any):
         """Safely sets content by sanitizing secrets and updating the cryptographic SHA-256 hash."""

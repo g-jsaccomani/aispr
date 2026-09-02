@@ -48,6 +48,7 @@ from domain.enums import (
     FindingSource,
     ControlRelationType,
 )
+from domain.models.base import utc_now
 from domain.models.asset import AIAsset
 from domain.models.finding import SecurityFinding
 from domain.models.evidence import Evidence, compute_sha256
@@ -912,13 +913,31 @@ class GCPConnector(BaseCloudConnector):
             errors=errors
         )
 
-    def discover_canonical(self, live: bool = False) -> NormalizedDiscoveryResult:
+    def discover_canonical(self, live: bool = False, fallback_on_error: bool = False) -> NormalizedDiscoveryResult:
         """
         Executes discovery and returns strongly-typed, normalized canonical entities.
+        If live=True and an API failure occurs:
+          - If fallback_on_error is True: returns explicit FALLBACK result recording failure metadata.
+          - If fallback_on_error is False: raises the typed CloudConnectorError.
         """
         if live:
-            raw_data = self.discover_resources_live()
-            return self.normalize(raw_data, ExecutionMode.LIVE)
+            try:
+                raw_data = self.discover_resources_live()
+                return self.normalize(raw_data, ExecutionMode.LIVE)
+            except Exception as exc:
+                if fallback_on_error:
+                    logger.warning(f"GCP Live discovery failed ({exc}). Falling back to simulated metadata with explicit FALLBACK mode.")
+                    raw_data = self.discover_resources()
+                    raw_data["execution_mode"] = ExecutionMode.FALLBACK
+                    raw_data["fallback_metadata"] = {
+                        "provider": "gcp",
+                        "attempted_operation": "gcp:discover_resources_live",
+                        "failure_reason": str(exc),
+                        "fallback_source": "LOCAL_SIMULATED_FIXTURE",
+                        "timestamp": utc_now().isoformat(),
+                    }
+                    return self.normalize(raw_data, ExecutionMode.FALLBACK)
+                raise
         else:
             raw_data = self.discover_resources()
             return self.normalize(raw_data, ExecutionMode.SIMULATION)

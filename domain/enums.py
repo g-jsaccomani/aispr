@@ -107,6 +107,7 @@ class ExecutionMode(StrEnum):
     FIXTURE = "FIXTURE"
     MOCK = "MOCK"
     DEGRADED = "DEGRADED"
+    FALLBACK = "FALLBACK"
 
 
 class ConfidenceLevel(StrEnum):

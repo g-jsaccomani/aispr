@@ -555,14 +555,31 @@ class EnterpriseRiskEngine:
                 declared_count += 1
 
         total_contracts = len(all_contracts)
+        # Truthful separation: DECLARED_ONLY controls receive 0.0 implemented coverage
         control_coverage_score = round(
             (
-                (1.0 * implemented_count + 0.5 * partial_count + 0.2 * declared_count)
+                (1.0 * implemented_count + 0.5 * partial_count + 0.0 * declared_count)
                 / total_contracts
                 * 100.0
             )
             if total_contracts > 0
-            else 100.0,
+            else 0.0,
+            2,
+        )
+        implementation_coverage = round(
+            (implemented_count / total_contracts * 100.0) if total_contracts > 0 else 0.0,
+            2,
+        )
+        declared_coverage = round(
+            ((implemented_count + partial_count + declared_count) / total_contracts * 100.0)
+            if total_contracts > 0
+            else 0.0,
+            2,
+        )
+        assessment_coverage = round(
+            ((automated_count + manual_count) / total_contracts * 100.0)
+            if total_contracts > 0
+            else 0.0,
             2,
         )
 
@@ -576,10 +593,12 @@ class EnterpriseRiskEngine:
                     "declared": declared_count,
                     "automated": automated_count,
                     "manual": manual_count,
+                    "implementation_coverage": implementation_coverage,
+                    "declared_coverage": declared_coverage,
                 },
                 normalized_value=control_coverage_score,
                 calculation_result=control_coverage_score,
-                description=f"Control coverage score {control_coverage_score}% (Automated: {automated_count}, Manual: {manual_count}).",
+                description=f"Control coverage score {control_coverage_score}% (Implemented: {implementation_coverage}%, Declared: {declared_coverage}%).",
             )
         )
 
@@ -617,7 +636,7 @@ class EnterpriseRiskEngine:
 
         total_ev_items = live_ev_count + sim_ev_count + missing_ev_count
         if total_ev_items == 0:
-            evidence_confidence_score = 100.0
+            evidence_confidence_score = 0.0
         else:
             # LIVE verified = 1.0; SIMULATION = 0.5; MISSING = 0.0
             weighted_ev = 1.0 * live_ev_count + 0.5 * sim_ev_count + 0.0 * missing_ev_count
@@ -840,6 +859,10 @@ class EnterpriseRiskEngine:
             simulated_evidence_count=sim_ev_count,
             missing_evidence_count=missing_ev_count,
             control_coverage_score=control_coverage_score,
+            implementation_coverage=implementation_coverage,
+            declared_coverage=declared_coverage,
+            evidence_coverage=evidence_confidence_score,
+            assessment_coverage=assessment_coverage,
             automated_controls_count=automated_count,
             manual_controls_count=manual_count,
             implemented_controls_count=implemented_count,

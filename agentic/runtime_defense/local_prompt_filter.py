@@ -144,7 +144,10 @@ class LocalPromptFilter:
             "matched_rules": matched_rules,
             "sanitized_prompt": sanitized_prompt,
             "requires_hitl": requires_hitl,
-            "is_blocked": verdict == "BLOCKED"
+            "is_blocked": verdict == "BLOCKED",
+            "inspection_source": "LOCAL_FALLBACK",
+            "execution_mode": "SIMULATION",
+            "description": f"Local Prompt Filter (offline fallback) verdict: {verdict}"
         }
 
     def inspect_output(self, generated_text: str) -> Dict[str, Any]:
@@ -172,5 +175,8 @@ class LocalPromptFilter:
             "verdict": verdict,
             "is_blocked": is_blocked,
             "matched_rules": matched_rules,
-            "sanitized_output": sanitized_output
+            "sanitized_output": sanitized_output,
+            "inspection_source": "LOCAL_FALLBACK",
+            "execution_mode": "SIMULATION",
+            "description": f"Local Output Filter (offline fallback) verdict: {verdict}"
         }

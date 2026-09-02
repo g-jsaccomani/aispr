@@ -107,8 +107,12 @@ class EnterpriseRiskMetrics(AISPRBaseModel):
     simulated_evidence_count: int = 0
     missing_evidence_count: int = 0
 
-    # 6. Control Coverage
+    # 6. Control Coverage (Separated Truthful Dimensions)
     control_coverage_score: float = Field(ge=0.0, le=100.0)
+    implementation_coverage: float = Field(default=0.0, ge=0.0, le=100.0)
+    declared_coverage: float = Field(default=0.0, ge=0.0, le=100.0)
+    evidence_coverage: float = Field(default=0.0, ge=0.0, le=100.0)
+    assessment_coverage: float = Field(default=0.0, ge=0.0, le=100.0)
     automated_controls_count: int = 0
     manual_controls_count: int = 0
     implemented_controls_count: int = 0

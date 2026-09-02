@@ -62,6 +62,9 @@ class ModelArmorGuard:
             try:
                 res = self.live_client.sanitize_user_prompt(prompt, hitl_approval_token=hitl_approval_token)
                 logger.debug(f"Model Armor Live API inspection verdict: {res['verdict']}")
+                res["inspection_source"] = "MODEL_ARMOR_LIVE"
+                res["execution_mode"] = "LIVE"
+                res["description"] = "Verdict verified by Google Cloud Model Armor API (modelarmor.googleapis.com)."
                 
                 # Check local high-impact mutation rules to preserve HITL authorization gates
                 local_check = self.local_filter.inspect_prompt(prompt, hitl_approval_token=hitl_approval_token)
@@ -70,15 +73,28 @@ class ModelArmorGuard:
                     if local_check.get("is_blocked"):
                         res["is_blocked"] = True
                         res["verdict"] = "BLOCKED"
+                        res["inspection_source"] = "LOCAL_FALLBACK"
+                        res["execution_mode"] = "FALLBACK"
+                        res["description"] = "Blocked by local security policy rules (high-impact mutation without valid HITL token)."
                         for rule in local_check.get("matched_rules", []):
                             if rule not in res["matched_rules"]:
                                 res["matched_rules"].append(rule)
                 return res
             except Exception as exc:
                 logger.debug(f"Live Model Armor API call bypassed ({exc}). Using local prompt filter fallback.")
+                fallback_res = self.local_filter.inspect_prompt(prompt, hitl_approval_token=hitl_approval_token)
+                fallback_res["inspection_source"] = "LOCAL_FALLBACK"
+                fallback_res["execution_mode"] = "FALLBACK"
+                fallback_res["fallback_reason"] = f"Live Model Armor API failed: {exc}"
+                fallback_res["description"] = "Verdict produced by local regex fallback. Live Model Armor was unavailable."
+                return fallback_res
 
         # Fallback to local regex filter
-        return self.local_filter.inspect_prompt(prompt, hitl_approval_token=hitl_approval_token)
+        res = self.local_filter.inspect_prompt(prompt, hitl_approval_token=hitl_approval_token)
+        res["inspection_source"] = "LOCAL_FALLBACK"
+        res["execution_mode"] = "SIMULATION"
+        res["description"] = f"Local Prompt Filter (offline fallback) verdict: {res['verdict']}"
+        return res
 
     def inspect_output(self, generated_text: str) -> Dict[str, Any]:
         """
@@ -90,8 +106,21 @@ class ModelArmorGuard:
             try:
                 res = self.live_client.sanitize_model_response(generated_text)
                 logger.debug(f"Model Armor Live API output inspection verdict: {res['verdict']}")
+                res["inspection_source"] = "MODEL_ARMOR_LIVE"
+                res["execution_mode"] = "LIVE"
+                res["description"] = "Model response sanitized by Google Cloud Model Armor Live API."
                 return res
             except Exception as exc:
                 logger.debug(f"Live Model Armor API output shielding bypassed ({exc}). Using local fallback.")
+                fallback_res = self.local_filter.inspect_output(generated_text)
+                fallback_res["inspection_source"] = "LOCAL_FALLBACK"
+                fallback_res["execution_mode"] = "FALLBACK"
+                fallback_res["fallback_reason"] = f"Live Model Armor API failed: {exc}"
+                fallback_res["description"] = "Model response evaluated via local regex fallback. Live Model Armor was unavailable."
+                return fallback_res
 
-        return self.local_filter.inspect_output(generated_text)
+        res = self.local_filter.inspect_output(generated_text)
+        res["inspection_source"] = "LOCAL_FALLBACK"
+        res["execution_mode"] = "SIMULATION"
+        res["description"] = "Output evaluated via local filter in simulation mode."
+        return res

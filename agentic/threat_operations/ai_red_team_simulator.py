@@ -64,6 +64,13 @@ class AIRedTeamSimulator:
             is_success = (actual == expected)
             if not is_success and expected == "BLOCKED" and actual == "ALLOWED":
                 bypassed_count += 1
+                outcome = "ATTACK_SUCCEEDED"
+            elif actual in ("BLOCKED", "SANITIZED"):
+                outcome = "ATTACK_BLOCKED"
+            elif expected == "ALLOWED" and actual == "ALLOWED":
+                outcome = "ATTACK_ATTEMPTED"
+            else:
+                outcome = "INCONCLUSIVE"
 
             if actual == "BLOCKED":
                 blocked_count += 1
@@ -77,17 +84,22 @@ class AIRedTeamSimulator:
                 "category": tc.get("category"),
                 "mitre_atlas": tc.get("mitre_atlas_mapping"),
                 "owasp": tc.get("owasp_mapping"),
+                "attack_outcome": outcome,
+                "execution_mode": "SIMULATION",
+                "inspection_source": verdict.get("inspection_source", "LOCAL_FALLBACK"),
                 "expected": expected,
                 "actual": actual,
                 "risk_score": verdict["risk_score"],
                 "matched_rules": verdict["matched_rules"],
-                "passed_validation": is_success
+                "passed_validation": is_success,
+                "proof_of_impact": f"Verified outcome: {outcome} with verdict {actual}"
             })
 
         total = len(self.test_cases)
         defense_efficacy = round(((blocked_count + sanitized_count) / max(total - allowed_count, 1)) * 100.0, 2)
 
         return {
+            "execution_mode": "SIMULATION",
             "total_adversarial_tests": total,
             "metrics": {
                 "blocked": blocked_count,

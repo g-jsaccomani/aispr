@@ -135,7 +135,21 @@ class SecurityFinding(AISPRBaseModel):
                 return ConfidenceLevel(v.upper().strip())
             except ValueError:
                 raise ValueError(f"Invalid ConfidenceLevel: '{v}'")
-        return v
+        if isinstance(v, ConfidenceLevel):
+            return v
+        raise ValueError(f"Invalid ConfidenceLevel: '{v}'")
+
+    @field_validator("execution_mode", mode="before")
+    @classmethod
+    def parse_execution_mode(cls, v: Any) -> ExecutionMode:
+        if isinstance(v, str):
+            try:
+                return ExecutionMode(v.upper().strip())
+            except ValueError:
+                raise ValueError(f"Invalid ExecutionMode: '{v}'")
+        if isinstance(v, ExecutionMode):
+            return v
+        raise ValueError(f"Invalid ExecutionMode: '{v}'")
 
     @model_validator(mode="before")
     @classmethod
@@ -301,15 +315,20 @@ class SecurityFinding(AISPRBaseModel):
             has_live_ev = any(ev.execution_mode == ExecutionMode.LIVE for ev in self.evidence)
             if not has_live_ev:
                 raise ValueError("LIVE finding integrity violation: Finding with execution_mode=LIVE must contain at least one LIVE evidence.")
-            has_valid_provenance = any(ev.status == EvidenceStatus.VERIFIED or (ev.status != EvidenceStatus.SIMULATED and ev.execution_mode == ExecutionMode.LIVE) for ev in self.evidence)
+            has_valid_provenance = any(
+                (ev.status == EvidenceStatus.VERIFIED or (ev.status != EvidenceStatus.SIMULATED and ev.execution_mode == ExecutionMode.LIVE))
+                and bool(ev.resource or (self.asset and (self.asset.resource_uri or self.asset.name)))
+                and bool(ev.collection_method)
+                for ev in self.evidence
+            )
             if not has_valid_provenance:
                 raise ValueError("LIVE finding integrity violation: Finding with execution_mode=LIVE must have valid evidence provenance.")
 
         # Rule 2: Simulation finding cannot be verified
-        if self.execution_mode in (ExecutionMode.SIMULATION, ExecutionMode.FIXTURE, ExecutionMode.MOCK):
+        if self.execution_mode in (ExecutionMode.SIMULATION, ExecutionMode.FIXTURE, ExecutionMode.MOCK, ExecutionMode.FALLBACK):
             for ev in self.evidence:
                 if ev.status == EvidenceStatus.VERIFIED:
-                    raise ValueError("Simulation finding integrity violation: Finding with SIMULATION mode cannot contain VERIFIED evidence.")
+                    raise ValueError(f"Simulation finding integrity violation: Finding with {self.execution_mode} mode cannot contain VERIFIED evidence.")
 
         # Rule 3: Inferred finding must specify origin
         has_inferred = any(ev.status == EvidenceStatus.INFERRED for ev in self.evidence)
@@ -320,9 +339,9 @@ class SecurityFinding(AISPRBaseModel):
 
     @property
     def propagated_confidence(self) -> float:
-        """Computes propagated confidence score based on attached empirical evidence."""
+        """Computes propagated confidence score based on attached empirical evidence. Zero evidence returns 0.0."""
         if not self.evidence:
-            return 0.5 if self.is_simulated else 0.85
+            return 0.0
         return round(sum(ev.confidence for ev in self.evidence) / len(self.evidence), 2)
 
     @property
