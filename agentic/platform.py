@@ -18,8 +18,10 @@ from .connectors.base import NormalizedDiscoveryResult
 from .dynamic_assessment import DynamicAssessmentEngine
 from .remediation_engine import RemediationEngine
 from .threat_operations.ai_red_team_simulator import AIRedTeamSimulator
+from domain.enums import ExecutionMode
 from .runtime_defense.model_armor_guard import ModelArmorGuard
 from .security_runtime import AgenticSecurityRuntime, AgentAction
+from .adversarial_engine import AdversarialValidationEngine, AdversarialCampaignReport
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("AISPR-Agentic-Core")
@@ -155,3 +157,21 @@ class AISPRAgenticCore:
             approval_token=approval_token,
             metadata=metadata
         )
+
+    def run_adversarial_validation_campaign(
+        self,
+        target: str = "sim://aispr/agentic-runtime",
+        mode: Optional[ExecutionMode] = None,
+        custom_tests: Optional[List[Dict[str, Any]]] = None,
+    ) -> AdversarialCampaignReport:
+        """
+        Executes a controlled adversarial testing campaign using Phase 8 AdversarialValidationEngine.
+        Enforces target authorization, MITRE ATLAS mapping, 4-way outcome separation,
+        and evidence proof-of-impact.
+        """
+        engine = AdversarialValidationEngine(
+            default_mode=mode or ExecutionMode.SIMULATION,
+            security_runtime=self.security_runtime,
+        )
+        return engine.run_campaign(target=target, mode=mode, custom_tests=custom_tests)
+

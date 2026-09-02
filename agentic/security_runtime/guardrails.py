@@ -72,7 +72,7 @@ class RuntimePromptGuard:
         r"(?i)drop (database|table)",
         r"(?i)rm -rf /",
         r"(?i)terminate instance",
-        r"(?i)disable (audit|logging|scc|guardrails)",
+        r"(?i)disable\s+(?:all\s+)?(?:security\s+)?(audit|logging|scc|guardrails)",
     ]
 
     def inspect_prompt(self, prompt: str, strict: bool = True) -> Dict[str, Any]:
