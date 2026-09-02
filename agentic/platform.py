@@ -14,6 +14,7 @@ from typing import Dict, List, Any, Optional
 from .connectors.gcp_connector import GCPConnector
 from .connectors.aws_connector import AWSConnector
 from .connectors.azure_connector import AzureConnector
+from .connectors.base import NormalizedDiscoveryResult
 from .dynamic_assessment import DynamicAssessmentEngine
 from .remediation_engine import RemediationEngine
 from .threat_operations.ai_red_team_simulator import AIRedTeamSimulator
@@ -91,6 +92,22 @@ class AISPRAgenticCore:
             ai_bom["vulnerabilities"].extend(res.get("vulnerabilities", []))
 
         return ai_bom
+
+    def run_canonical_discovery(self, live: bool = False) -> Dict[str, NormalizedDiscoveryResult]:
+        """
+        Executes discovery and returns strongly-typed NormalizedDiscoveryResults containing
+        canonical AIAsset, SecurityFinding, and Evidence entities for each registered provider.
+        """
+        if not self.connectors:
+            self.register_cloud_connector("gcp", {"project_id": "your-gcp-project-id"})
+            self.register_cloud_connector("aws", {"account_id": "123456789012"})
+            self.register_cloud_connector("azure", {"subscription_id": "sub-000-111-222"})
+
+        results: Dict[str, NormalizedDiscoveryResult] = {}
+        for provider, connector in self.connectors.items():
+            if hasattr(connector, "discover_canonical"):
+                results[provider] = connector.discover_canonical(live=live)
+        return results
 
     def generate_progressive_questions(self, ai_bom: Dict[str, Any]) -> List[Dict[str, Any]]:
         """

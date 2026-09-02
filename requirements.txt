@@ -21,3 +21,10 @@ google-cloud-modelarmor>=0.1.0
 # Google GenAI & Agent SDKs
 google-genai>=0.1.0
 google-adk>=0.1.0
+
+# Multi-Cloud Provider SDKs (Phase 6)
+boto3>=1.34.0
+botocore>=1.34.0
+azure-identity>=1.15.0
+azure-mgmt-cognitiveservices>=13.5.0
+azure-mgmt-resource>=23.0.0

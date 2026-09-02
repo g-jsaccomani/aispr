@@ -36,16 +36,55 @@ except ImportError:
     get_default_project_id = None
     GCPAuth = None
 
+from domain.enums import (
+    CloudProvider,
+    ExecutionMode,
+    AssetType,
+    FindingSeverity,
+    FindingStatus,
+    ConfidenceLevel,
+    EvidenceType,
+    EvidenceStatus,
+    FindingSource,
+    ControlRelationType,
+)
+from domain.models.asset import AIAsset
+from domain.models.finding import SecurityFinding
+from domain.models.evidence import Evidence, compute_sha256
+from domain.models.control import ControlLink
+from domain.sanitization import sanitize_evidence_content
+from agentic.connectors.base import (
+    BaseCloudConnector,
+    NormalizedDiscoveryResult,
+    CloudConnectorError,
+    CloudAuthenticationError,
+    CloudPermissionDeniedError,
+    CloudAPIResponseError,
+    ReadOnlyEnforcementError,
+    CloudSDKMissingError,
+)
+
 logger = logging.getLogger("AISPR-GCP-Connector")
 
 
-class GCPConnector:
+class GCPConnector(BaseCloudConnector):
     """
     Federated connector for Google Cloud discovering Vertex AI models,
     endpoints, GKE namespaces, and Security Command Center (SCC) AI Protection telemetry.
     """
 
-    def __init__(self, project_id: str = "your-gcp-project-id", credentials_payload: Dict[str, Any] = None):
+    def __init__(
+        self,
+        project_id: str = "your-gcp-project-id",
+        credentials_payload: Optional[Dict[str, Any]] = None,
+        execution_mode: ExecutionMode = ExecutionMode.SIMULATION,
+    ):
+        super().__init__(
+            provider=CloudProvider.GCP,
+            target_identifier=project_id,
+            execution_mode=execution_mode,
+            credentials_payload=credentials_payload,
+        )
         self.project_id = project_id
         self.credentials_payload = credentials_payload or {}
         self._auth_helper: Optional[Any] = None
@@ -667,6 +706,7 @@ class GCPConnector:
             logger.debug(f"Security Command Center discovery error: {exc}")
 
         # 8. Return exact schema shape matching discover_resources()
+        self.execution_mode = ExecutionMode.LIVE
         return {
             "provider": "gcp",
             "project_id": effective_project,
@@ -675,3 +715,210 @@ class GCPConnector:
             "shadow_ai": shadow_ai_findings,
             "vulnerabilities": vulnerabilities
         }
+
+    def normalize(self, raw_data: Dict[str, Any], execution_mode: ExecutionMode) -> NormalizedDiscoveryResult:
+        """
+        Normalizes GCP raw dictionary output into canonical AIAsset, SecurityFinding, and Evidence entities.
+        """
+        assets: List[AIAsset] = []
+        findings: List[SecurityFinding] = []
+        evidence_list: List[Evidence] = []
+        errors: List[str] = []
+
+        is_live = (execution_mode == ExecutionMode.LIVE)
+        evidence_status = EvidenceStatus.VERIFIED if is_live else EvidenceStatus.UNVERIFIED
+        eff_project = raw_data.get("project_id", self.project_id)
+
+        # 1. Normalize Models
+        for m in raw_data.get("models", []):
+            m_name = m.get("name", "gcp-ai-model")
+            r_type = m.get("resource_type", "vertex_ai_model")
+
+            if "endpoint" in r_type.lower():
+                a_type = AssetType.INFERENCE_ENDPOINT
+            elif "workbench" in r_type.lower() or "notebook" in r_type.lower():
+                a_type = AssetType.AI_WORKBENCH_NOTEBOOK
+            else:
+                a_type = AssetType.FOUNDATION_MODEL
+
+            loc = m.get("location", "us-central1")
+            res_uri = m.get("resource_uri") or f"projects/{eff_project}/locations/{loc}/models/{m_name}"
+
+            asset = AIAsset(
+                name=m_name,
+                asset_type=a_type,
+                provider=CloudProvider.GCP,
+                location=loc,
+                resource_uri=res_uri,
+                display_name=m_name,
+                cmek_enabled=bool(m.get("cmek_enabled", False)),
+                is_private_endpoint=bool(m.get("private_endpoint", False)),
+                model_armor_enabled=bool(m.get("model_armor_enabled", False)),
+                metadata=self.sanitize_credentials(m.get("metadata", {}))
+            )
+            assets.append(asset)
+
+        # 2. Normalize Endpoints
+        for ep in raw_data.get("endpoints", []):
+            ep_name = ep.get("name", "gcp-endpoint")
+            res_uri = ep_name if ep_name.startswith("projects/") else f"projects/{eff_project}/locations/global/endpoints/{ep_name}"
+
+            asset = AIAsset(
+                name=ep_name.split("/")[-1] if "/" in ep_name else ep_name,
+                asset_type=AssetType.INFERENCE_ENDPOINT,
+                provider=CloudProvider.GCP,
+                location=ep.get("location", "us-central1"),
+                resource_uri=res_uri,
+                display_name=ep_name.split("/")[-1],
+                cmek_enabled=bool(ep.get("cmek_enabled", False)),
+                is_private_endpoint=bool(ep.get("private_endpoint", False)),
+                model_armor_enabled=bool(ep.get("protected", False)),
+                metadata={"url": ep.get("url", "")}
+            )
+            assets.append(asset)
+
+        # Helper to create finding and evidence
+        def _build_canonical_finding(
+            f_id: str,
+            title: str,
+            desc: str,
+            sev_str: str,
+            res_uri: str,
+            control_id: str,
+            cve: Optional[str] = None
+        ):
+            mapped_asset = next((a for a in assets if a.resource_uri == res_uri or a.name == res_uri), None)
+            if not mapped_asset:
+                mapped_asset = AIAsset(
+                    name=res_uri.split("/")[-1] if "/" in res_uri else res_uri,
+                    asset_type=AssetType.INFERENCE_ENDPOINT if "endpoints" in res_uri else AssetType.AI_WORKBENCH_NOTEBOOK if "workbench" in res_uri else AssetType.VECTOR_DATABASE,
+                    provider=CloudProvider.GCP,
+                    location="us-central1",
+                    resource_uri=res_uri,
+                )
+                assets.append(mapped_asset)
+
+            sanitized_payload = sanitize_evidence_content(f"GCP Resource: {res_uri} | Finding: {title} | Details: {desc}")
+            ev = Evidence(
+                evidence_id=f"EVD-GCP-{compute_sha256(f_id)[:8].upper()}",
+                source=FindingSource.GCP_SCC if "SCC" in f_id else FindingSource.MULTI_CLOUD_SCANNER,
+                provider=CloudProvider.GCP,
+                resource=res_uri,
+                collection_method="API_CALL" if is_live else "FIXTURE",
+                evidence_type=EvidenceType.CONFIGURATION,
+                status=evidence_status,
+                confidence=1.0 if is_live else 0.5,
+                execution_mode=execution_mode,
+                sanitized_content=sanitized_payload,
+                content_hash=compute_sha256(sanitized_payload),
+                metadata={"gcp_project_id": eff_project, "control_id": control_id}
+            )
+            evidence_list.append(ev)
+
+            sev_upper = sev_str.upper()
+            severity = FindingSeverity.HIGH
+            if "CRITICAL" in sev_upper:
+                severity = FindingSeverity.CRITICAL
+            elif "MEDIUM" in sev_upper:
+                severity = FindingSeverity.MEDIUM
+            elif "LOW" in sev_upper:
+                severity = FindingSeverity.LOW
+
+            finding = SecurityFinding(
+                finding_id=f"FND-{f_id.replace(':', '-')[:16].upper()}",
+                assessment_id="ASSESSMENT-GCP-LIVE" if is_live else "ASSESSMENT-GCP-SIM",
+                source=FindingSource.GCP_SCC if "SCC" in f_id else FindingSource.MULTI_CLOUD_SCANNER,
+                provider=CloudProvider.GCP,
+                asset=mapped_asset,
+                title=title,
+                description=desc,
+                severity=severity,
+                confidence=ConfidenceLevel.HIGH if is_live else ConfidenceLevel.MEDIUM,
+                status=FindingStatus.OPEN,
+                execution_mode=execution_mode,
+                evidence=[ev],
+                control_links=[
+                    ControlLink(
+                        control_id=control_id,
+                        relation_type=ControlRelationType.PRIMARY_CONTROL,
+                        rationale=f"GCP AI-SPM automated finding mapped to {control_id}"
+                    )
+                ],
+                cve=cve,
+                metadata={"project_id": eff_project}
+            )
+            findings.append(finding)
+
+        # 3. Normalize Vulnerabilities
+        for v in raw_data.get("vulnerabilities", []):
+            v_id = v.get("id", "GCP-VULN-01")
+            cve = v.get("cve", "MISCONFIG")
+            desc = v.get("description", "GCP AI security deviation")
+            res = v.get("resource", f"projects/{eff_project}")
+            sev = v.get("severity", "HIGH")
+
+            if "CMEK" in v_id or "CMEK" in cve:
+                cid = "INF-04"
+            elif "WORKBENCH" in v_id or "2244" in cve:
+                cid = "MOD-03"
+            elif "ARMOR" in v_id:
+                cid = "APP-02"
+            else:
+                cid = "INF-02"
+
+            _build_canonical_finding(
+                f_id=v_id,
+                title=f"GCP AI Security Deviation: {cve}",
+                desc=desc,
+                sev_str=sev,
+                res_uri=res,
+                control_id=cid,
+                cve=cve
+            )
+
+        # 4. Normalize Shadow AI
+        for s in raw_data.get("shadow_ai", []):
+            s_id = s.get("id", "GCP-SHADOW-01")
+            s_type = s.get("type", "Shadow AI")
+            desc = s.get("description", "Unsanctioned AI asset detected")
+            res = s.get("resource", "k8s://cluster/shadow-pod")
+            sev = s.get("severity", "CRITICAL")
+
+            if "OLLAMA" in s_id or "OLLAMA" in s_type.upper():
+                cid = "GOV-02"
+            elif "VLLM" in s_id:
+                cid = "DAT-03"
+            else:
+                cid = "APP-01"
+
+            _build_canonical_finding(
+                f_id=s_id,
+                title=s_type,
+                desc=desc,
+                sev_str=sev,
+                res_uri=res,
+                control_id=cid,
+                cve=None
+            )
+
+        return NormalizedDiscoveryResult(
+            provider=CloudProvider.GCP,
+            execution_mode=execution_mode,
+            account_or_project_id=eff_project,
+            assets=assets,
+            findings=findings,
+            evidence=evidence_list,
+            raw_discovery=self.sanitize_credentials(raw_data),
+            errors=errors
+        )
+
+    def discover_canonical(self, live: bool = False) -> NormalizedDiscoveryResult:
+        """
+        Executes discovery and returns strongly-typed, normalized canonical entities.
+        """
+        if live:
+            raw_data = self.discover_resources_live()
+            return self.normalize(raw_data, ExecutionMode.LIVE)
+        else:
+            raw_data = self.discover_resources()
+            return self.normalize(raw_data, ExecutionMode.SIMULATION)
