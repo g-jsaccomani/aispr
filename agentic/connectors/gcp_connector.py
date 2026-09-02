@@ -26,7 +26,8 @@ try:
         get_authenticated_session,
         get_auth_headers,
         get_default_project_id,
-        GCPAuth
+        GCPAuth,
+        check_adc_status
     )
 except ImportError:
     # Graceful fallback if config module is loaded in isolated environments
@@ -35,6 +36,7 @@ except ImportError:
     get_auth_headers = None
     get_default_project_id = None
     GCPAuth = None
+    check_adc_status = None
 
 from domain.enums import (
     CloudProvider,
@@ -922,6 +924,15 @@ class GCPConnector(BaseCloudConnector):
         """
         if live:
             try:
+                try:
+                    import google.auth
+                    from google.cloud import asset_v1
+                except (ImportError, ModuleNotFoundError):
+                    raise CloudSDKMissingError(
+                        "GCP SDKs ('google-auth', 'google-cloud-asset') are not installed. "
+                        "Run 'pip install google-auth google-cloud-asset' to enable live GCP discovery.",
+                        provider=CloudProvider.GCP
+                    )
                 raw_data = self.discover_resources_live()
                 return self.normalize(raw_data, ExecutionMode.LIVE)
             except Exception as exc:

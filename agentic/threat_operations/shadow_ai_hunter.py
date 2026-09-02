@@ -19,14 +19,20 @@ logger = logging.getLogger("AISPR-ShadowAIHunter")
 
 class ShadowAIHunter:
     """
-    Hunting engine across Kubernetes pods, Compute instances,
-    and Developer Workbenches to flag unmanaged LLMs and known CVEs.
-    Explicitly tracks execution_mode, confidence, evidence, and provenance.
+    Simulation-only threat operations harness across Kubernetes pods, Compute instances,
+    and Developer Workbenches to evaluate unmanaged LLM and CVE detection logic.
+    Identified strictly as a fixture-based simulation harness; does not execute live API discovery.
+    For live multi-source enterprise discovery, use agentic.shadow_ai.EnterpriseShadowAIDiscoveryEngine.
     """
 
-    def __init__(self, project_id: str = "your-gcp-project-id", mode: ExecutionMode = ExecutionMode.SIMULATION):
+    def __init__(self, project_id: str = "demo-gcp-project", mode: ExecutionMode = ExecutionMode.SIMULATION):
+        if mode == ExecutionMode.LIVE:
+            raise ValueError(
+                "ShadowAIHunter is an offline simulation harness and cannot be executed in LIVE mode. "
+                "For live enterprise telemetry discovery, use agentic.shadow_ai.EnterpriseShadowAIDiscoveryEngine."
+            )
         self.project_id = project_id
-        self.mode = mode
+        self.mode = ExecutionMode.SIMULATION
 
     def scan_kubernetes_workloads(self) -> List[Dict[str, Any]]:
         """
@@ -42,8 +48,9 @@ class ShadowAIHunter:
                 "provider": "gcp",
                 "source": "cloud resources",
                 "timestamp": now_ts,
-                "confidence": "OBSERVED" if self.mode == ExecutionMode.LIVE else "SUSPECTED",
-                "execution_mode": self.mode.value if hasattr(self.mode, "value") else str(self.mode),
+                "confidence": "SUSPECTED",
+                "execution_mode": "SIMULATION",
+                "fixture_classification": "SIMULATION_SCENARIO",
                 "severity": "CRITICAL",
                 "category": "Unmanaged Local LLM Engine",
                 "engine": "Ollama (Llama-3-70B)",
@@ -54,11 +61,11 @@ class ShadowAIHunter:
                 "exposure": "INTERNAL_VPC_UNAUTHENTICATED",
                 "risk": "Rogue LLM instance accepting uninspected internal prompts without Cloud DLP or Model Armor.",
                 "mitigation": "Enforce admission controllers blocking unapproved container images and isolate port 11434 via NetworkPolicy.",
-                "discovery_method": "KUBERNETES_WORKLOAD_SPEC_INSPECTION",
-                "provenance": f"Audit of pod daemonset in namespace credit-risk-analytics (Execution: {self.mode}).",
+                "discovery_method": "SIMULATED_WORKLOAD_SPEC_INSPECTION",
+                "provenance": "Simulation fixture scenario in namespace credit-risk-analytics.",
                 "evidence": {
                     "content_hash": compute_sha256("ollama-inference-daemon-7b89f:11434:INTERNAL_VPC"),
-                    "status": "SIMULATED" if self.mode != ExecutionMode.LIVE else "VERIFIED"
+                    "status": "SIMULATED"
                 }
             },
             {
@@ -67,8 +74,9 @@ class ShadowAIHunter:
                 "provider": "gcp",
                 "source": "cloud resources",
                 "timestamp": now_ts,
-                "confidence": "OBSERVED" if self.mode == ExecutionMode.LIVE else "SUSPECTED",
-                "execution_mode": self.mode.value if hasattr(self.mode, "value") else str(self.mode),
+                "confidence": "SUSPECTED",
+                "execution_mode": "SIMULATION",
+                "fixture_classification": "SIMULATION_SCENARIO",
                 "severity": "HIGH",
                 "category": "Unmanaged Local LLM Engine",
                 "engine": "vLLM Inference Server",
@@ -79,11 +87,11 @@ class ShadowAIHunter:
                 "exposure": "VPC_PEERING_ACCESSIBLE",
                 "risk": "Developer instance running vLLM with world-readable local logs logging raw financial prompts.",
                 "mitigation": "Quarantine compute instance and migrate workload to managed Vertex AI Private Endpoints.",
-                "discovery_method": "COMPUTE_PROCESS_SCAN",
-                "provenance": f"Audit of compute instance process list in gce-sandbox (Execution: {self.mode}).",
+                "discovery_method": "SIMULATED_COMPUTE_PROCESS_SCAN",
+                "provenance": "Simulation fixture scenario in gce-sandbox.",
                 "evidence": {
                     "content_hash": compute_sha256("ml-dev-sandbox-vm:8000:VPC_PEERING"),
-                    "status": "SIMULATED" if self.mode != ExecutionMode.LIVE else "VERIFIED"
+                    "status": "SIMULATED"
                 }
             }
         ]
@@ -103,7 +111,8 @@ class ShadowAIHunter:
                 "source": "infrastructure metadata",
                 "timestamp": now_ts,
                 "confidence": "INFERRED",
-                "execution_mode": self.mode.value if hasattr(self.mode, "value") else str(self.mode),
+                "execution_mode": "SIMULATION",
+                "fixture_classification": "SIMULATION_SCENARIO",
                 "cve": "CVE-2026-2244",
                 "severity": "CRITICAL",
                 "resource_name": "workbench-analyst-gpu-01",
@@ -111,11 +120,11 @@ class ShadowAIHunter:
                 "vulnerability_type": "OAuth Token Exposure in World-Readable Logs",
                 "risk": "Custom startup script writes Google Cloud access token to world-readable disk log (/var/log/startup.log).",
                 "mitigation": "Update metadata to remove sensitive tokens and redeploy with Shielded VM and CMEK.",
-                "discovery_method": "WORKBENCH_METADATA_INSPECTION",
-                "provenance": f"Inspection of instance startup-script metadata in zone southamerica-east1-a (Execution: {self.mode}).",
+                "discovery_method": "SIMULATED_WORKBENCH_METADATA_INSPECTION",
+                "provenance": "Simulation fixture scenario in zone southamerica-east1-a.",
                 "evidence": {
                     "content_hash": compute_sha256("workbench-analyst-gpu-01:startup-script:token_leak"),
-                    "status": "SIMULATED" if self.mode != ExecutionMode.LIVE else "VERIFIED"
+                    "status": "SIMULATED"
                 }
             },
             {
@@ -124,8 +133,9 @@ class ShadowAIHunter:
                 "provider": "gcp",
                 "source": "infrastructure metadata",
                 "timestamp": now_ts,
-                "confidence": "OBSERVED" if self.mode == ExecutionMode.LIVE else "SUSPECTED",
-                "execution_mode": self.mode.value if hasattr(self.mode, "value") else str(self.mode),
+                "confidence": "SUSPECTED",
+                "execution_mode": "SIMULATION",
+                "fixture_classification": "SIMULATION_SCENARIO",
                 "cve": "MISCONFIG-PUBLIC-IP",
                 "severity": "HIGH",
                 "resource_name": "workbench-analyst-gpu-01",
@@ -133,11 +143,11 @@ class ShadowAIHunter:
                 "vulnerability_type": "Direct Internet Access (Public IP Enabled)",
                 "risk": "Vertex AI Workbench instance is accessible directly via public IPv4 address without Cloud IAP.",
                 "mitigation": "Disable public IP and enforce VPC-SC perimeter ingress rules.",
-                "discovery_method": "COMPUTE_NETWORK_INTERFACE_INSPECTION",
-                "provenance": f"Inspection of external NAT IP assignment on networkInterfaces (Execution: {self.mode}).",
+                "discovery_method": "SIMULATED_NETWORK_INTERFACE_INSPECTION",
+                "provenance": "Simulation fixture scenario of networkInterfaces.",
                 "evidence": {
                     "content_hash": compute_sha256("workbench-analyst-gpu-01:public_ip_enabled"),
-                    "status": "SIMULATED" if self.mode != ExecutionMode.LIVE else "VERIFIED"
+                    "status": "SIMULATED"
                 }
             }
         ]
@@ -154,7 +164,8 @@ class ShadowAIHunter:
 
         return {
             "project_id": self.project_id,
-            "execution_mode": self.mode.value if hasattr(self.mode, "value") else str(self.mode),
+            "execution_mode": "SIMULATION",
+            "engine_classification": "OFFLINE_SIMULATION_HARNESS",
             "status": "COMPLETED",
             "total_findings": len(k8s_findings) + len(cve_findings),
             "shadow_ai_detected": len(k8s_findings),

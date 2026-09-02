@@ -528,10 +528,24 @@ class EnterpriseRiskEngine:
         declared_count = 0
 
         for contract in all_contracts:
+            cid = contract.control_id
+            eval_override = control_evaluations.get(cid, {}) if control_evaluations else {}
+
             if contract.assessment_type == AssessmentType.AUTOMATED:
                 automated_count += 1
             else:
                 manual_count += 1
+
+            override_status = eval_override.get("implementation_status")
+            if override_status:
+                st = str(override_status).upper()
+                if st == "IMPLEMENTED":
+                    implemented_count += 1
+                elif st == "PARTIAL":
+                    partial_count += 1
+                else:
+                    declared_count += 1
+                continue
 
             # Inspect test definitions for implementation status
             has_implemented = False
@@ -556,9 +570,9 @@ class EnterpriseRiskEngine:
 
         total_contracts = len(all_contracts)
         # Truthful separation: DECLARED_ONLY controls receive 0.0 implemented coverage
-        control_coverage_score = round(
+        implementation_coverage = round(
             (
-                (1.0 * implemented_count + 0.5 * partial_count + 0.0 * declared_count)
+                (1.0 * implemented_count + 0.5 * partial_count)
                 / total_contracts
                 * 100.0
             )
@@ -566,12 +580,9 @@ class EnterpriseRiskEngine:
             else 0.0,
             2,
         )
-        implementation_coverage = round(
-            (implemented_count / total_contracts * 100.0) if total_contracts > 0 else 0.0,
-            2,
-        )
+        control_coverage_score = implementation_coverage
         declared_coverage = round(
-            ((implemented_count + partial_count + declared_count) / total_contracts * 100.0)
+            (declared_count / total_contracts * 100.0)
             if total_contracts > 0
             else 0.0,
             2,

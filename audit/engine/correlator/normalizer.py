@@ -76,7 +76,8 @@ class FindingNormalizer:
         resource: str,
         description: str,
         suggested_control_id: Optional[str] = None,
-        assessment_id: Optional[str] = None
+        assessment_id: Optional[str] = None,
+        execution_mode: Optional[ExecutionMode] = None,
     ) -> SecurityFinding:
         """Constructs a canonical SecurityFinding from generic raw finding arguments."""
         provider = self.infer_provider(resource, source)
@@ -89,8 +90,21 @@ class FindingNormalizer:
             resource_uri=resource
         )
 
-        exec_mode = ExecutionMode.LIVE if any(t in source for t in ("Live", "SCC", "GCP Compute API")) else ExecutionMode.SIMULATION
-        ev_status = EvidenceStatus.VERIFIED if exec_mode == ExecutionMode.LIVE else EvidenceStatus.SIMULATED
+        if execution_mode is not None:
+            exec_mode = execution_mode
+        elif "FALLBACK" in source.upper():
+            exec_mode = ExecutionMode.FALLBACK
+        elif any(t in source for t in ("Live", "SCC", "GCP Compute API")):
+            exec_mode = ExecutionMode.LIVE
+        else:
+            exec_mode = ExecutionMode.SIMULATION
+
+        if exec_mode == ExecutionMode.LIVE:
+            ev_status = EvidenceStatus.VERIFIED
+        elif exec_mode == ExecutionMode.FALLBACK:
+            ev_status = EvidenceStatus.UNVERIFIED
+        else:
+            ev_status = EvidenceStatus.SIMULATED
 
         evidence = Evidence(
             source=source,
@@ -100,7 +114,7 @@ class FindingNormalizer:
             status=ev_status,
             execution_mode=exec_mode,
             sanitized_content=description,
-            confidence=0.95 if exec_mode == ExecutionMode.LIVE else 0.85
+            confidence=1.0 if exec_mode == ExecutionMode.LIVE else 0.5
         )
 
         finding = SecurityFinding(

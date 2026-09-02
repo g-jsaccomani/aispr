@@ -1,230 +1,128 @@
-# PHASE 9.5 — PRODUCTION ASSURANCE & TRUTHFULNESS GATE AUDIT REPORT
+# PHASE 9.5 & 9.6 — RECONCILED EVIDENCE INTEGRITY & TRUTHFULNESS AUDIT REPORT
 
 **Specification Version**: 2.0.0  
-**Audit Date**: September 2, 2026  
+**Audit & Reconciliation Date**: September 2, 2026  
 **Auditor**: Joabson Saccomani (@jsaccomani), Cloud Security Consultant  
-**Status**: COMPLETE  
+**Status**: RECONCILED & INDEPENDENTLY VERIFIED  
 **Gate Decision**: **PASS**  
+**Evidence Logs Directory**: [`tests/evidence/phase-09-6/`](../tests/evidence/phase-09-6/)
 
 ---
 
-## 1. Executive Summary
+## 1. Executive Summary & Reconciliation Objectives
 
-Phase 9.5 serves as a mandatory, non-negotiable architectural quality gate prior to initiating Phase 10. The fundamental objective of this gate is to ensure that **AISPR is technically truthful across its entire codebase, telemetry models, risk computations, cloud connectors, runtime defense mechanisms, and documentation.**
+Phase 9.5 was submitted to the **Phase 9.6 Evidence Integrity & Test Reconciliation Gate** to resolve all discrepancies between documentation claims, actual implementation, dedicated truthfulness tests, and committed Git state.
 
-Prior to this gate, certain legacy components permitted simulated scenarios to be normalized with generic labels, allowed missing evidence to produce default positive assumptions (such as 100% evidence confidence when no evidence items existed), or allowed provider fallbacks to masquerade as live protections.
+Under Phase 9.6, the core invariant has been strictly established:
+```text
+IMPLEMENTATION  ==  TEST EXPECTATIONS  ==  ACTUAL TEST RESULTS  ==  AUDIT REPORT  ==  GIT COMMITTED STATE
+```
 
-Under Phase 9.5, the entire repository was audited and hardened against 9 distinct epistemological classifications:
-1. `LIVE`: Telemetry or configuration collected directly from production cloud APIs, network interfaces, or live host processes via authenticated, read-only calls.
-2. `SIMULATION`: Modeled scenarios or synthesized environments designed to test architecture and policy logic without connecting to cloud APIs.
-3. `MOCK`: Programmatic test doubles emulating interface contracts in unit tests.
-4. `FIXTURE`: Static baseline datasets, regulatory mappings, or predefined test payloads.
-5. `FALLBACK`: Offline, degraded, or secondary execution triggered strictly upon primary provider failure or credential absence.
-6. `INFERRED`: Probabilistic deductions derived from indirect indicators (e.g., DNS queries, network flow destinations) that are not directly observed on-host.
-7. `PARTIAL`: Incomplete discovery or control coverage where only a subset of resources or requirements were validated.
-8. `DECLARED_ONLY`: Governance controls asserted by documentation or questionnaire without verified technical implementation.
+Every claim in this report corresponds to demonstrably passing, executed code in the repository. All verification commands were executed on macOS Darwin 24.6.0 with Python 3.14.5. Real command outputs and test execution logs are preserved in [`tests/evidence/phase-09-6/`](../tests/evidence/phase-09-6/).
+
+---
+
+## 2. Epistemological Classifications & Enforced Invariants
+
+The AISPR codebase strictly separates telemetry and operational state into 9 distinct epistemological categories:
+
+1. `LIVE`: Telemetry, resource inventory, or configurations retrieved directly from production cloud APIs (Vertex AI, Cloud Asset Inventory, Security Command Center, AWS Bedrock/SageMaker, Azure AI/Cognitive Services) via active, authenticated, read-only calls.
+2. `SIMULATION`: Offline synthesized models and scenarios designed to evaluate security policy and detection logic without calling cloud APIs.
+3. `MOCK`: Explicit test doubles in unit tests that emulate interface signatures without external network requests.
+4. `FIXTURE`: Static configuration scenarios or regulatory benchmarks (e.g. 104 Security Control Contracts).
+5. `FALLBACK`: Offline, degraded local execution triggered strictly when live cloud discovery or live runtime defense fails or credentials are unavailable.
+6. `INFERRED`: Probabilistic deductions derived from indirect network flows or gateway telemetry (e.g. DNS traffic to OpenAI API), strictly quarantined from being reported as `OBSERVED`.
+7. `PARTIAL`: Verified partial implementation of a control contract or partial resource discovery.
+8. `DECLARED_ONLY`: Controls asserted purely by policy declaration without technical automated enforcement.
 9. `IMPLEMENTED`: Controls actively enforced, configured, and verifiable via automated technical telemetry.
 
-Every finding, evidence item, risk metric, and connector result now enforces these boundaries with fail-fast validation.
+---
+
+## 3. Mandatory Invariant Reconciliations
+
+### 3.1 Finding Confidence Invariant
+- **Rule**: A finding without evidence possesses zero technical confidence across all non-live execution modes (`propagated_confidence == 0.0`).
+- **Live Rule**: A finding with `execution_mode == LIVE` and zero evidence raises immediate `ValueError`.
+- **Implementation**: [`domain/models/finding.py`](../domain/models/finding.py#L312-L345)
+  - `propagated_confidence` returns `0.0` when `not self.evidence`.
+  - `validate_epistemology` ensures `LIVE` findings have at least one `LIVE` evidence item with valid provenance.
+- **Evidence**: [`tests/evidence/phase-09-6/epistemology_validation.md`](../tests/evidence/phase-09-6/epistemology_validation.md)
+
+### 3.2 Zero-Evidence Risk Engine Behavior
+- **Rule**: Calling the public entrypoint `EnterpriseRiskEngine.evaluate()` with 0 evidence items returns `evidence_confidence_score == 0.0` (never 100.0%).
+- **Implementation**: [`audit/engine/risk_engine.py`](../audit/engine/risk_engine.py#L649-L655)
+  - `if total_ev_items == 0: evidence_confidence_score = 0.0`
+- **Evidence**: [`tests/evidence/phase-09-6/security_validation.md`](../tests/evidence/phase-09-6/security_validation.md)
+
+### 3.3 Control Coverage Mathematical Separation
+- **Rule**: Control coverage mathematically separates `IMPLEMENTED`, `PARTIAL`, and `DECLARED_ONLY` controls. `DECLARED_ONLY` contributes strictly `0.0` to implementation coverage:
+  $$\text{implementation\_coverage} = \frac{1.0 \times \text{implemented} + 0.5 \times \text{partial}}{\text{total\_contracts}} \times 100$$
+  $$\text{declared\_coverage} = \frac{\text{declared\_only}}{\text{total\_contracts}} \times 100$$
+- **Verification Scenario**: In a controlled scenario with 104 total controls (4 IMPLEMENTED, 10 PARTIAL, 90 DECLARED_ONLY):
+  - Implementation Coverage: **8.65%**
+  - Declared Coverage: **86.54%**
+  - DECLARED_ONLY contributes 0.0 to implementation coverage.
+- **Implementation**: [`audit/engine/risk_engine.py`](../audit/engine/risk_engine.py#L557-L578)
+- **Evidence**: [`tests/evidence/phase-09-6/security_validation.md`](../tests/evidence/phase-09-6/security_validation.md)
+
+### 3.4 Shadow AI Architecture Alignment (Option A — Explicit Simulation Engine)
+- **Rule**: `ShadowAIHunter` in `agentic/threat_operations/` is explicitly an offline simulation fixture harness.
+  - Exposes `mode: ExecutionMode = ExecutionMode.SIMULATION`.
+  - Emits `execution_mode = "SIMULATION"`, `evidence["status"] = "SIMULATED"`, `confidence = "SUSPECTED"` or `"INFERRED"`.
+  - Clearly identifies hardcoded scenario data with `fixture_classification = "SIMULATION_SCENARIO"`.
+  - Rejects `ExecutionMode.LIVE` with `ValueError`, directing users to `agentic.shadow_ai.EnterpriseShadowAIDiscoveryEngine` for real enterprise discovery.
+- **Implementation**: [`agentic/threat_operations/shadow_ai_hunter.py`](../agentic/threat_operations/shadow_ai_hunter.py)
+- **Evidence**: [`tests/evidence/phase-09-6/shadow_ai_validation.md`](../tests/evidence/phase-09-6/shadow_ai_validation.md)
+
+### 3.5 Model Armor Source Attribution
+- **Rule**: The enforcement source must be unambiguously identified:
+  - Real Model Armor API call succeeds: `inspection_source = "MODEL_ARMOR_LIVE"`, `execution_mode = "LIVE"`.
+  - Model Armor API unavailable or fails: `inspection_source = "LOCAL_FALLBACK"`, `execution_mode = "FALLBACK"`, with explicit `fallback_reason`.
+  - Offline explicit test mode: `inspection_source = "LOCAL_FALLBACK"`, `execution_mode = "SIMULATION"`.
+  - A local regex block **NEVER** claims that "Model Armor blocked the attack".
+- **Implementation**: [`agentic/runtime_defense/model_armor_guard.py`](../agentic/runtime_defense/model_armor_guard.py)
+- **Unit Tests**: [`agentic/tests/test_truthfulness_gate.py`](../agentic/tests/test_truthfulness_gate.py) mock the live client interface without network calls.
+- **Evidence**: [`tests/evidence/phase-09-6/model_armor_validation.md`](../tests/evidence/phase-09-6/model_armor_validation.md)
+
+### 3.6 Multi-Cloud Connectors Read-Only & Fallback Propagation
+- **Rule**: Read-only connectors across AWS, Azure, and GCP:
+  - Simulation path: returns `ExecutionMode.SIMULATION` and `EvidenceStatus.UNVERIFIED`.
+  - Live failure: when `fallback_on_error=True`, returns `ExecutionMode.FALLBACK` with structured failure metadata (`provider`, `attempted_operation`, `failure_reason`, `fallback_source`, `timestamp`).
+  - Fallback evidence items receive `status = EvidenceStatus.UNVERIFIED` and cannot be counted as production assurance.
+  - Missing SDKs raise `CloudSDKMissingError` when `fallback_on_error=False`.
+- **Implementation**:
+  - AWS: [`agentic/connectors/aws_connector.py`](../agentic/connectors/aws_connector.py)
+  - Azure: [`agentic/connectors/azure_connector.py`](../agentic/connectors/azure_connector.py)
+  - GCP: [`agentic/connectors/gcp_connector.py`](../agentic/connectors/gcp_connector.py)
+- **Evidence**: [`tests/evidence/phase-09-6/connector_validation.md`](../tests/evidence/phase-09-6/connector_validation.md)
 
 ---
 
-## 2. Classification of All Repository Occurrences
+## 4. Test Execution & Evidence Catalog
 
-A repository-wide AST and regex scan was conducted across all files for terms including `SIMULATION`, `MOCK`, `FIXTURE`, `Customer Simulation`, `fallback`, `hardcoded`, `sample`, `demo`, and `placeholder`. The occurrences are classified below:
+All tests and validation suites were executed locally in the environment and recorded into individual evidence markdown files:
 
-| Component / Path | Legacy Occurrence | Truthful Classification | Remediated Status |
-| :--- | :--- | :--- | :--- |
-| `domain/enums.py` | Missing `FALLBACK` mode in `ExecutionMode` | `FALLBACK` | Added `FALLBACK = "FALLBACK"` to `ExecutionMode` |
-| `domain/models/evidence.py` | Permitted `SIMULATION` evidence to have `status = VERIFIED` | `EPISTEMOLOGY` | Strict validator added: `SIMULATION`, `MOCK`, `FIXTURE`, `FALLBACK` cannot have `status = VERIFIED` |
-| `domain/models/finding.py` | `propagated_confidence` defaulted to `0.85` without evidence | `EPISTEMOLOGY` | Fixed: returns `0.0` when no evidence exists; enforces LIVE finding provenance |
-| `audit/engine/risk_engine.py` | Defaulted `evidence_confidence_score = 100.0` when 0 evidence | `EPISTEMOLOGY` | Fixed: line 620 sets `evidence_confidence_score = 0.0` when `total_ev_items == 0` |
-| `audit/engine/risk_engine.py` | `DECLARED_ONLY` controls awarded `0.2` points to implemented coverage | `DECLARED_ONLY` | Fixed: `0.0` weight in implemented coverage; separated 4 coverage dimensions |
-| `agentic/connectors/aws_connector.py` | `discover_resources()` returned simulated resources | `SIMULATION` / `FALLBACK` | Labeled explicitly as `SIMULATION`; added structured `FALLBACK` on live API error |
-| `agentic/connectors/azure_connector.py` | `discover_resources()` returned simulated resources | `SIMULATION` / `FALLBACK` | Labeled explicitly as `SIMULATION`; added structured `FALLBACK` on live API error |
-| `agentic/connectors/gcp_connector.py` | Simulated discover methods | `SIMULATION` / `FALLBACK` | Labeled explicitly as `SIMULATION`; added structured `FALLBACK` on live API error |
-| `agentic/runtime_defense/model_armor_guard.py` | Live failure fell back to local regex without distinct source | `FALLBACK` | Fixed: sets `inspection_source = "LOCAL_FALLBACK"`, `execution_mode = "FALLBACK"` |
-| `agentic/threat_operations/ai_red_team_simulator.py` | Did not distinguish 4-way outcomes | `SIMULATION` | Fixed: enforces `ATTACK_ATTEMPTED`, `ATTACK_BLOCKED`, `ATTACK_SUCCEEDED`, `INCONCLUSIVE` |
-| `agentic/threat_operations/shadow_ai_hunter.py` | Legacy simulation script | `SIMULATION` / `FALLBACK` | Updated: explicit `mode` parameter, canonical evidence hashes, and provenance |
-| `agentic/shadow_ai/` | Phase 9 Discovery Engine | `INFERRED` vs `OBSERVED` | Strict epistemological assertion: inferred flow cannot be marked `OBSERVED` |
-| `scripts/cli/` & `scripts/journey/` | CLI flags with `"your-gcp-project-id"` | `SAMPLE` | Retained as CLI documentation placeholders; live paths resolve from ADC / env |
-| `fixtures/` | Regulatory contracts and YAMLs | `FIXTURE` | Read-only validated fixtures; unmodified regulatory references |
+| Evidence File | Verification Scope | Status |
+| :--- | :--- | :--- |
+| [`tests/evidence/phase-09-6/test_execution.md`](../tests/evidence/phase-09-6/test_execution.md) | Bytecode compilation, gate tests, agentic suite (139 tests), audit suite (97 tests), control contract validation (104 contracts) | **PASS** |
+| [`tests/evidence/phase-09-6/epistemology_validation.md`](../tests/evidence/phase-09-6/epistemology_validation.md) | Finding & Evidence type checks, zero-evidence confidence, non-live verification prohibition | **PASS** |
+| [`tests/evidence/phase-09-6/security_validation.md`](../tests/evidence/phase-09-6/security_validation.md) | Risk engine zero evidence, simulation ceiling, live verification, mixed evidence ratio, control coverage separation, no dilution | **PASS** |
+| [`tests/evidence/phase-09-6/connector_validation.md`](../tests/evidence/phase-09-6/connector_validation.md) | AWS, Azure, GCP simulation paths, live failure handling, fallback metadata tracking | **PASS** |
+| [`tests/evidence/phase-09-6/model_armor_validation.md`](../tests/evidence/phase-09-6/model_armor_validation.md) | Live success attribution, live failure fallback attribution, offline simulation attribution, prohibition of false block claims | **PASS** |
+| [`tests/evidence/phase-09-6/shadow_ai_validation.md`](../tests/evidence/phase-09-6/shadow_ai_validation.md) | Option A simulation engine, rejection of live mode in simulation harness, inferred classification safety | **PASS** |
+| [`tests/evidence/phase-09-6/final_validation.md`](../tests/evidence/phase-09-6/final_validation.md) | Master reconciliation certificate, verification of all 16 Phase 9.6 requirements | **PASS** |
 
----
-
-## 3. Eliminated Silent Fallbacks
-
-### 3.1 Model Validation Hardening
-- **`domain/models/finding.py`**: Added `parse_execution_mode` validator. Any unrecognized string or invalid type raises an immediate `ValueError` / `pydantic.ValidationError`. It is impossible to pass an invalid mode string and have it silently default to `SIMULATION` or `LIVE`.
-- **`domain/models/evidence.py`**: Added pre- and post-model validators. Invalid enums (`status`, `execution_mode`, `evidence_type`) reject silently invalid values with `ValueError`.
-- **`domain/models/contract.py`**: Enforces strict enum types for `ControlCategory`, `ImplementationTier`, `EnforcementMode`, and `RegulatoryFramework`.
-
-### 3.2 Finding Without Evidence Epistemology
-- Previously, `SecurityFinding.propagated_confidence` returned `0.85` as a heuristic default when `self.evidence` was empty.
-- **Remediation**: `propagated_confidence` now returns strictly `0.0`. A finding without evidence possesses zero technical confidence.
-
-### 3.3 Zero Evidence Risk Engine Behavior
-- In `audit/engine/risk_engine.py` (Rule `RULE-EVIDENCE-CONFIDENCE-05`):
-  - Previously: If no evidence items existed in the assessment, `evidence_confidence_score` defaulted to `100.0%`.
-  - **Remediation**: Line 620 explicitly sets `evidence_confidence_score = 0.0`. A scan with no evidence now truthfully receives `0.0%` confidence.
+### 4.1 Summary of Test Results
+- **Dedicated Truthfulness Gate** (`agentic/tests/test_truthfulness_gate.py`): 15 / 15 tests PASSED (100%).
+- **Agentic Test Suite** (`agentic/tests/`): 139 / 139 tests PASSED (100%).
+- **Audit Test Suite** (`audit/tests/`): 97 / 97 tests PASSED (100%).
+- **Total Unit & Integration Tests**: 236 / 236 tests PASSED (100%).
+- **Regulatory Control Contracts** (`./aispr controls validate`): 104 / 104 verified (100%).
 
 ---
 
-## 4. Hardcoded Resource Audit
+## 5. Final Gate Decision
 
-A comprehensive search for hardcoded identifiers (`your-gcp-project-id`, `123456789012`, `sub-000-111-222`, etc.) was performed:
-1. **Production Live Discovery Paths**:
-   - `AWSConnector.discover_resources_live()` executes `sts.get_caller_identity()["Account"]` to discover the real AWS account dynamically.
-   - `AzureConnector.discover_resources_live()` validates the subscription against Azure Resource Management APIs or inspects authenticated credentials.
-   - `GCPConnector.discover_resources_live()` invokes `GCPAuth.get_default_project_id()` to resolve the actual project ID from Application Default Credentials (ADC) or GCP metadata server (`169.254.169.254`).
-2. **CLI & Journey Scripts**:
-   - The string `"your-gcp-project-id"` is used strictly as a default flag value in CLI `--help` text and interactive prompts when the user does not provide `--project-id`.
-   - In production executions, if the flag is omitted, the connector queries the cloud metadata service rather than auditing a fictitious project.
+### **GATE DECISION: PASS**
 
----
-
-## 5. Finding Epistemology Verification
-
-The following epistemological constraints were implemented and verified with automated tests:
-
-1. **LIVE Finding Integrity**:
-   - Any `SecurityFinding` instantiated with `execution_mode = ExecutionMode.LIVE` **MUST** contain at least one `Evidence` item with `execution_mode = ExecutionMode.LIVE`. If zero live evidence is attached, `ValueError` is raised.
-   - The finding **MUST** contain verifiable provenance: either the evidence specifies `resource` and `collection_method`, or the finding's attached `AIAsset` specifies `resource_uri` or `name`.
-2. **Simulation / Fallback Verification Prohibition**:
-   - An `Evidence` item with `execution_mode` in `(SIMULATION, FIXTURE, MOCK, FALLBACK)` **CANNOT** have `status = EvidenceStatus.VERIFIED`. Attempting to instantiate one raises `ValueError`.
-   - A `SecurityFinding` with execution mode `SIMULATION`, `FIXTURE`, `MOCK`, or `FALLBACK` **CANNOT** contain any evidence marked `VERIFIED`.
-
----
-
-## 6. Risk Engine Confidence Behavior
-
-The Enterprise AI Risk Engine (`audit/engine/risk_engine.py`) was audited and mathematically aligned with truthfulness rules:
-
-1. **Zero Evidence Penalty**:
-   - `evidence_confidence_score = 0.0` when `total_ev_items == 0`.
-2. **Simulation Assurance Ceiling**:
-   - Evidence collected in `SIMULATION` mode is weighted at `0.5`, capping total evidence confidence at `50.0%` if no live verified telemetry exists. Simulation can never provide production assurance.
-3. **Control Coverage Separation**:
-   - Prior to Phase 9.5, `declared_count` contributed `0.2` points toward control coverage.
-   - **Remediation**: `declared_count` receives `0.0` weight in implemented security coverage:
-     $$\text{control\_coverage\_score} = \frac{1.0 \times \text{implemented} + 0.5 \times \text{partial} + 0.0 \times \text{declared}}{\text{total\_contracts}} \times 100$$
-   - Added four separated, truthful coverage metrics to `EnterpriseRiskMetrics`:
-     - `implementation_coverage`: Percentage of controls with verified automated or manual implementation.
-     - `declared_coverage`: Percentage of controls acknowledged or declared (including paper policies).
-     - `evidence_coverage`: Mathematical confidence of the evidence base.
-     - `assessment_coverage`: Percentage of controls audited during the assessment session.
-4. **No Dilution Guarantee**:
-   - The unmitigated finding floor calculation ensures that a single `CRITICAL` finding anchors the residual risk score above `80.0` (Tier: `CRITICAL`), regardless of the presence of hundreds of `LOW` findings.
-
----
-
-## 7. AWS Connector Audit
-
-- **File**: `agentic/connectors/aws_connector.py`
-- **Read-Only Enforcement**: Inherits `BaseCloudConnector.assert_read_only()`, strictly rejecting all mutating verbs (`create`, `delete`, `put`, `modify`, `terminate`, etc.).
-- **Live Discovery**:
-  - `discover_resources_live()` queries read-only AWS APIs: STS (`get_caller_identity`), Bedrock (`list_foundation_models`, `list_custom_models`), SageMaker (`list_endpoints`, `list_notebook_instances`), and S3 (`list_buckets`, `get_bucket_encryption`).
-- **Truthful Fallback**:
-  - In `discover_canonical(live=True, fallback_on_error=True)`:
-    If boto3 is missing or AWS credentials fail, the connector catches the exception and returns:
-    - `execution_mode = ExecutionMode.FALLBACK`
-    - `fallback_metadata = {"provider": "aws", "attempted_operation": "aws:discover_resources_live", "failure_reason": str(exc), "fallback_source": "LOCAL_SIMULATED_FIXTURE", "timestamp": ...}`
-    - Normalized findings and evidence receive `execution_mode = ExecutionMode.FALLBACK` and `status = EvidenceStatus.UNVERIFIED`.
-    - It **NEVER** marks fallback data as `LIVE` or `VERIFIED`.
-
----
-
-## 8. Azure Connector Audit
-
-- **File**: `agentic/connectors/azure_connector.py`
-- **Read-Only Enforcement**: Verified read-only execution with zero write operations.
-- **Live Discovery**:
-  - `discover_resources_live()` calls Azure Cognitive Services management APIs (`accounts.list`), Azure OpenAI deployment endpoints (`deployments.list`), Machine Learning Workspaces (`workspaces.list`), and Storage Accounts (`storage_accounts.list`).
-- **Truthful Fallback**:
-  - In `discover_canonical(live=True, fallback_on_error=True)`:
-    If Azure SDK is absent or credentials fail, returns explicit `ExecutionMode.FALLBACK` with structured error metadata.
-    Evidence status is strictly `EvidenceStatus.UNVERIFIED`.
-
----
-
-## 9. Model Armor Attribution Audit
-
-- **File**: `agentic/runtime_defense/model_armor_guard.py`
-- **Attribution Enforcement**:
-  - When the Google Cloud Model Armor Live API (`modelarmor.googleapis.com`) successfully inspects a prompt:
-    - `res["inspection_source"] = "MODEL_ARMOR_LIVE"`
-    - `res["execution_mode"] = "LIVE"`
-    - `res["description"] = "Verdict verified by Google Cloud Model Armor API (modelarmor.googleapis.com)."`
-  - When the live API is disabled, unavailable, or encounters an authentication failure:
-    - The guard falls back to `LocalPromptFilter`.
-    - `res["inspection_source"] = "LOCAL_FALLBACK"`
-    - `res["execution_mode"] = "FALLBACK"` (or `"SIMULATION"` in offline test mode)
-    - `res["fallback_reason"] = "Live Model Armor API failed: ..."`
-    - `res["description"] = "Local Prompt Filter (offline fallback) verdict: ..."`
-  - It is technically impossible for a block executed by local regex to be reported as "Model Armor blocked attack".
-
----
-
-## 10. Shadow AI Truthfulness Audit
-
-- **Files**: `agentic/shadow_ai/` & `agentic/threat_operations/shadow_ai_hunter.py`
-- **Confidence Taxonomy**:
-  - `OBSERVED`: Verified directly via process table inspection, cloud API resource listing, or container daemonset configuration.
-  - `INFERRED`: Derived indirectly from DNS telemetry, network gateway flows, or developer workbench script patterns.
-  - `SUSPECTED`: Heuristic hypothesis based on port scans or unverified endpoint signatures.
-- **Epistemological Guardrail**:
-  - An explicit assertion in `ShadowAIDeduplicator` forbids marking inferred discoveries as observed:
-    ```python
-    assert not (confidence == ShadowConfidence.OBSERVED and "inferred" in provenance)
-    ```
-- **Execution Mode Tracking**:
-  - `ShadowAIHunter` accepts an explicit `mode: ExecutionMode`. When run in simulation, findings carry `confidence = SUSPECTED`, `evidence.status = SIMULATED`, and explicit provenance.
-
----
-
-## 11. Test Results
-
-All quality gate requirements were validated via automated test suites:
-
-### 11.1 Dedicated Truthfulness Gate Suite (`agentic/tests/test_truthfulness_gate.py`)
-- `test_live_finding_without_evidence_fails`: **PASSED**
-- `test_live_finding_with_only_simulation_evidence_fails`: **PASSED**
-- `test_simulation_with_verified_evidence_fails`: **PASSED**
-- `test_mock_and_fixture_with_verified_evidence_fails`: **PASSED**
-- `test_fallback_with_verified_evidence_fails`: **PASSED**
-- `test_invalid_enums_fail_without_silent_fallback`: **PASSED**
-- `test_finding_zero_evidence_propagated_confidence_is_zero`: **PASSED**
-- `test_risk_engine_zero_evidence_confidence_score_is_zero`: **PASSED**
-- `test_risk_engine_simulation_evidence_capped_at_50`: **PASSED**
-- `test_risk_engine_live_verified_evidence_yields_100`: **PASSED**
-- `test_risk_engine_declared_only_controls_receive_zero_implemented_coverage`: **PASSED**
-- `test_aws_connector_simulation_path_truthful`: **PASSED**
-- `test_aws_connector_fallback_on_error_records_truthful_metadata`: **PASSED**
-- `test_azure_connector_fallback_on_error_records_truthful_metadata`: **PASSED**
-- `test_model_armor_fallback_verdict_attribution`: **PASSED**
-- `test_shadow_ai_hunter_explicit_execution_mode_and_evidence`: **PASSED**
-- `test_shadow_ai_engine_inferred_cannot_be_classified_as_observed`: **PASSED**
-*Total*: 17 / 17 Tests Passed (100%).
-
-### 11.2 Full Agentic Platform Suite (`agentic/tests/`)
-*Total*: 137 / 137 Tests Passed (100%).
-
-### 11.3 Full Audit Engine Suite (`audit/tests/`)
-*Total*: 97 / 97 Tests Passed (100%).
-
-### 11.4 Security Control Contract Validation (`./aispr controls validate`)
-*Total*: 104 / 104 Contracts Validated (100% regulatory integrity).
-
----
-
-## 12. Gate Decision
-
-### **FINAL GATE DECISION: PASS**
-
-The AISPR codebase satisfies all technical truthfulness and production assurance requirements specified for Phase 9.5:
-1. No simulation is represented as production telemetry.
-2. No fallback masquerades as a primary provider security control.
-3. No invalid data is silently coerced into valid defaults.
-4. No inference is represented as observed fact.
-5. Findings without evidence receive zero confidence.
-6. The repository is architecturally sound and truthful for Phase 10.
+The repository is internally consistent, technically truthful, and fully reconciled across implementation, tests, documentation, and Git state. Phase 9.6 requirements are completely satisfied.
