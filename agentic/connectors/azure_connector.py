@@ -410,21 +410,30 @@ class AzureConnector(BaseCloudConnector):
 
     def _handle_azure_exception(self, err: Exception, api_name: str) -> None:
         """Translates Azure Core / Identity exceptions into AISPR canonical connector exceptions."""
-        err_str = str(err)
+        err_str = str(err).lower()
         status_code = getattr(err, "status_code", None)
 
-        if status_code == 401 or "authentication" in err_str.lower() or isinstance(err, ClientAuthenticationError):
-            raise CloudAuthenticationError(
-                f"Azure Entra ID authentication failed for '{api_name}': {err}",
-                provider=self.provider,
-                details={"api": api_name, "status_code": 401}
-            )
-        if status_code == 403 or "authorizationfailed" in err_str.lower() or "forbidden" in err_str.lower():
+        # 1. Prioritize Permission Denied (HTTP 403 / RBAC / Authorization / Forbidden)
+        if status_code == 403 or "forbidden" in err_str or "authorization" in err_str:
             raise CloudPermissionDeniedError(
                 f"Azure RBAC permission denied for '{api_name}': {err}",
                 provider=self.provider,
                 details={"api": api_name, "status_code": 403}
             )
+
+        # 2. Authentication Failure (HTTP 401 / Entra ID token / Credentials)
+        if status_code == 401 or "authentication" in err_str or "credential" in err_str or isinstance(err, ClientAuthenticationError):
+            raise CloudAuthenticationError(
+                f"Azure Entra ID authentication failed for '{api_name}': {err}",
+                provider=self.provider,
+                details={"api": api_name, "status_code": 401}
+            )
+
+        # 3. Fallback to general connector error
+        raise CloudConnectorError(
+            f"Azure API error during '{api_name}': {err}",
+            provider=self.provider
+        )
 
     def normalize(self, raw_data: Dict[str, Any], execution_mode: ExecutionMode) -> NormalizedDiscoveryResult:
         """
