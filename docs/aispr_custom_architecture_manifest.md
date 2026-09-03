@@ -2,7 +2,7 @@
 **Author & Lead Architect:** Joabson Saccomani (@jsaccomani) — Cloud Security Consultant | Google Cloud
 **Operational Model:** Framework-Agnostic, Multi-Cloud, Zero-Footprint, Agentic SecOps
 **Technical Alignment:** Google SAIF (Secure AI Framework), NIST AI RMF 1.0, ISO/IEC 42001 (AIMS), MITRE ATLAS, EU AI Act
-**Copyright © 2026 Google LLC. All Rights Reserved.**
+**Copyright © 2026 Joabson Saccomani. All Rights Reserved.**
 
 ---
 
@@ -74,6 +74,6 @@ aispr/
 
 ---
 
-*Copyright © 2026 Google LLC. Developed by Joabson Saccomani (@jsaccomani).*
+*Copyright © 2026 Joabson Saccomani (@jsaccomani).*
 *Role: Cloud Security Consultant | LinkedIn: https://www.linkedin.com/in/jsaccomani*
 *Licensed under the Apache License, Version 2.0.*

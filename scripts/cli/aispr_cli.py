@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Copyright © 2026 Google LLC. Developed by Joabson Saccomani (@jsaccomani).
+Copyright © 2026 Joabson Saccomani (@jsaccomani).
 Role: Cloud Security Consultant | LinkedIn: https://www.linkedin.com/in/jsaccomani
 Licensed under the Apache License, Version 2.0.
 
@@ -26,10 +26,14 @@ if project_root not in sys.path:
 from domain.enums import ExecutionMode
 from domain.models.session import AssessmentSession
 from audit.cli import AISPRAssessmentCLI
+from audit.engine.pdf_reporter import ExecutivePDFReporter
+from audit.engine.audit_trail import AuditTrail
 from agentic.threat_operations.shadow_ai_hunter import ShadowAIHunter
 from agentic.threat_operations.ai_red_team_simulator import AIRedTeamSimulator
 from agentic.runtime_defense.model_armor_guard import ModelArmorGuard
 from agentic.core_platform import AISPRAgenticCore
+
+audit_trail = AuditTrail()
 
 
 def redact_sensitive_info(text: Any, verbose: bool = False) -> str:
@@ -133,6 +137,13 @@ def cmd_audit(args):
     )
     session.calculate_metrics()
     session.save()
+    audit_trail.log_assessment(
+        session_id=session.session_id,
+        client=session.client,
+        scope=session.scope,
+        execution_mode=exec_mode.value,
+        metrics=session.metrics
+    )
     print(f"✅ Assessment Session persisted: '{session_id}' (Mode: {exec_mode.value})")
 
 
@@ -141,6 +152,31 @@ def cmd_report(args):
     if not session:
         print(f"Error: Assessment session '{args.session_id}' not found.", file=sys.stderr)
         sys.exit(1)
+
+    # Ensure implementation_coverage and declared_coverage exist
+    if not session.metrics or "implementation_coverage" not in session.metrics:
+        session.calculate_metrics()
+        session.save()
+
+    report_format = getattr(args, "format", None)
+    if not report_format and getattr(args, "json", False):
+        report_format = "json"
+    elif not report_format and getattr(args, "output", None) and args.output.lower().endswith(".pdf"):
+        report_format = "pdf"
+    elif not report_format:
+        report_format = "text"
+
+    if report_format == "pdf" or (getattr(args, "output", None) and args.output.lower().endswith(".pdf")):
+        out_path = getattr(args, "output", None) or f"reports/aispr_report_{session.session_id}.pdf"
+        ExecutivePDFReporter.generate_pdf(session, output_path=out_path, audit_trail=audit_trail)
+        audit_trail.log_report(
+            session_id=session.session_id,
+            report_format="pdf",
+            metrics=session.metrics,
+            output_path=out_path
+        )
+        print(f"✅ Executive PDF report generated: '{out_path}'")
+        sys.exit(0)
 
     report_data = {
         "session_id": session.session_id,
@@ -153,21 +189,37 @@ def cmd_report(args):
         "findings": session.findings,
         "evidence": session.evidence,
     }
-    if getattr(args, "json", False):
-        print(json.dumps(report_data, indent=2))
+    audit_trail.log_report(
+        session_id=session.session_id,
+        report_format=report_format,
+        metrics=session.metrics,
+        output_path=getattr(args, "output", None)
+    )
+
+    if report_format == "json" or getattr(args, "json", False):
+        out_json = json.dumps(report_data, indent=2)
+        if getattr(args, "output", None):
+            os.makedirs(os.path.dirname(os.path.abspath(args.output)), exist_ok=True)
+            with open(args.output, "w", encoding="utf-8") as f:
+                f.write(out_json)
+            print(f"✅ Report saved to {args.output}")
+        else:
+            print(out_json)
         sys.exit(0)
     else:
         print("=" * 80)
         print(f"AISPR ASSESSMENT REPORT • SESSION: {session.session_id}")
         print("=" * 80)
-        print(f"Client         : {session.client}")
-        print(f"Scope          : {session.scope}")
-        print(f"Execution Mode : {report_data['execution_mode']}")
-        print(f"Compliance     : {session.metrics.get('health_score_percentage', 0.0)}%")
-        print(f"Total Controls : {session.metrics.get('controls_total', 104)}")
-        print(f"Compliant (Y)  : {session.metrics.get('controls_yes', 0)}")
-        print(f"Partial (P)    : {session.metrics.get('controls_partial', 0)}")
-        print(f"Non-Compliant  : {session.metrics.get('controls_no', 0)}")
+        print(f"Client                  : {session.client}")
+        print(f"Scope                   : {session.scope}")
+        print(f"Execution Mode          : {report_data['execution_mode']}")
+        print(f"Implementation Coverage : {session.metrics.get('implementation_coverage', 0.0)}% (Verified Technical Controls)")
+        print(f"Declared Coverage       : {session.metrics.get('declared_coverage', 0.0)}% (Policy Self-Attestation)")
+        print(f"Health Score            : {session.metrics.get('health_score_percentage', 0.0)}%")
+        print(f"Total Controls          : {session.metrics.get('controls_total', 104)}")
+        print(f"Compliant (Y)           : {session.metrics.get('controls_yes', 0)}")
+        print(f"Partial (P)             : {session.metrics.get('controls_partial', 0)}")
+        print(f"Non-Compliant           : {session.metrics.get('controls_no', 0)}")
         print("=" * 80)
         sys.exit(0)
 
@@ -444,6 +496,8 @@ Examples:
     # Command: report
     report_p = subparsers.add_parser("report", help="View or export saved assessment session report")
     report_p.add_argument("--session-id", required=True, help="Session ID to report on")
+    report_p.add_argument("--format", choices=["json", "pdf", "markdown", "text"], default=None, help="Report format (json, pdf, markdown, text)")
+    report_p.add_argument("--output", default=None, help="Output file path for generated report")
     report_p.add_argument("--json", action="store_true", default=False, help="Output report data as JSON")
 
     # Command: scan

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Copyright © 2026 Google LLC. Developed by Joabson Saccomani (@jsaccomani).
+Copyright © 2026 Joabson Saccomani (@jsaccomani).
 Role: Cloud Security Consultant | LinkedIn: https://www.linkedin.com/in/jsaccomani
 Licensed under the Apache License, Version 2.0.
 
@@ -88,9 +88,23 @@ class AssessmentSession(AISPRBaseModel):
         except Exception:
             pass
 
+        total_evaluated = max(1, yes_cnt + partial_cnt + no_cnt)
+        declared_coverage = round((yes_cnt + 0.5 * partial_cnt) / total_evaluated * 100.0, 1)
+
+        # Implementation coverage strictly counts verified technical controls without unmitigated findings
+        finding_count = len(self.findings)
+        verified_impl_cnt = max(0, yes_cnt - min(yes_cnt, finding_count))
+        implementation_coverage = round(
+            (verified_impl_cnt + 0.25 * partial_cnt) / total_evaluated * 100.0, 1
+        )
+        if scores.get("overall_percentage") is not None and not self.findings:
+            implementation_coverage = declared_coverage
+
         self.domain_scores = scores.get("domains", {})
         self.metrics = {
             "health_score_percentage": scores.get("overall_percentage", 0.0),
+            "implementation_coverage": implementation_coverage,
+            "declared_coverage": declared_coverage,
             "controls_total": total_contracts,
             "controls_yes": yes_cnt,
             "controls_partial": partial_cnt,

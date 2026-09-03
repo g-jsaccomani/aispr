@@ -1,5 +1,5 @@
 /**
- * Copyright © 2026 Google LLC. Developed by Joabson Saccomani (@jsaccomani).
+ * Copyright © 2026 Joabson Saccomani (@jsaccomani).
  * Role: Cloud Security Consultant | LinkedIn: https://www.linkedin.com/in/jsaccomani
  *
  * Agentic AISPR - Customer-Owned Deployment Package (Terraform)

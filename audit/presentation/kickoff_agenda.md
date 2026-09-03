@@ -60,4 +60,4 @@ The **AI Security Posture Review (AI-SPR)** workshop is a structured, collaborat
 6. **AI Governance:** AI-BOM inventory, policy compliance, accountability.
 
 ---
-*Copyright © 2026 Google LLC / Joabson Saccomani. All rights reserved. Distributed under the Apache License 2.0.*
+*Copyright © 2026 Joabson Saccomani. All rights reserved. Distributed under the Apache License 2.0.*

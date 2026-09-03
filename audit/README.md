@@ -4,7 +4,7 @@
 **Author & Security Architect:** Joabson Saccomani ([@jsaccomani](https://github.com/g-jsaccomani))
 **Role:** Cloud Security Consultant
 **LinkedIn:** [linkedin.com/in/jsaccomani](https://www.linkedin.com/in/jsaccomani)
-*Copyright © 2026 Google LLC / Joabson Saccomani. All rights reserved. Distributed under the Apache License 2.0.*
+*Copyright © 2026 Joabson Saccomani. All rights reserved. Distributed under the Apache License 2.0.*
 
 **Framework Alignments:** Google SAIF, NIST AI RMF 1.0 (Govern & Map), ISO/IEC 42001 (AIMS), MITRE ATLAS, OWASP Top 10 for LLM Applications
 
