@@ -25,6 +25,7 @@ if project_root not in sys.path:
 from agentic.runtime_defense.model_armor_guard import ModelArmorGuard
 from agentic.threat_operations.ai_red_team_simulator import AIRedTeamSimulator
 from agentic.threat_operations.ai_bom_generator import AIBOMGenerator
+from agentic.agent.reasoner import AISPRReasoner
 from audit.questionnaire.handler import QuestionnaireHandler
 from audit.engine.scorer import PostureScorer
 from domain.models.session import AssessmentSession
@@ -39,6 +40,7 @@ TEMPLATES_DIR = os.path.join(project_root, "scripts", "journey", "templates")
 REPORTS_DIR = os.path.join(project_root, "reports")
 
 guard = ModelArmorGuard()
+reasoner = AISPRReasoner()
 q_handler = QuestionnaireHandler()
 
 # Discovered findings map and assets catalogue populated from real session state
@@ -2736,6 +2738,28 @@ class AISPRServerHandler(http.server.BaseHTTPRequestHandler):
                     "score_data": scores,
                     "metrics": session.metrics
                 })
+            except Exception as e:
+                self._send_json({"error": str(e)}, status_code=500)
+        elif path == "/api/chat":
+            try:
+                session_id = payload.get("session_id")
+                message = payload.get("message") or payload.get("prompt") or ""
+
+                # Grounded exclusively in real session state
+                session = None
+                if session_id:
+                    session = AssessmentSession.load(session_id)
+                else:
+                    sessions = AssessmentSession.list_sessions()
+                    if sessions:
+                        session = sessions[0]
+
+                if session is None:
+                    self._send_json({"error": "NO_ASSESSMENT", "message": "No active assessment session found. Real session required."}, status_code=409)
+                    return
+
+                chat_res = reasoner.answer_question(context=session, question=message, session_id=session.session_id)
+                self._send_json(chat_res)
             except Exception as e:
                 self._send_json({"error": str(e)}, status_code=500)
         else:
