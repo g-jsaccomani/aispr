@@ -9,31 +9,52 @@ on:
 jobs:
   validate-aispr:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
 
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    - name: Set up Python
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
-        python-version: "3.11"
+        python-version: ${{ matrix.python-version }}
 
-    - name: Install Dependencies
+    - name: Install Dependencies & Static Analysis Tools
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        pip install pyflakes
+
+    - name: Blocking Static Analysis (Zero Undefined Names)
+      run: |
+        python -m pyflakes . | grep "undefined name" && exit 1 || true
+
+    - name: Run Import Integrity Guard Suite
+      run: |
+        export PYTHONPATH=$(pwd)
+        python -m unittest tests.test_import_integrity -v
 
     - name: Run Audit Module Tests (GRC & Scoring)
       run: |
+        export PYTHONPATH=$(pwd)
         python -m unittest discover -s audit/tests -p "test_*.py" -v
 
     - name: Run Agentic Module Tests (Model Armor & Threat Operations)
       run: |
+        export PYTHONPATH=$(pwd)
         python -m unittest discover -s agentic/tests -p "test_*.py" -v
+
+    - name: Run Control Contracts CLI Verification
+      run: |
+        ./aispr controls validate
 
     - name: Run End-to-End CLI Verification
       run: |
+        export PYTHONPATH=$(pwd)
         python scripts/cli/aispr_cli.py audit --demo --output reports/ci_audit_report.md
         python scripts/cli/aispr_cli.py scan --project-id ci-validation-proj --output reports/ci_scan_report.json
         python scripts/cli/aispr_cli.py redteam --output reports/ci_redteam_report.json

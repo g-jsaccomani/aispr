@@ -1,13 +1,12 @@
 # 🤖 CLAUDE CRITICAL DOUBLE-CHECK HANDOFF — AISPR PHASE 9.6.1 TO PHASE 10
 
-**Document Version:** 1.0.0  
+**Document Version:** 1.2.0  
 **Target Reviewer:** Claude (Independent Critical Security & Architecture Reviewer)  
 **Date:** September 2, 2026  
 **Author:** Joabson Saccomani ([@jsaccomani](https://www.linkedin.com/in/jsaccomani)) — Cloud Security Consultant @ Google Cloud  
 **Repository:** [https://github.com/g-jsaccomani/aispr](https://github.com/g-jsaccomani/aispr)  
 **Current Branch:** `main`  
-**Current Baseline Commit SHA:** `4c7e71d75ea9ee4e07de0ad985f53804f8b6f676`  
-**Integrity Status:** **PASS** (Phase 9.6.1 Closed)  
+**Integrity Status:** **PASS — P0 REPRODUCIBILITY DEFECTS RESOLVED (Python 3.11, 3.12, 3.13, 3.14)**  
 
 ---
 
@@ -28,6 +27,35 @@
 ## 1. Executive Summary & Objective for Claude
 
 You are receiving this handoff document to perform an **independent, adversarial, and ruthlessly critical double-check** of the **AISPR (AI Security Posture Reviewer & Mesh)** platform.
+
+### Crucial Epistemological Clarification: The "244 Tests, 100% PASS" Baseline Claim
+
+> [!WARNING]
+> **Prior Non-Reproducibility Acknowledgment:**
+> Earlier revisions of this handoff document stated: *"244 tests, 100% PASS"*. **This claim was not reproducible on standard Python 3.11 or 3.12 environments.**
+> 
+> Because the original development occurred on Python 3.14 (where certain import ordering differences masked the issue), six deterministic defects prevented ~78% of the declared test suite from ever being collected on Python 3.11 (CI) and 3.12:
+> 1. **Stdlib Module Shadowing (P0):** `agentic/platform.py` and `config/secrets.py` shadowed Python's standard library `platform` and `secrets`. Unittest discovery inserted `agentic/` into `sys.path`; when `pydantic` loaded `uuid`, Python's `uuid.py` executed `import platform`, resolving to `agentic/platform.py` and crashing `pydantic` across the entire `agentic/` suite (blocking 117 tests).
+> 2. **Missing Typing Imports (Class-definition time NameError):**
+>    - `audit/engine/reporter.py` (missing `Optional`)
+>    - `audit/contracts/validator.py` (missing `Optional`)
+>    - `audit/cli.py` (missing `Optional`)
+>    - `audit/engine/correlator/evidence_validator.py` (missing `List`)
+>    - `agentic/platform.py` (missing `Callable`)
+> 3. **Undefined Type Annotation:** `agentic/shadow_ai/deduplicator.py` had `-> Tuple_Merged`, a non-existent identifier.
+> 4. **Missing Test Packaging:** `audit/tests/` lacked an `__init__.py`.
+> 5. **Unhandled Optional Cloud SDK Imports:** Missing `boto3` or `azure-core` raised unhandled `ModuleNotFoundError` in 4 connector failure tests instead of skipping.
+> 6. **Non-Hermetic Fallback Tests:** `test_gcp_connector_simulation_and_fallback_propagation` relied on lack of ADC to trigger fallback; when run in an environment with active ADC, it made real GCP network calls and failed with `LIVE != FALLBACK`.
+>
+> **Current State (True Now):**
+> - Renamed `agentic/platform.py` $\rightarrow$ `agentic/core_platform.py` and `config/secrets.py` $\rightarrow$ `config/secret_manager.py` (via `git mv`).
+> - Added all missing typing imports and fixed `Tuple[ShadowAIDiscovery, bool]`.
+> - Added `audit/tests/__init__.py`.
+> - Wrapped optional SDK tests in `@unittest.skipUnless(HAS_BOTO3 / HAS_AZURE)`.
+> - Hermetically patched live failure in `test_truthfulness_gate.py`.
+> - Created `tests/test_import_integrity.py` guarding importability, stdlib shadowing, and undefined names.
+> - Updated `.github/workflows/validation.yml` to a matrix over Python 3.11, 3.12, 3.13 with blocking pyflakes.
+> - **Total verified tests:** **247 tests (97 audit + 147 agentic + 3 integrity guard), 100% PASS with 0 errors across Python 3.11, 3.12, 3.13, and 3.14.**
 
 ### What is AISPR?
 AISPR is an enterprise-grade multi-cloud **AI Security Posture Management (AI-SPM)** and autonomous **SecOps Platform** for Generative AI workloads. It combines:
@@ -178,15 +206,18 @@ The following states raise a Pydantic `ValidationError` or Python `ValueError` a
 
 ### Test Execution Matrix
 
-| Test Suite / Target | Number of Tests | Status | Execution Command |
+| Test Suite / Target | Number of Tests | Status (3.11 / 3.12 / 3.13 / 3.14) | Execution Command |
 | :--- | :---: | :---: | :--- |
-| **Truthfulness Gate** | 23 | **PASS** | `python3 -m unittest agentic/tests/test_truthfulness_gate.py -v` |
-| **Agentic Platform Suite** | 147 | **PASS** | `python3 -m unittest discover -s agentic/tests -p "test_*.py"` |
-| **Audit Engine Suite** | 97 | **PASS** | `python3 -m unittest discover -s audit/tests -p "test_*.py"` |
-| **Total Automated Tests** | **244** | **100% PASS** | `make test` |
-| **Regulatory Controls** | **104 / 104** | **100% PASS** | `./aispr controls validate` |
-| **Source Compilation** | 0 errors | **PASS** | `python3 -m compileall .` |
-| **Git Diff / Whitespace** | 0 errors | **PASS** | `git diff --check` |
+| **Truthfulness Gate** | 23 | **100% PASS** | `python3 -m unittest agentic/tests/test_truthfulness_gate.py -v` |
+| **Agentic Platform Suite** | 147 | **100% PASS** (4 skipped when optional SDKs absent) | `python3 -m unittest discover -s agentic/tests -p "test_*.py"` |
+| **Audit Engine Suite** | 97 | **100% PASS** | `python3 -m unittest discover -s audit/tests -p "test_*.py"` |
+| **Import & Typing Integrity Guard** | 3 | **100% PASS** | `python3 -m unittest tests.test_import_integrity -v` |
+| **Total Automated Tests** | **247** | **100% PASS (0 errors, 0 failures)** | `python3 -m unittest discover -s audit/tests && python3 -m unittest discover -s agentic/tests && python3 -m unittest tests.test_import_integrity` |
+| **Regulatory Controls** | **104 / 104** | **100% PASS (EXIT=0)** | `./aispr controls validate` |
+| **Zero Undefined Names (pyflakes)** | 0 errors | **100% PASS (EXIT=1 on grep)** | `python3 -m pyflakes . \| grep "undefined name"` |
+| **Stdlib Module Shadowing Guard** | 0 shadowed | **100% PASS (EXIT=0)** | Programmatically validated against `sys.stdlib_module_names` |
+| **Source Bytecode Compilation** | 0 errors | **100% PASS (EXIT=0)** | `python3 -m compileall .` |
+| **Git Diff / Formatting Check** | 0 errors | **100% PASS (EXIT=0)** | `git diff --check` |
 
 ### Evidence Artifacts on Disk
 All real execution evidence logs are committed in Markdown format under [`tests/evidence/phase-09-6-final/`](../tests/evidence/phase-09-6-final/):
