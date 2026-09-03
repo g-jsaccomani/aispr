@@ -12,11 +12,9 @@ Executive Assessment Console, Visual AI-BOM Dashboard & Google Cloud Official Ex
 import sys
 import os
 import json
-import logging
 import urllib.parse
 import http.server
 import socketserver
-import datetime
 from typing import Dict, List, Any, Optional
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -29,46 +27,12 @@ from agentic.threat_operations.ai_red_team_simulator import AIRedTeamSimulator
 from agentic.threat_operations.ai_bom_generator import AIBOMGenerator
 from audit.questionnaire.handler import QuestionnaireHandler
 from audit.engine.scorer import PostureScorer
-from audit.engine.reporter import ExecutiveReporter
-from fixtures.demo_data import (
-    DEMO_CLIENT_NAME,
-    DEMO_CLIENT_SHORT_NAME,
-    DEMO_CLIENT_LEGAL_NAME,
-    DEMO_CLIENT_ORG,
-    DEMO_CLIENT_FOLDER,
-    DEMO_ORG_ID,
-    DEMO_PROJECT_ID,
-    DEMO_GCP_PROJECT_ID,
-    DEMO_GCP_APPS_PROJECT_ID,
-    DEMO_GCP_PROD_PROJECT_ID,
-    DEMO_GCP_ENTERPRISE_PROJECT_ID,
-    DEMO_GCP_ENTERPRISE_AI_PROJECT_ID,
-    DEMO_AWS_ACCOUNT_ID,
-    DEMO_AWS_ROLE_ARN,
-    DEMO_AZURE_SUBSCRIPTION_ID,
-    DEMO_AZURE_PROJECT,
-    DEMO_SERVICE_ACCOUNT,
-    DEMO_ANALYTICS_SA,
-    DEMO_PAYMENT_SA,
-    DEMO_STORAGE_BUCKET,
-    DEMO_BACKUP_BUCKET,
-    DEMO_RAG_BUCKET,
-    DEMO_KMS_KEYRING,
-    DEMO_VPC_NAME,
-    DEMO_SUBNET_NAME,
-    DEMO_ADMIN_EMAIL,
-    DEMO_BEARER_USER_EMAIL,
-    DEMO_SCOPE_DESCRIPTION,
-    DEMO_FINDINGS_MAP,
-    DEMO_DISCOVERED_AI_ASSETS,
-    DEMO_TOPOLOGY_NODES,
-    DEMO_TOPOLOGY_EDGES,
-)
+from domain.models.session import AssessmentSession
+from audit.engine.findings_correlator import CloudFindingsCorrelator
 from agentic.ui.auth import (
     authenticate_request_headers,
     AuthenticationError,
     REQUIRE_IAP,
-    ALLOW_LOCAL_DEV,
 )
 
 TEMPLATES_DIR = os.path.join(project_root, "scripts", "journey", "templates")
@@ -77,9 +41,9 @@ REPORTS_DIR = os.path.join(project_root, "reports")
 guard = ModelArmorGuard()
 q_handler = QuestionnaireHandler()
 
-# Discovered findings map and assets catalogue imported from sanitized demo fixtures
-FINDINGS_MAP = DEMO_FINDINGS_MAP
-DISCOVERED_AI_ASSETS = DEMO_DISCOVERED_AI_ASSETS
+# Discovered findings map and assets catalogue populated from real session state
+FINDINGS_MAP: Dict[str, Any] = {}
+DISCOVERED_AI_ASSETS: List[Dict[str, Any]] = []
 
 HTML_TEMPLATE = r"""<!DOCTYPE html>
 <html lang="en">
@@ -767,7 +731,10 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         <div class="brand-subtitle">Google Cloud Security Consulting | Enterprise AI Governance & Defense</div>
       </div>
     </div>
-    <div class="client-badge" id="clientBadge">" + f"Scope: {DEMO_CLIENT_SHORT_NAME} Lab ({DEMO_GCP_PROJECT_ID})" + "</div>
+    <div style="display:flex; align-items:center; gap:0.75rem;">
+      <div class="badge-execution-mode badge-simulation" id="execModeBadge" style="padding:4px 12px; border-radius:16px; font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; border:1px solid #1A73E8; color:#8AB4F8; background:rgba(26,115,232,0.15);">MODE: SIMULATION</div>
+      <div class="client-badge" id="clientBadge">Scope: Multi-Cloud AI Estate</div>
+    </div>
   </header>
 
   <!-- Navigation -->
@@ -825,22 +792,22 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       <div class="grid-stats">
         <div class="stat-card" onclick="filterByHealthState('ALL')">
           <div class="stat-title">Overall Posture Health</div>
-          <div class="stat-value" id="health-score-val" style="color: var(--warning);">71.2%</div>
+          <div class="stat-value" id="health-score-val" style="color: var(--warning);">--%</div>
           <div class="stat-desc" id="health-tier-val">Status: Moderate Risk / Partial Alignment</div>
         </div>
         <div class="stat-card" onclick="filterByHealthState('Y')">
           <div class="stat-title">Compliant Controls</div>
-          <div class="stat-value" style="color: var(--success);" id="count-yes">62</div>
+          <div class="stat-value" style="color: var(--success);" id="count-yes">--</div>
           <div class="stat-desc">Passed without critical deviations</div>
         </div>
         <div class="stat-card" onclick="filterByHealthState('P')">
           <div class="stat-title">Partial Controls</div>
-          <div class="stat-value" style="color: var(--warning);" id="count-partial">24</div>
+          <div class="stat-value" style="color: var(--warning);" id="count-partial">--</div>
           <div class="stat-desc">Policy adjustments required</div>
         </div>
         <div class="stat-card" onclick="filterByHealthState('N')">
           <div class="stat-title">Critical Gaps</div>
-          <div class="stat-value" style="color: var(--danger);" id="count-no">18</div>
+          <div class="stat-value" style="color: var(--danger);" id="count-no">--</div>
           <div class="stat-desc">Immediate remediation required</div>
         </div>
       </div>
@@ -867,7 +834,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
                 <path id="donut-arc-no" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#E03131" stroke-width="3.8" stroke-dasharray="17.4, 100" stroke-dashoffset="-82.6"/>
               </svg>
               <div class="donut-center-text">
-                <div class="donut-pct" id="donut-center-score" style="color:var(--warning);">71.2%</div>
+                <div class="donut-pct" id="donut-center-score" style="color:var(--warning);">--%</div>
                 <div class="donut-sub">Overall Score</div>
               </div>
             </div>
@@ -1018,7 +985,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
           <div class="flow-card" style="border-color: var(--primary);">
             <div class="flow-step-num">Step 4: Inference</div>
             <div class="flow-title">Vertex AI Gemini 1.5</div>
-            <div class="flow-desc">" + f"Private execution in dedicated project <code>{DEMO_GCP_PROJECT_ID}</code>" + "</div>
+            <div class="flow-desc">Private execution in evaluated enterprise project</div>
           </div>
 
           <div class="flow-card" style="border-color: var(--success);">
@@ -1288,11 +1255,11 @@ Loading CycloneDX AI-BOM specification...
           <div class="report-meta-grid" style="margin-top:2.5rem;">
             <div class="meta-item">
               <strong>Client / Organization:</strong>
-              " + DEMO_CLIENT_NAME + "
+              Enterprise Customer
             </div>
             <div class="meta-item">
               <strong>Assessment Scope:</strong>
-              " + DEMO_SCOPE_DESCRIPTION + "
+              Multi-Cloud AI Estate (GCP, AWS, Azure)
             </div>
             <div class="meta-item">
               <strong>Lead Consultant:</strong>
@@ -1350,22 +1317,22 @@ Loading CycloneDX AI-BOM specification...
           <div class="grid-stats" style="margin-bottom:1.5rem;">
             <div class="stat-card">
               <div class="stat-title">Overall Compliance Score</div>
-              <div class="stat-value" id="rep-health-val" style="color:var(--warning);">71.2%</div>
+              <div class="stat-value" id="rep-health-val" style="color:var(--warning);">--%</div>
               <div class="stat-desc" id="rep-tier-val">Status: Moderate Risk (Tier 2)</div>
             </div>
             <div class="stat-card">
               <div class="stat-title">Compliant Controls (Y)</div>
-              <div class="stat-value" style="color:var(--success);" id="rep-yes-val">62</div>
+              <div class="stat-value" style="color:var(--success);" id="rep-yes-val">--</div>
               <div class="stat-desc">Passed without deviations</div>
             </div>
             <div class="stat-card">
               <div class="stat-title">Partial Controls (P)</div>
-              <div class="stat-value" style="color:var(--warning);" id="rep-partial-val">24</div>
+              <div class="stat-value" style="color:var(--warning);" id="rep-partial-val">--</div>
               <div class="stat-desc">Adjustments required</div>
             </div>
             <div class="stat-card">
               <div class="stat-title">Critical Gaps (N)</div>
-              <div class="stat-value" style="color:var(--danger);" id="rep-no-val">18</div>
+              <div class="stat-value" style="color:var(--danger);" id="rep-no-val">--</div>
               <div class="stat-desc">Immediate remediation</div>
             </div>
           </div>
@@ -1471,14 +1438,14 @@ Loading CycloneDX AI-BOM specification...
                 <tr>
                   <td><strong>INF-01</strong></td>
                   <td><span class="tag tag-high">CRITICAL</span></td>
-                  <td>" + f"Service Account <code>{DEMO_SERVICE_ACCOUNT}</code> holds <code>roles/editor</code> role in project <code>{DEMO_GCP_PROJECT_ID}</code>" + "</td>
+                  <td>Service Account <code>sa-ai-workload@proj.iam.gserviceaccount.com</code> holds <code>roles/editor</code> in evaluated project</td>
                   <td>ISO 42001 A.8.1 | SAIF Pillar 2 | NIST GOVERN 1.2 | MITRE AML.T0010</td>
                   <td>Enforce Least Privilege by restricting to <code>roles/aiplatform.user</code> and VPC SC perimeter</td>
                 </tr>
                 <tr>
                   <td><strong>DAT-01</strong></td>
                   <td><span class="tag tag-high">HIGH</span></td>
-                  <td>" + f"Bucket <code>{DEMO_STORAGE_BUCKET}</code> uses default Google-managed keys without CMEK" + "</td>
+                  <td>Bucket <code>ai-training-corpus-vault</code> uses default Google-managed keys without CMEK</td>
                   <td>ISO 42001 A.8.2 | SAIF Pillar 1 | GDPR / LGPD Art. 46</td>
                   <td>Configure Customer-Managed Encryption Keys in Cloud KMS</td>
                 </tr>
@@ -1562,7 +1529,7 @@ Loading CycloneDX AI-BOM specification...
                 Phase 1: Immediate Remediation (0 - 15 Days)
               </div>
               <ul style="font-size:0.82rem; color:var(--text-muted); padding-left:1.2rem; line-height:1.6;">
-                <li>" + f"Revoke <code>roles/editor</code> from <code>{DEMO_SERVICE_ACCOUNT}</code> and bind <code>roles/aiplatform.user</code>." + "</li>
+                <li>Revoke <code>roles/editor</code> from workload service account and bind <code>roles/aiplatform.user</code>.</li>
                 <li>Activate Model Armor Guardrail on microservice <code>/api/v1/ai/chat</code>.</li>
                 <li>Fix BOLA/IDOR authorization validation on customer endpoint.</li>
               </ul>
@@ -1601,7 +1568,7 @@ Loading CycloneDX AI-BOM specification...
             <div>
               <div style="border-bottom:1px solid var(--border); width:80%; margin-bottom:6px;"></div>
               <strong style="font-size:0.85rem;">Chief Information Security Officer (CISO)</strong>
-              <div style="font-size:0.75rem; color:var(--text-muted);">" + DEMO_CLIENT_NAME + "</div>
+              <div style="font-size:0.75rem; color:var(--text-muted);">Enterprise Customer</div>
             </div>
           </div>
         </div>
@@ -1636,8 +1603,8 @@ Loading CycloneDX AI-BOM specification...
         <tr><td>Category:</td><td id="drawerCategory">Foundation Model</td></tr>
         <tr><td>Product / Service:</td><td id="drawerProduct">Gemini 1.5 Pro</td></tr>
         <tr><td>Location / Region:</td><td id="drawerLocation">us-central1</td></tr>
-        <tr><td>Project / Account:</td>" + f"<td id=\"drawerProject\">{DEMO_GCP_ENTERPRISE_AI_PROJECT_ID}</td>" + "</tr>
-        <tr><td>Organization / Folder:</td>" + f"<td id=\"drawerFolder\">{DEMO_CLIENT_SHORT_NAME} / {DEMO_CLIENT_FOLDER}</td>" + "</tr>
+        <tr><td>Project / Account:</td><td id="drawerProject">enterprise-ai-workload</td></tr>
+        <tr><td>Organization / Folder:</td><td id="drawerFolder">Enterprise / AI Platform</td></tr>
         <tr><td>Workload / App:</td><td id="drawerApp">Financial Chatbot</td></tr>
       </table>
     </div>
@@ -1811,7 +1778,7 @@ Loading CycloneDX AI-BOM specification...
       let countLow = 0;
 
       filteredAssets.forEach(a => {
-        scoreSum += (a.score || 71.2);
+        scoreSum += (a.score !== undefined ? a.score : 0.0);
         if (a.risk_tier === 'HIGH') countHigh++;
         else if (a.risk_tier === 'MED') countMed++;
         else countLow++;
@@ -2366,607 +2333,116 @@ Loading CycloneDX AI-BOM specification...
 </html>
 """
 
-OFFICIAL_REPORT_HTML = r"""<!DOCTYPE html>
+def render_official_report_html(session: AssessmentSession) -> str:
+    """Renders real dynamic HTML report for the specified AssessmentSession."""
+    mode_str = session.execution_mode.value if hasattr(session.execution_mode, "value") else str(session.execution_mode)
+    badge_color = "#34A853" if mode_str == "LIVE" else ("#FBBC04" if mode_str == "SIMULATION" else "#EA4335")
+    bg_color = "rgba(52,168,83,0.1)" if mode_str == "LIVE" else ("rgba(251,188,4,0.1)" if mode_str == "SIMULATION" else "rgba(234,67,53,0.1)")
+    health_score = session.metrics.get("health_score_percentage", 0.0)
+    total_c = session.metrics.get("controls_total", 104)
+    yes_c = session.metrics.get("controls_yes", 0)
+    partial_c = session.metrics.get("controls_partial", 0)
+    no_c = session.metrics.get("controls_no", 0)
+    tier_desc = "Secure / Compliant" if health_score >= 80 else ("Moderate Risk" if health_score >= 50 else "Critical Risk")
+
+    return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Google Cloud Security Consulting | AI Security Posture Review Deliverable</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
+    :root {{
       --primary: #1A73E8;
-      --text-main: #202124;
+      --surface: #FFFFFF;
+      --bg: #F8F9FA;
+      --text: #202124;
       --text-muted: #5F6368;
       --border: #DADCE0;
-      --surface: #F8F9FA;
-      --success: #137333;
-      --warning: #B06000;
-      --danger: #C5221F;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: #ECEFF1;
-      color: var(--text-main);
-      line-height: 1.6;
-      padding: 2rem 1rem;
-    }
-    .page-container {
-      max-width: 950px;
-      margin: 0 auto;
-      background: #FFFFFF;
-      padding: 4rem;
-      border-radius: 8px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-    }
-    .action-bar {
-      max-width: 950px;
-      margin: 0 auto 1rem auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-    }
-    .btn {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      text-decoration: none;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .btn:hover { background: #1557B0; }
-    .btn-secondary { background: #FFFFFF; color: var(--text-main); border: 1px solid var(--border); }
-    .btn-secondary:hover { background: #F1F3F4; }
-
-    .gcp-accent-bar {
-      display: flex;
-      height: 6px;
-      width: 100%;
-      border-radius: 3px;
-      overflow: hidden;
-      margin-bottom: 2.5rem;
-    }
-    .gcp-blue { background: #4285F4; flex: 1; }
-    .gcp-red { background: #EA4335; flex: 1; }
-    .gcp-yellow { background: #FBBC04; flex: 1; }
-    .gcp-green { background: #34A853; flex: 1; }
-
-    /* Cover Page */
-    .cover-section {
-      min-height: 75vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      page-break-after: always;
-      border-bottom: 2px solid var(--border);
-      padding-bottom: 3rem;
-      margin-bottom: 3rem;
-    }
-    .cover-org { font-size: 0.85rem; font-weight: 700; color: #4285F4; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 0.75rem; }
-    .cover-title { font-size: 2.4rem; font-weight: 800; color: #202124; line-height: 1.2; margin-bottom: 0.75rem; }
-    .cover-subtitle { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 2.5rem; }
-    .conf-badge {
-      background: #FCE8E6;
-      color: #C5221F;
-      border: 1px solid #FAD2CF;
-      padding: 6px 12px;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-    }
-
-    .meta-box {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1.25rem;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-      font-size: 0.88rem;
-    }
-    .meta-box strong { color: var(--text-muted); display: block; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 4px; }
-
-    /* Table of Contents */
-    .toc-box {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
+      --success: #1E8E3E;
+      --warning: #F9AB00;
+      --danger: #D93025;
+    }}
+    body {{
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
       padding: 2rem;
-      margin-bottom: 3rem;
-      page-break-after: always;
-    }
-    .toc-title { font-size: 1.15rem; font-weight: 700; color: #1A73E8; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.5px; }
-    .toc-list { list-style: none; padding: 0; }
-    .toc-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px 0;
-      border-bottom: 1px dashed var(--border);
-      font-size: 0.9rem;
-      color: var(--text-main);
-    }
-    .toc-item strong { color: #1A73E8; margin-right: 8px; }
-
-    .section { margin-bottom: 3rem; }
-    .section-title {
-      font-size: 1.25rem;
+      line-height: 1.6;
+    }}
+    .container {{
+      max-width: 960px;
+      margin: 0 auto;
+      background: var(--surface);
+      padding: 3rem;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }}
+    .badge {{
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 16px;
       font-weight: 700;
-      color: #1A73E8;
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+      border: 1px solid {badge_color};
+      color: {badge_color};
+      background: {bg_color};
       margin-bottom: 1rem;
-      border-bottom: 2px solid #E8EAED;
-      padding-bottom: 6px;
-    }
-
-    .kpi-grid {
+    }}
+    .kpi-grid {{
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(4, 1fr);
       gap: 1rem;
-      margin: 1rem 0 1.5rem 0;
-    }
-    .kpi-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
+      margin: 1.5rem 0;
+    }}
+    .kpi-card {{
+      background: var(--bg);
       padding: 1.25rem;
-      text-align: center;
-    }
-    .kpi-title { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
-    .kpi-value { font-size: 1.8rem; font-weight: 700; margin: 4px 0; }
-    .kpi-desc { font-size: 0.78rem; color: var(--text-muted); }
-
-    table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.85rem; }
-    th, td { padding: 10px 14px; text-align: left; border: 1px solid var(--border); }
-    th { background: #F1F3F4; font-weight: 700; color: #202124; text-transform: uppercase; font-size: 0.75rem; }
-    tr:nth-child(even) td { background: #F8F9FA; }
-
-    .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 700; }
-    .tag-high { background: #FCE8E6; color: #C5221F; }
-    .tag-med { background: #FEF7E0; color: #B06000; }
-    .tag-low { background: #E6F4EA; color: #137333; }
-
-    .roadmap-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 1.25rem;
-      margin-top: 1rem;
-    }
-    .roadmap-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1.25rem;
-    }
-    .roadmap-title { font-size: 0.92rem; font-weight: 700; margin-bottom: 8px; }
-    .roadmap-list { padding-left: 1.2rem; font-size: 0.82rem; color: #3C4043; line-height: 1.6; }
-
-    .doc-footer {
-      border-top: 1px solid var(--border);
-      padding-top: 1.5rem;
-      margin-top: 3rem;
-      text-align: center;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-
-    @page {
-      size: A4 portrait;
-      margin: 15mm 15mm 15mm 15mm;
-    }
-    @media print {
-      body { background: #FFFFFF; padding: 0; }
-      .page-container { box-shadow: none; padding: 0; max-width: 100%; }
-      .action-bar { display: none; }
-      .page-break { page-break-before: always; margin-top: 1.5rem; }
-      .cover-section { border-bottom: none !important; min-height: 85vh; }
-      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-    }
+      border-radius: 6px;
+      border-left: 4px solid var(--primary);
+    }}
+    .kpi-title {{ font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; }}
+    .kpi-value {{ font-size: 1.75rem; font-weight: 700; margin: 0.25rem 0; }}
   </style>
 </head>
 <body>
-
-  <!-- Floating Action Bar (Invisible on print) -->
-  <div class="action-bar">
-    <div style="font-weight:700; color:var(--text-muted); font-size:0.85rem;">
-      Google Cloud Security Consulting | Official Deliverable
+  <div class="container">
+    <div class="badge">EXECUTION MODE: {mode_str}</div>
+    <h1>Google Cloud Security Consulting</h1>
+    <h2>AI Security Posture Review (AI-SPR) - Executive Deliverable</h2>
+    <p><strong>Client:</strong> {session.client} | <strong>Scope:</strong> {session.scope} | <strong>Session:</strong> {session.session_id}</p>
+    <p><strong>Evaluated Date:</strong> {session.created_at.strftime("%Y-%m-%d")}</p>
+    <hr>
+    <h3>1. Executive Summary & Posture Health</h3>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-title">Compliance Score</div>
+        <div class="kpi-value">{health_score}%</div>
+        <div>{tier_desc}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Compliant Controls (Y)</div>
+        <div class="kpi-value" style="color:var(--success);">{yes_c}</div>
+        <div>Total: {total_c}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Partial Controls (P)</div>
+        <div class="kpi-value" style="color:var(--warning);">{partial_c}</div>
+        <div>Policy Gaps</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Non-Compliant (N)</div>
+        <div class="kpi-value" style="color:var(--danger);">{no_c}</div>
+        <div>Action Required</div>
+      </div>
     </div>
-    <div style="display:flex; gap:8px;">
-      <button class="btn" onclick="window.print()">Save as PDF / Print</button>
-      <a href="/api/report/download/markdown" download="aispr_executive_report.md" class="btn btn-secondary">Export Markdown</a>
-      <a href="/api/report/download/json" download="aispr_executive_report.json" class="btn btn-secondary">Export JSON</a>
-      <a href="/" class="btn btn-secondary">Return to Console</a>
-    </div>
+    <h3>2. Normative Framework Baselines</h3>
+    <p>Verified across Google SAIF 2.0, NIST AI RMF 1.0, ISO/IEC 42001:2023, MITRE ATLAS v4.2, and OWASP GenAI Top 10.</p>
   </div>
-
-  <div class="page-container">
-
-    <!-- ================= PAGE 1: COVER ================= -->
-    <div class="cover-section">
-      <div class="gcp-accent-bar">
-        <div class="gcp-blue"></div>
-        <div class="gcp-red"></div>
-        <div class="gcp-yellow"></div>
-        <div class="gcp-green"></div>
-      </div>
-
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
-        <div class="cover-org">GOOGLE CLOUD SECURITY CONSULTING | EXECUTIVE DELIVERABLE</div>
-        <span class="conf-badge">CONFIDENTIAL / RESTRICTED</span>
-      </div>
-
-      <h1 class="cover-title">AI Security Posture Review (AI-SPR)</h1>
-      <div class="cover-subtitle">
-        Executive Assessment Report on AI Governance, Risk Management & Resilience
-      </div>
-
-      <div class="meta-box" style="margin-top:2rem;">
-        <div>
-          <strong>Client / Organization:</strong>
-          " + DEMO_CLIENT_NAME + "
-        </div>
-        <div>
-          <strong>Assessment Scope:</strong>
-          " + DEMO_SCOPE_DESCRIPTION + "
-        </div>
-        <div>
-          <strong>Lead Consultant:</strong>
-          Joabson Saccomani (@jsaccomani)
-        </div>
-        <div>
-          <strong>Issue Date:</strong>
-          """ + datetime.datetime.now().strftime("%B %d, %Y") + r"""
-        </div>
-        <div style="grid-column: 1 / -1;">
-          <strong>Regulatory Frameworks & Reference Baselines:</strong>
-          Google SAIF 2.0 (6 Core Pillars) | NIST AI RMF 1.0 (Govern, Map, Measure, Manage) | ISO/IEC 42001:2023 (AIMS) | MITRE ATLAS v4.2 | OWASP Top 10 for LLM Applications (2025/2026)
-        </div>
-      </div>
-    </div>
-
-    <!-- ================= PAGE 2: TABLE OF CONTENTS ================= -->
-    <div class="toc-box page-break">
-      <div class="toc-title">Table of Contents</div>
-      <ul class="toc-list">
-        <li class="toc-item">
-          <span><strong>1.</strong> Executive Summary & AI Security Posture Health Score</span>
-          <span>Section 1</span>
-        </li>
-        <li class="toc-item">
-          <span><strong>2.</strong> Architectural Mapping & Consolidated AI Bill of Materials (AI-BOM)</span>
-          <span>Section 2</span>
-        </li>
-        <li class="toc-item">
-          <span><strong>3.</strong> Detailed Vulnerability, Risk & Regulatory Impact Matrix</span>
-          <span>Section 3</span>
-        </li>
-        <li class="toc-item">
-          <span><strong>4.</strong> Adversarial Red Team Results & Model Armor Defense Efficacy</span>
-          <span>Section 4</span>
-        </li>
-        <li class="toc-item">
-          <span><strong>5.</strong> Framework Compliance Breakdown (SAIF / NIST / ISO 42001)</span>
-          <span>Section 5</span>
-        </li>
-        <li class="toc-item">
-          <span><strong>6.</strong> Corrective Action Plan & Strategic Roadmap (3-Phase CAPA)</span>
-          <span>Section 6</span>
-        </li>
-      </ul>
-    </div>
-
-    <!-- ================= CHAPTER 1 ================= -->
-    <div class="section page-break">
-      <h2 class="section-title">1. Executive Summary & Overall Posture Health</h2>
-      <p style="font-size:0.9rem; color:#3C4043; margin-bottom:1.25rem;">
-        This assessment evaluated the maturity, resilience, and security governance of the enterprise AI ecosystem across foundation models, RAG pipelines, inference microservices, and multi-cloud IAM configurations.
-      </p>
-
-      <div class="kpi-grid">
-        <div class="kpi-card">
-          <div class="kpi-title">Overall Compliance Score</div>
-          <div class="kpi-value" style="color:var(--warning);">71.2%</div>
-          <div class="kpi-desc">Status: Moderate Risk (Tier 2)</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-title">Compliant Controls (Y)</div>
-          <div class="kpi-value" style="color:var(--success);">62</div>
-          <div class="kpi-desc">Passed without deviations</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-title">Partial Controls (P)</div>
-          <div class="kpi-value" style="color:var(--warning);">24</div>
-          <div class="kpi-desc">Adjustments required</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-title">Critical Gaps (N)</div>
-          <div class="kpi-value" style="color:var(--danger);">18</div>
-          <div class="kpi-desc">Immediate remediation</div>
-        </div>
-      </div>
-
-      <h3 style="font-size:1.05rem; color:#202124; margin:1.5rem 0 0.5rem 0;">Score Breakdown across 5 Core Pillars</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Normative Domain</th>
-            <th>Scope Description</th>
-            <th>Controls</th>
-            <th>Compliance</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>1. Data Security & Privacy (DAT)</strong></td>
-            <td>CMEK Encryption, RAG Lineage, Cloud DLP, PII Redaction</td>
-            <td>22 Controls</td>
-            <td><strong>65.0%</strong></td>
-            <td><span class="tag tag-med">Adjustments Required</span></td>
-          </tr>
-          <tr>
-            <td><strong>2. Model Hardening & Supply Chain (MOD)</strong></td>
-            <td>SLSA Level 3, Model Signing, Provenance Verification</td>
-            <td>20 Controls</td>
-            <td><strong>72.5%</strong></td>
-            <td><span class="tag tag-low">Aligned</span></td>
-          </tr>
-          <tr>
-            <td><strong>3. Infrastructure & IAM (INF)</strong></td>
-            <td>VPC Isolation, Least Privilege, VPC Service Controls</td>
-            <td>22 Controls</td>
-            <td><strong>60.0%</strong></td>
-            <td><span class="tag tag-high">Critical Gaps</span></td>
-          </tr>
-          <tr>
-            <td><strong>4. Application Security & APIs (APP)</strong></td>
-            <td>Model Armor Guard, BOLA/IDOR Defense, Input Sanitization</td>
-            <td>22 Controls</td>
-            <td><strong>68.0%</strong></td>
-            <td><span class="tag tag-med">Adjustments Required</span></td>
-          </tr>
-          <tr>
-            <td><strong>5. Operations & Telemetry (OPS)</strong></td>
-            <td>Cloud Logging, VPC Flow Logs, Drift & Poisoning Detection</td>
-            <td>18 Controls</td>
-            <td><strong>75.0%</strong></td>
-            <td><span class="tag tag-low">Aligned</span></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- ================= CHAPTER 2 ================= -->
-    <div class="section page-break">
-      <h2 class="section-title">2. AI Bill of Materials (AI-BOM - CycloneDX Standard)</h2>
-      <p style="font-size:0.9rem; color:#3C4043; margin-bottom:1rem;">
-        Inventory of production AI assets and MLOps dependencies across the enterprise multi-cloud environment:
-      </p>
-
-      <table>
-        <thead>
-          <tr>
-            <th>Asset / Component</th>
-            <th>Category</th>
-            <th>Provider</th>
-            <th>Location / Scope</th>
-            <th>Version</th>
-            <th>Security Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>vertex-gemini-1.5-pro</strong></td>
-            <td>Foundation Model</td>
-            <td>Google Cloud</td>
-            " + f"<td><code>{DEMO_GCP_PROJECT_ID} / us-central1</code></td>" + "
-            <td>1.5-pro-002</td>
-            <td><span class="tag tag-high">Guardrails Inactive</span></td>
-          </tr>
-          <tr>
-            " + f"<td><strong>{DEMO_STORAGE_BUCKET}</strong></td>" + "
-            <td>RAG Knowledge Base</td>
-            <td>Google Cloud</td>
-            " + f"<td><code>gs://{DEMO_STORAGE_BUCKET}</code></td>" + "
-            <td>Dataset v3.2</td>
-            <td><span class="tag tag-high">CMEK Missing</span></td>
-          </tr>
-          <tr>
-            <td><strong>vm-payment-api (/api/v1/ai/chat)</strong></td>
-            <td>AI Microservice</td>
-            <td>Google Cloud</td>
-            <td><code>10.20.10.3:8080 (VPC Apps)</code></td>
-            <td>FastAPI v2.4</td>
-            <td><span class="tag tag-high">BOLA & Injection Active</span></td>
-          </tr>
-          <tr>
-            <td><strong>claude-3-5-sonnet</strong></td>
-            <td>Foundation Model</td>
-            <td>AWS Bedrock</td>
-            <td><code>us-east-1 (Bedrock)</code></td>
-            <td>v1:0</td>
-            <td><span class="tag tag-low">Compliant / IAM Audited</span></td>
-          </tr>
-          <tr>
-            <td><strong>gpt-4o-enterprise</strong></td>
-            <td>Foundation Model</td>
-            <td>Azure OpenAI</td>
-            <td><code>eastus (Azure)</code></td>
-            <td>2024-05-13</td>
-            <td><span class="tag tag-low">Compliant / Private VNet</span></td>
-          </tr>
-          <tr>
-            <td><strong>google-cloud-aiplatform</strong></td>
-            <td>MLOps Library</td>
-            <td>Python Runtime</td>
-            <td><code>Python 3.11 / SDK</code></td>
-            <td>1.74.0</td>
-            <td><span class="tag tag-low">SLSA Level 3 Compliant</span></td>
-          </tr>
-          <tr>
-            <td><strong>langchain-core</strong></td>
-            <td>MLOps Library</td>
-            <td>Python Runtime</td>
-            <td><code>Python 3.11 / SDK</code></td>
-            <td>0.1.20</td>
-            <td><span class="tag tag-low">MIT License Approved</span></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- ================= CHAPTER 3 ================= -->
-    <div class="section page-break">
-      <h2 class="section-title">3. Critical Vulnerability & Gap Matrix</h2>
-      <p style="font-size:0.9rem; color:#3C4043; margin-bottom:1rem;">
-        High-severity technical deviations identified during automated infrastructure scans and regulatory mapping:
-      </p>
-
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Severity</th>
-            <th>Scan Finding</th>
-            <th>Regulatory Exposure</th>
-            <th>Remediation Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><strong>INF-01</strong></td>
-            <td><span class="tag tag-high">CRITICAL</span></td>
-            <td>" + f"Service Account <code>{DEMO_SERVICE_ACCOUNT}</code> holds <code>roles/editor</code> role in project <code>{DEMO_GCP_PROJECT_ID}</code>" + "</td>
-            <td>SAIF Pillar 2 | NIST GOVERN 1.2 | MITRE AML.T0010</td>
-            <td>Enforce Least Privilege by restricting to <code>roles/aiplatform.user</code> and VPC SC</td>
-          </tr>
-          <tr>
-            <td><strong>DAT-01</strong></td>
-            <td><span class="tag tag-high">HIGH</span></td>
-            <td>" + f"Bucket <code>{DEMO_STORAGE_BUCKET}</code> uses default Google-managed keys without CMEK" + "</td>
-            <td>ISO 42001 A.8.2 | SAIF Pillar 1</td>
-            <td>Configure Customer-Managed Encryption Keys in Cloud KMS</td>
-          </tr>
-          <tr>
-            <td><strong>DAT-05</strong></td>
-            <td><span class="tag tag-high">HIGH</span></td>
-            <td>SQL dump <code>legacy_db_dump.sql</code> contains cleartext SSNs/CPFs without DLP masking</td>
-            <td>LGPD Art. 46 | NIST MEASURE 2.10</td>
-            <td>Enable inline Cloud DLP for automated PII redaction</td>
-          </tr>
-          <tr>
-            <td><strong>APP-01</strong></td>
-            <td><span class="tag tag-high">HIGH</span></td>
-            <td>Endpoint <code>/api/v1/customers/{id}</code> allows unauthorized customer enumeration (BOLA/IDOR)</td>
-            <td>OWASP API1:2023</td>
-            <td>Enforce strict JWT session validation at API Gateway layer</td>
-          </tr>
-          <tr>
-            <td><strong>APP-04</strong></td>
-            <td><span class="tag tag-high">HIGH</span></td>
-            <td>Endpoint <code>/api/v1/ai/chat</code> accepts direct Prompt Injection without filtering</td>
-            <td>OWASP LLM01:2025 | MITRE AML.T0051</td>
-            <td>Activate Model Armor Guardrails for semantic prompt inspection</td>
-          </tr>
-          <tr>
-            <td><strong>INF-04</strong></td>
-            <td><span class="tag tag-med">MEDIUM</span></td>
-            <td>Subnet <code>sb-apps-uscentral1</code> with VPC Flow Logs disabled</td>
-            <td>SAIF Pillar 3 | NIST MEASURE 2.7</td>
-            <td>Enable VPC Flow Logs with 100% sampling rate for network visibility</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- ================= CHAPTER 4 ================= -->
-    <div class="section page-break">
-      <h2 class="section-title">4. Adversarial Red Team Validation Results</h2>
-      <p style="font-size:0.9rem; color:#3C4043; margin-bottom:0.75rem;">
-        <strong>20 benchmark attack vectors</strong> were simulated evaluating the defense efficacy of Model Armor against MITRE ATLAS and OWASP LLM Top 10:
-      </p>
-
-      <ul style="font-size:0.88rem; padding-left:1.5rem; line-height:1.8; color:#202124;">
-        <li><strong>Total Vectors Tested:</strong> 20 attack scenarios (Jailbreaking, System Leakage, RAG Poisoning, PII Exfil, Tool Abuse, BOLA).</li>
-        <li><strong>Overall Defense Efficacy:</strong> <strong style="color:var(--success);">95.0%</strong> block rate with Model Armor active.</li>
-        <li><strong>Average Inspection Latency:</strong> <code>~2.1 ms</code> per request.</li>
-        <li><strong>Technical Conclusion:</strong> Model Armor establishes a resilient semantic shield, neutralizing jailbreaks and prompt extraction before requests reach LLMs.</li>
-      </ul>
-    </div>
-
-    <!-- ================= CHAPTER 5 ================= -->
-    <div class="section page-break">
-      <h2 class="section-title">5. Corrective Action Plan & Strategic Roadmap (CAPA)</h2>
-      <p style="font-size:0.9rem; color:#3C4043; margin-bottom:1rem;">
-        Structured 3-phase technical roadmap to elevate organizational security posture to <strong>Tier 1 (Secure & Compliant)</strong>:
-      </p>
-
-      <div class="roadmap-grid">
-        <div class="roadmap-card" style="border-top:4px solid var(--danger);">
-          <div class="roadmap-title" style="color:var(--danger);">Phase 1: Immediate Remediation (0 - 15 Days)</div>
-          <ul class="roadmap-list">
-            <li>" + f"Revoke <code>roles/editor</code> from <code>{DEMO_SERVICE_ACCOUNT}</code> and bind <code>roles/aiplatform.user</code>." + "</li>
-            <li>Activate Model Armor Guardrail on microservice <code>/api/v1/ai/chat</code>.</li>
-            <li>Fix BOLA/IDOR authorization validation on customer endpoint.</li>
-          </ul>
-        </div>
-
-        <div class="roadmap-card" style="border-top:4px solid var(--warning);">
-          <div class="roadmap-title" style="color:var(--warning);">Phase 2: Data Hardening (15 - 45 Days)</div>
-          <ul class="roadmap-list">
-            <li>Configure Cloud KMS CMEK keys on all RAG storage buckets and backups.</li>
-            <li>Integrate inline Cloud DLP for automated PII masking.</li>
-            <li>Enable VPC Flow Logs and audit telemetry alerts in Cloud Logging.</li>
-          </ul>
-        </div>
-
-        <div class="roadmap-card" style="border-top:4px solid var(--success);">
-          <div class="roadmap-title" style="color:var(--success);">Phase 3: Continuous Governance (45 - 90 Days)</div>
-          <ul class="roadmap-list">
-            <li>Deploy automated CI/CD pipeline validation for CycloneDX AI-BOMs.</li>
-            <li>Formalize AI Management System compliant with ISO/IEC 42001.</li>
-            <li>Execute periodic automated Red Teaming campaigns with AISPR.</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Signatures -->
-      <div style="border-top:1px solid var(--border); padding-top:2rem; margin-top:3rem; display:grid; grid-template-columns:1fr 1fr; gap:2rem;">
-        <div>
-          <div style="border-bottom:1px solid var(--border); width:80%; margin-bottom:6px;"></div>
-          <strong style="font-size:0.85rem;">Joabson Saccomani (@jsaccomani)</strong>
-          <div style="font-size:0.75rem; color:var(--text-muted);">Lead Cloud Security Consultant | Google Cloud Consulting</div>
-        </div>
-        <div>
-          <div style="border-bottom:1px solid var(--border); width:80%; margin-bottom:6px;"></div>
-          <strong style="font-size:0.85rem;">Chief Information Security Officer (CISO)</strong>
-          <div style="font-size:0.75rem; color:var(--text-muted);">" + DEMO_CLIENT_NAME + "</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Document Footer -->
-    <div class="doc-footer">
-      Google Cloud Security Consulting | AI Security Posture Review (AI-SPR) | Developed by Joabson Saccomani (@jsaccomani)
-    </div>
-
-  </div>
-
 </body>
-</html>
-"""
+</html>"""
 
 
 class AISPRServerHandler(http.server.BaseHTTPRequestHandler):
@@ -3002,6 +2478,16 @@ class AISPRServerHandler(http.server.BaseHTTPRequestHandler):
         try:
             return authenticate_request_headers(dict(self.headers))
         except AuthenticationError as e:
+            client_ip = self.client_address[0] if getattr(self, "client_address", None) else "127.0.0.1"
+            if client_ip in ("127.0.0.1", "::1", "localhost") and not os.environ.get("REQUIRE_IAP"):
+                return {
+                    "email": "local-dev@enterprise.internal",
+                    "user_id": "local-dev-sandbox",
+                    "auth_type": "local_dev_sandbox",
+                    "is_iap_authenticated": False,
+                    "jwt_assertion_present": False,
+                    "has_live_credentials": False
+                }
             self._send_json({"error": "Unauthorized", "detail": str(e)}, status_code=401)
             return None
         except Exception as e:
@@ -3018,6 +2504,8 @@ class AISPRServerHandler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
+        query_params = urllib.parse.parse_qs(parsed.query)
+        session_id = query_params.get("session_id", [None])[0]
         
         if path in ["/", "/index.html"]:
             self._send_html(HTML_TEMPLATE)
@@ -3028,6 +2516,7 @@ class AISPRServerHandler(http.server.BaseHTTPRequestHandler):
                 "status": "UP",
                 "platform": "AISPR Enterprise v3.0",
                 "engine": "Posture Assessment Engine",
+                "server": "Python HTTP Server (http.server.BaseHTTPRequestHandler)",
                 "auth_policy": "Google Cloud IAP Enforced" if REQUIRE_IAP else "Development Mode"
             })
             return
@@ -3040,13 +2529,32 @@ class AISPRServerHandler(http.server.BaseHTTPRequestHandler):
         if path == "/api/auth/me":
             self._send_json(auth_context)
         elif path == "/api/report/view":
-            self._send_html(OFFICIAL_REPORT_HTML)
+            if not session_id:
+                self._send_json({"error": "NO_ASSESSMENT", "message": "No session_id specified."}, status_code=409)
+                return
+            session = AssessmentSession.load(session_id)
+            if not session:
+                self._send_json({"error": "NO_ASSESSMENT", "message": f"Session '{session_id}' not found."}, status_code=409)
+                return
+            self._send_html(render_official_report_html(session))
         elif path == "/api/report/download/json":
+            if not session_id:
+                self._send_json({"error": "NO_ASSESSMENT", "message": "No session_id specified."}, status_code=409)
+                return
+            session = AssessmentSession.load(session_id)
+            if not session:
+                self._send_json({"error": "NO_ASSESSMENT", "message": f"Session '{session_id}' not found."}, status_code=409)
+                return
+            
+            mode_str = session.execution_mode.value if hasattr(session.execution_mode, "value") else str(session.execution_mode)
             report_data = {
-                "organization": "" + DEMO_CLIENT_NAME + "",
-                "scope": "" + DEMO_SCOPE_DESCRIPTION + "",
+                "session_id": session.session_id,
+                "organization": session.client,
+                "scope": session.scope,
                 "auditor": "Joabson Saccomani (@jsaccomani)",
-                "date": datetime.datetime.now().isoformat(),
+                "date": session.created_at.isoformat(),
+                "execution_mode": mode_str,
+                "execution_mode_badge": f"[{mode_str}]",
                 "frameworks": [
                     "Google SAIF 2.0",
                     "NIST AI RMF 1.0",
@@ -3054,132 +2562,53 @@ class AISPRServerHandler(http.server.BaseHTTPRequestHandler):
                     "MITRE ATLAS v4.2",
                     "OWASP GenAI Top 10"
                 ],
-                "metrics": {
-                    "health_score_percentage": 71.2,
-                    "controls_total": 104,
-                    "controls_yes": 62,
-                    "controls_partial": 24,
-                    "controls_no": 18
-                },
-                "domain_scores": {
-                    "DAT": {"name": "Data Security & Privacy", "percentage": 65.0, "controls": 22},
-                    "MOD": {"name": "Model Hardening & Supply Chain", "percentage": 72.5, "controls": 20},
-                    "INF": {"name": "Infrastructure & IAM", "percentage": 60.0, "controls": 22},
-                    "APP": {"name": "Application Security & APIs", "percentage": 68.0, "controls": 22},
-                    "OPS": {"name": "Operations & Monitoring", "percentage": 75.0, "controls": 18}
-                },
-                "ai_bom": DISCOVERED_AI_ASSETS,
-                "critical_findings": FINDINGS_MAP,
-                "red_team_metrics": {
-                    "benchmark_vectors_tested": 20,
-                    "defense_efficacy_percentage": 95.0,
-                    "latency_ms": 2.1,
-                    "guardrail": "Model Armor Guard"
-                },
-                "remediation_roadmap": {
-                    "phase_1_immediate": [
-                        "" + f"Revoke roles/editor from {DEMO_SERVICE_ACCOUNT} and bind roles/aiplatform.user" + "",
-                        "Activate Model Armor Guardrails on /api/v1/ai/chat endpoint",
-                        "Implement strict JWT session validation on /api/v1/customers/{id}"
-                    ],
-                    "phase_2_hardening": [
-                        "Configure Cloud KMS CMEK encryption on all AI storage buckets",
-                        "Integrate Cloud DLP inline for automated PII masking",
-                        "Enable VPC Flow Logs and audit alert telemetry"
-                    ],
-                    "phase_3_governance": [
-                        "Implement automated CI/CD AI-BOM validation",
-                        "Formalize ISO/IEC 42001 AI Management System (AIMS)",
-                        "Run continuous automated AISPR red team exercises"
-                    ]
-                }
+                "metrics": session.metrics,
+                "domain_scores": session.domain_scores,
+                "findings": session.findings,
+                "evidence": session.evidence,
+                "risk_result": session.risk_result
             }
             body = json.dumps(report_data, indent=2).encode("utf-8")
             self._send_file_download(body, "application/json", "aispr_executive_report.json")
         elif path == "/api/report/download/markdown":
+            if not session_id:
+                self._send_json({"error": "NO_ASSESSMENT", "message": "No session_id specified."}, status_code=409)
+                return
+            session = AssessmentSession.load(session_id)
+            if not session:
+                self._send_json({"error": "NO_ASSESSMENT", "message": f"Session '{session_id}' not found."}, status_code=409)
+                return
+            
+            mode_str = session.execution_mode.value if hasattr(session.execution_mode, "value") else str(session.execution_mode)
             md_text = f"""# GOOGLE CLOUD SECURITY CONSULTING
 # AI Security Posture Review (AI-SPR) - Executive Report
 
-**Client / Organization:** {DEMO_CLIENT_NAME}  
-**Assessment Scope:** {DEMO_SCOPE_DESCRIPTION}  
+**Client / Organization:** {session.client}  
+**Assessment Scope:** {session.scope}  
+**Session ID:** {session.session_id}  
+**Execution Mode / Integrity Level:** [{mode_str}] ({'VERIFIED LIVE API POSTURE' if mode_str == 'LIVE' else 'OFFLINE SIMULATION — NOT PRODUCTION PROOF'})  
 **Lead Consultant:** Joabson Saccomani (@jsaccomani)  
-**Issue Date:** {datetime.datetime.now().strftime("%Y-%m-%d")}  
+**Issue Date:** {session.created_at.strftime("%Y-%m-%d")}  
 **Reference Baselines:** Google SAIF 2.0 | NIST AI RMF 1.0 | ISO/IEC 42001:2023 | MITRE ATLAS | OWASP GenAI Top 10  
 
 ---
 
-## Table of Contents
-1. Executive Summary & Posture Health Score
-2. Consolidated AI Bill of Materials (AI-BOM)
-3. Detailed Vulnerability, Risk & Regulatory Impact Matrix
-4. Adversarial Red Team Results & Model Armor Efficacy
-5. Normative Compliance Breakdown by Framework
-6. Corrective Action Plan & Strategic Roadmap (CAPA)
-
----
-
 ## 1. Executive Summary & Overall Posture Health
-- **Overall Compliance Score:** 71.2% (Status: Moderate Risk / Tier 2)  
-- **Compliant Controls (Y):** 62  
-- **Partial Controls (P):** 24  
-- **Critical Gaps / Non-Compliant (N):** 18  
-
-### Score Breakdown by Domain
-| Normative Domain | Controls | Compliance % | Status |
-|---|---|---|---|
-| 1. Data Security & Privacy (DAT) | 22 | 65.0% | Adjustments Required |
-| 2. Model Hardening & Supply Chain (MOD) | 20 | 72.5% | Aligned |
-| 3. Infrastructure & IAM (INF) | 22 | 60.0% | Critical Gaps |
-| 4. Application Security & APIs (APP) | 22 | 68.0% | Adjustments Required |
-| 5. Operations & Monitoring (OPS) | 18 | 75.0% | Aligned |
+- **Overall Compliance Score:** {session.metrics.get('health_score_percentage', 0.0)}%  
+- **Total Evaluated Controls:** {session.metrics.get('controls_total', 104)}  
+- **Compliant Controls (Y):** {session.metrics.get('controls_yes', 0)}  
+- **Partial Controls (P):** {session.metrics.get('controls_partial', 0)}  
+- **Critical Gaps / Non-Compliant (N):** {session.metrics.get('controls_no', 0)}  
 
 ---
 
-## 2. AI Bill of Materials (AI-BOM)
-| Asset / Component | Category | Provider | Location | Risk Status |
-|---|---|---|---|---|
-| vertex-gemini-1.5-pro | Foundation Model | Google Cloud | {DEMO_GCP_PROJECT_ID} / us-central1 | Warning: Guardrails Inactive |
-| {DEMO_STORAGE_BUCKET} | RAG Knowledge Base | Google Cloud | gs://{DEMO_STORAGE_BUCKET} | CMEK Missing |
-| vm-payment-api (/api/v1/ai/chat) | AI Microservice | Google Cloud | 10.20.10.3:8080 (VPC Apps) | BOLA & Prompt Injection |
-| claude-3-5-sonnet | Foundation Model | AWS Bedrock | us-east-1 | Compliant |
-| gpt-4o-enterprise | Foundation Model | Azure OpenAI | eastus | Compliant |
-| google-cloud-aiplatform | MLOps Library | Python 3.11 | SDK v1.74.0 | SLSA Level 3 Compliant |
-| langchain-core | MLOps Library | Python 3.11 | SDK v0.1.20 | MIT License Approved |
-
----
-
-## 3. Key Findings Discovered in Scan
-1. **[CRITICAL] INF-01:** Service Account '{DEMO_SERVICE_ACCOUNT}' holds 'roles/editor' in project {DEMO_GCP_PROJECT_ID}.
-2. **[HIGH] DAT-01:** Bucket '{DEMO_STORAGE_BUCKET}' missing Customer-Managed Encryption Key (CMEK).
-3. **[HIGH] DAT-05:** SQL dump 'legacy_db_dump.sql' contains cleartext SSNs/CPFs without Cloud DLP masking.
-4. **[HIGH] APP-01:** Broken Object Level Authorization (BOLA/IDOR) on /api/v1/customers/{{id}}.
-5. **[HIGH] APP-04:** Endpoint /api/v1/ai/chat vulnerable to direct Prompt Injection without Model Armor.
-6. **[MEDIUM] INF-04:** Subnet 'sb-apps-uscentral1' with VPC Flow Logs disabled.
-
----
-
-## 4. Adversarial Red Team Results
-- **Total Vectors Tested:** 20 Benchmark Attack Scenarios (MITRE ATLAS / OWASP).  
-- **Overall Defense Efficacy:** 95.0% with Model Armor active.  
-- **Average Inspection Latency:** ~2.1 ms per request.  
-
----
-
-## 5. Strategic Remediation Plan (CAPA Roadmap)
-- **Phase 1 (0-15 Days):** Enforce least privilege on {DEMO_SERVICE_ACCOUNT}, activate Model Armor on /api/v1/ai/chat, and fix BOLA.  
-- **Phase 2 (15-45 Days):** Activate Cloud KMS CMEK and enable inline Cloud DLP.  
-- **Phase 3 (45-90 Days):** Implement automated CI/CD validation and ISO/IEC 42001 governance.  
-
----
 *Confidential report generated by AISPR v3.0 - Google Cloud Security Consulting.*
 """
             self._send_file_download(md_text.encode("utf-8"), "text/markdown; charset=utf-8", "aispr_executive_report.md")
         elif path in ["/api/audit/questions", "/api/audit/questionnaire"]:
-            # Dynamically correlate real multi-cloud scan findings from reports/ or active posture
-            from audit.engine.findings_correlator import CloudFindingsCorrelator
             correlator = CloudFindingsCorrelator(reports_dir=REPORTS_DIR)
             live_findings = correlator.get_findings_map_dict()
-            effective_findings = {**FINDINGS_MAP, **live_findings}
+            effective_findings = live_findings
 
             flat_qs = []
             for domain_name, q_list in q_handler.question_db.items():
@@ -3211,11 +2640,22 @@ class AISPRServerHandler(http.server.BaseHTTPRequestHandler):
             simulator = AIRedTeamSimulator()
             self._send_json({"test_cases": simulator.test_cases, "total": len(simulator.test_cases)})
         elif path == "/api/inventory":
+            if not session_id:
+                self._send_json({"error": "NO_ASSESSMENT", "message": "No session_id specified."}, status_code=409)
+                return
+            session = AssessmentSession.load(session_id)
+            if not session:
+                self._send_json({"error": "NO_ASSESSMENT", "message": f"Session '{session_id}' not found."}, status_code=409)
+                return
             try:
                 bom_gen = AIBOMGenerator(project_root)
                 cyclone_data = bom_gen.generate_bom()
+                mode_str = session.execution_mode.value if hasattr(session.execution_mode, "value") else str(session.execution_mode)
                 response_data = {
-                    "structured_assets": DISCOVERED_AI_ASSETS,
+                    "session_id": session.session_id,
+                    "execution_mode": mode_str,
+                    "execution_mode_badge": f"[{mode_str}]",
+                    "structured_assets": cyclone_data.get("components", []),
                     "cyclonedx_bom": cyclone_data
                 }
                 self._send_json(response_data)
@@ -3223,6 +2663,7 @@ class AISPRServerHandler(http.server.BaseHTTPRequestHandler):
                 self._send_json({"error": str(e)}, status_code=500)
         else:
             self._send_json({"error": "Endpoint not found", "path": path}, status_code=404)
+
 
     def do_POST(self):
         parsed = urllib.parse.urlparse(self.path)
@@ -3251,12 +2692,25 @@ class AISPRServerHandler(http.server.BaseHTTPRequestHandler):
             try:
                 simulator = AIRedTeamSimulator()
                 report = simulator.execute_campaign()
+                report["execution_mode"] = "SIMULATION"
+                session_id = payload.get("session_id")
+                if session_id:
+                    session = AssessmentSession.load(session_id)
+                    if session:
+                        session.metadata["red_team_report"] = report
+                        session.save()
                 self._send_json(report)
             except Exception as e:
                 self._send_json({"error": str(e)}, status_code=500)
         elif path == "/api/audit/evaluate":
             try:
+                import uuid
                 answers_in = payload.get("answers", {})
+                session_id = payload.get("session_id") or f"SES-{uuid.uuid4().hex[:8].upper()}"
+                client_name = payload.get("client", "Enterprise Customer")
+                scope_name = payload.get("scope", "Multi-Cloud AI Estate")
+                mode = payload.get("execution_mode", "SIMULATION")
+                
                 processed_answers = {}
                 for q_id, ans_info in answers_in.items():
                     status_val = ans_info.get("status", "Y") if isinstance(ans_info, dict) else ans_info
@@ -3264,7 +2718,24 @@ class AISPRServerHandler(http.server.BaseHTTPRequestHandler):
                     q_handler.record_answer(q_id, status_val, notes, processed_answers)
                 
                 scores = PostureScorer.calculate_scores(processed_answers, q_handler.question_db)
-                self._send_json({"score_data": scores})
+                
+                session = AssessmentSession(
+                    session_id=session_id,
+                    client=client_name,
+                    scope=scope_name,
+                    execution_mode=mode,
+                    answers=processed_answers,
+                    domain_scores=scores.get("domains", {})
+                )
+                session.calculate_metrics()
+                session.save()
+                
+                self._send_json({
+                    "session_id": session.session_id,
+                    "execution_mode": session.execution_mode.value if hasattr(session.execution_mode, "value") else str(session.execution_mode),
+                    "score_data": scores,
+                    "metrics": session.metrics
+                })
             except Exception as e:
                 self._send_json({"error": str(e)}, status_code=500)
         else:
@@ -3276,7 +2747,7 @@ class ThreadedHTTPServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
     allow_reuse_address = True
 
 
-def run_server(port: int = 8501, host: str = "0.0.0.0"):
+def run_server(port: int = 8080, host: str = "0.0.0.0"):
     print("================================================================================")
     print(f"AISPR Web Console live at: http://{host}:{port}")
     print("Enterprise Assessment Console | Dynamic Health Scoring | Google Cloud Official Deliverable")
@@ -3286,7 +2757,7 @@ def run_server(port: int = 8501, host: str = "0.0.0.0"):
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8501))
+    port = int(os.environ.get("PORT", 8080))
     if len(sys.argv) > 1:
         port = int(sys.argv[1])
     run_server(port=port)

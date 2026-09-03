@@ -179,9 +179,9 @@ def authenticate_request_headers(headers: Dict[str, str]) -> Dict[str, Any]:
 
     # Priority 3: Local Dev Sandbox (Explicitly opt-in only)
     if ALLOW_LOCAL_DEV and not REQUIRE_IAP:
-        from fixtures.demo_data import DEMO_ADMIN_EMAIL
+        local_email = os.environ.get("AISPR_ADMIN_EMAIL", "security-lead@enterprise.internal")
         return {
-            "email": DEMO_ADMIN_EMAIL,
+            "email": local_email,
             "user_id": "local-dev-sandbox",
             "auth_type": "local_dev_sandbox",
             "is_iap_authenticated": False,

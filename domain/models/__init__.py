@@ -25,6 +25,7 @@ from domain.models.risk import (
 from domain.models.finding import SecurityFinding, Finding
 from domain.models.event import SecurityEvent
 from domain.models.assessment import Assessment, AssessmentRun
+from domain.models.session import AssessmentSession
 from domain.models.contract import (
     RegulatoryMapping,
     TestDefinition,
@@ -55,6 +56,7 @@ __all__ = [
     "SecurityEvent",
     "Assessment",
     "AssessmentRun",
+    "AssessmentSession",
     "RegulatoryMapping",
     "TestDefinition",
     "EvidenceRequirement",

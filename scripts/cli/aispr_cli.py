@@ -14,6 +14,7 @@ import os
 import re
 import argparse
 import json
+import uuid
 from typing import Any
 
 # Ensure project root is in sys.path
@@ -22,6 +23,8 @@ project_root = os.path.abspath(os.path.join(current_dir, "../.."))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
+from domain.enums import ExecutionMode
+from domain.models.session import AssessmentSession
 from audit.cli import AISPRAssessmentCLI
 from agentic.threat_operations.shadow_ai_hunter import ShadowAIHunter
 from agentic.threat_operations.ai_red_team_simulator import AIRedTeamSimulator
@@ -106,6 +109,67 @@ def cmd_audit(args):
         cli.run_mock_demo(output_file=args.output)
     else:
         cli.run_interactive(output_file=args.output)
+
+    # Persist session state into canonical AssessmentSession
+    session_id = getattr(args, "session_id", None) or f"SES-{uuid.uuid4().hex[:8].upper()}"
+    exec_mode = ExecutionMode.SIMULATION if args.demo else ExecutionMode.LIVE
+    
+    findings_list = []
+    if hasattr(cli, "findings_map") and cli.findings_map:
+        for fid, fval in cli.findings_map.items():
+            findings_list.append({
+                "id": fid,
+                "detail": fval,
+                "execution_mode": exec_mode.value
+            })
+
+    session = AssessmentSession(
+        session_id=session_id,
+        client=args.client,
+        scope=args.project,
+        execution_mode=exec_mode,
+        answers=cli.answers,
+        findings=findings_list,
+    )
+    session.calculate_metrics()
+    session.save()
+    print(f"✅ Assessment Session persisted: '{session_id}' (Mode: {exec_mode.value})")
+
+
+def cmd_report(args):
+    session = AssessmentSession.load(args.session_id)
+    if not session:
+        print(f"Error: Assessment session '{args.session_id}' not found.", file=sys.stderr)
+        sys.exit(1)
+
+    report_data = {
+        "session_id": session.session_id,
+        "organization": session.client,
+        "scope": session.scope,
+        "execution_mode": session.execution_mode.value if hasattr(session.execution_mode, "value") else str(session.execution_mode),
+        "date": session.created_at.isoformat(),
+        "metrics": session.metrics,
+        "domain_scores": session.domain_scores,
+        "findings": session.findings,
+        "evidence": session.evidence,
+    }
+    if getattr(args, "json", False):
+        print(json.dumps(report_data, indent=2))
+        sys.exit(0)
+    else:
+        print("=" * 80)
+        print(f"AISPR ASSESSMENT REPORT • SESSION: {session.session_id}")
+        print("=" * 80)
+        print(f"Client         : {session.client}")
+        print(f"Scope          : {session.scope}")
+        print(f"Execution Mode : {report_data['execution_mode']}")
+        print(f"Compliance     : {session.metrics.get('health_score_percentage', 0.0)}%")
+        print(f"Total Controls : {session.metrics.get('controls_total', 104)}")
+        print(f"Compliant (Y)  : {session.metrics.get('controls_yes', 0)}")
+        print(f"Partial (P)    : {session.metrics.get('controls_partial', 0)}")
+        print(f"Non-Compliant  : {session.metrics.get('controls_no', 0)}")
+        print("=" * 80)
+        sys.exit(0)
 
 
 def cmd_scan(args):
@@ -372,9 +436,15 @@ Examples:
     audit_p.add_argument("--client", default="Acme Global Enterprise", help="Client organization name")
     audit_p.add_argument("--project", default="Enterprise GenAI Platform", help="AI workload scope")
     audit_p.add_argument("--assessor", default="@jsaccomani", help="Lead Security Assessor")
+    audit_p.add_argument("--session-id", default=None, help="Assessment session ID for persistence and UI correlation")
     audit_p.add_argument("--output", default="reports/aispr_executive_report.md", help="Path for executive Markdown deliverable")
     audit_p.add_argument("--demo", action="store_true", help="Run in automated demonstration mode")
     audit_p.add_argument("--verbose", "-v", action="store_true", default=False, help="Display full unmasked resource names and ARNs")
+
+    # Command: report
+    report_p = subparsers.add_parser("report", help="View or export saved assessment session report")
+    report_p.add_argument("--session-id", required=True, help="Session ID to report on")
+    report_p.add_argument("--json", action="store_true", default=False, help="Output report data as JSON")
 
     # Command: scan
     scan_p = subparsers.add_parser("scan", help="Hunt Shadow AI and cloud vulnerabilities (GKE, Workbench CVE, Buckets)")
@@ -430,6 +500,8 @@ Examples:
 
     if args.command == "audit":
         cmd_audit(args)
+    elif args.command == "report":
+        cmd_report(args)
     elif args.command == "scan":
         cmd_scan(args)
     elif args.command == "redteam":
