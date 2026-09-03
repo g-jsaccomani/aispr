@@ -635,7 +635,8 @@ class TestProductionAssuranceAndTruthfulnessGate(unittest.TestCase):
             self.assertNotEqual(ev.status, EvidenceStatus.VERIFIED)
 
         # 2. Fallback path on live failure
-        fb_res = connector.discover_canonical(live=True, fallback_on_error=True)
+        with patch.object(connector, "discover_resources_live", side_effect=RuntimeError("AWS API 503 Unavailable")):
+            fb_res = connector.discover_canonical(live=True, fallback_on_error=True)
         self.assertEqual(fb_res.execution_mode, ExecutionMode.FALLBACK)
         self.assertIn("fallback_metadata", fb_res.raw_discovery)
         fb_meta = fb_res.raw_discovery["fallback_metadata"]
@@ -654,7 +655,16 @@ class TestProductionAssuranceAndTruthfulnessGate(unittest.TestCase):
         Azure Connector live failure with fallback_on_error produces FALLBACK.
         """
         connector = AzureConnector(subscription_id="sub-000-111-222")
-        fb_res = connector.discover_canonical(live=True, fallback_on_error=True)
+
+        # 1. Simulation path
+        sim_res = connector.discover_canonical(live=False)
+        self.assertEqual(sim_res.execution_mode, ExecutionMode.SIMULATION)
+        for ev in sim_res.evidence:
+            self.assertNotEqual(ev.status, EvidenceStatus.VERIFIED)
+
+        # 2. Fallback path on live failure
+        with patch.object(connector, "discover_resources_live", side_effect=RuntimeError("Azure API 503 Unavailable")):
+            fb_res = connector.discover_canonical(live=True, fallback_on_error=True)
 
         self.assertEqual(fb_res.execution_mode, ExecutionMode.FALLBACK)
         self.assertIn("fallback_metadata", fb_res.raw_discovery)
@@ -670,8 +680,16 @@ class TestProductionAssuranceAndTruthfulnessGate(unittest.TestCase):
         GCP Connector live failure with fallback_on_error produces FALLBACK.
         """
         connector = GCPConnector(project_id="demo-gcp-project")
-        # In this environment without ADC, live discovery will fail and fallback cleanly
-        fb_res = connector.discover_canonical(live=True, fallback_on_error=True)
+
+        # 1. Simulation path
+        sim_res = connector.discover_canonical(live=False)
+        self.assertEqual(sim_res.execution_mode, ExecutionMode.SIMULATION)
+        for ev in sim_res.evidence:
+            self.assertNotEqual(ev.status, EvidenceStatus.VERIFIED)
+
+        # 2. Fallback path on live failure (induce failure deterministically)
+        with patch.object(connector, "discover_resources_live", side_effect=RuntimeError("GCP API 503 Service Unavailable")):
+            fb_res = connector.discover_canonical(live=True, fallback_on_error=True)
 
         self.assertEqual(fb_res.execution_mode, ExecutionMode.FALLBACK)
         self.assertIn("fallback_metadata", fb_res.raw_discovery)
